@@ -1,0 +1,2 @@
+# TinyWeatherForecastGermanyScan
+scan code of TinyWeatherForecastGermany
