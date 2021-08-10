@@ -88,11 +88,15 @@ jobs:
           path: |
             */*.apk
       
-      - name: git init
-        run: git init -b gh-pages # docs see: https://git-scm.com/docs/git-init
+      - name: publish files
+        run: mv -v public/* TinyWeatherForecastGermanyScan
       
-      - name: Deploy
-        uses: JamesIves/github-pages-deploy-action@4.1.4
-        with:
-          branch: gh-pages # The branch the action should deploy to.
-          folder: public # The folder the action should deploy.
+      - name: list directory contents of TinyWeatherForecastGermanyScan
+        run: cd TinyWeatherForecastGermanyScan && ls -lisha
+        
+      - name: git push to origin
+        run:
+          git config --global user.name 'twfgcicdbot'
+          git config --global user.email 'twfgcicdbot@users.noreply.github.com'
+          git commit -am "update github pages"
+          git push
