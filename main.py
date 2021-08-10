@@ -30,6 +30,9 @@ from dateutil.tz import tzutc # timezone UTC -> docs: https://dateutil.readthedo
 from bs4 import BeautifulSoup
 import requests
 
+import markdown
+from markdown.extensions.toc import TocExtension
+
 from exodus_core.analysis.static_analysis import StaticAnalysis
 from exodus_core.analysis.apk_signature import ApkSignature
 
@@ -273,7 +276,7 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
                                     certificateTempMd = certificateTempStr
                                     try:
                                         certificateTempStr = 'Issuer: {} \n Subject: {} \n Fingerprint: {} \n Serial: {}'.format(certificateTemp.issuer, certificateTemp.subject, certificateTemp.fingerprint, certificateTemp.serial)
-                                        certificateTempMd = '\n<details>\n<summary>click to expand</summary>\n\n**Issuer**: {} \n\n**Subject**: {} \n\n**Fingerprint**: {} \n\n**Serial**: {}\n\n</details>'.format(certificateTemp.issuer, certificateTemp.subject, certificateTemp.fingerprint, certificateTemp.serial)
+                                        certificateTempMd = '\n<details>\n<summary>click to expand</summary>\n\n**Issuer**: {} \n\n**Subject**: {} \n\n**Fingerprint**: {} \n\n**Serial**: {}\n\n</details>\n\n'.format(certificateTemp.issuer, certificateTemp.subject, certificateTemp.fingerprint, certificateTemp.serial)
                                     except Exception as e:
                                         logging.warning("serializing of certificate '"+str(certificateTemp)+"' of '"+str(apkFileTemp)+"' failed! -> error: "+str(e))
                                         logging.warning(" using fallback solution ")
@@ -321,7 +324,7 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
                             else:
                                 logging.debug("skipping iteration of trackers as 'lenEmbeddedTrackers' is "+str(lenEmbeddedTrackers))
                             
-                            resultMarkdown += "\n</details>"
+                            resultMarkdown += "\n</details>\n\n"
                         else:
                             resultMarkdown += "\n **failed** to detect trackers! \n\n"
                             logging.error("parsing of 'detect_trackers()' for apk '"+str(apkFileTemp)+"' failed! -> error: result is None!")    
@@ -382,9 +385,36 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
                         logging.error("while trying to save analysis result as markdown file -> error: "+str(e))
 
                     try:
+                        reportFileHtml = markdown.markdown(resultMarkdown, extensions=['extra', 'sane_lists', TocExtension(baselevel=3, title='Table of contents', anchorlink=True)])
+                        
+                        with open(str(Path(workingDir / "index.html").absolute()), "w+", encoding="utf-8") as fh:
+                            fh.write(str(reportFileHtml))
+                    except Exception as e:
+                        logging.error("while trying to save analysis result as html file -> error: "+str(e))
+
+                    try:
                         #pprint(analysisTemp.signatures[0])                        
+
+                        try:
+                            trackerSignatures = list(analysisTemp.signatures) # list of named tuples -> also see: https://stackoverflow.com/questions/26180528/convert-a-namedtuple-into-a-dictionary
+                        except Exception as e:
+                            trackerSignatures = []
+                            logging.error("while trying to save tracker signatures -> error: "+str(e))
+
+                        if len(trackerSignatures) > 0:
+                            trackerSignaturesRaw = trackerSignatures
+                            trackerSignatures = []
+                            for trackerSignatureTemp in trackerSignaturesRaw:
+                                try:
+                                    trackerSignatures.append(trackerSignatureTemp._asdict())
+                                except Exception as e:
+                                    logging.error("while trying to parse tracker signature '"+str(trackerSignatureTemp)+"' -> error: "+str(e))
+                        else:
+                            logging.error("while trying to parse tracker signatures -> error: data length is invalid!")
+
                         with open(str(Path(workingDir / "tracker-signatures.json").absolute()), "w+", encoding="utf-8") as fh:
-                            fh.write(str(json.dumps(analysisTemp.signatures, indent=4)))
+                            fh.write(str(json.dumps(trackerSignatures, indent=4)))
+
                         resultMarkdown += "\nThe analysis has been conducted using "+str(len(analysisTemp.signatures))+" tracker signatures by ExodusPrivacy."
                     except Exception as e:
                         logging.error("while trying to save tracker signatures -> error: "+str(e))
