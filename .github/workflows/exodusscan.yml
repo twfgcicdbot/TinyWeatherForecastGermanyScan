@@ -93,6 +93,7 @@ jobs:
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY
           git fetch --all
           git checkout --orphan 'gh-pages'
+          git reset
           git add *.json
           git add *.md
           git add *.html
