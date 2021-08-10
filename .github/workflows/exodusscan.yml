@@ -92,7 +92,7 @@ jobs:
           git config --global user.email 'twfgcicdbot@users.noreply.github.com'
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY
           git fetch --all
-          git checkout -orphan 'gh-pages'
+          git checkout --orphan 'gh-pages'
           git add *.json
           git add *.md
           git add *.html
