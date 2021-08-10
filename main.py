@@ -55,7 +55,7 @@ except Exception as e:
     print("ERROR: codeberg api request failed! -> error: "+str(e))
 
 if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
-    twfgJson = searchResultCodebergJson["results"][0]
+    twfgJson = searchResultCodebergJson[0]
     
     pprint(twfgJson)
     
