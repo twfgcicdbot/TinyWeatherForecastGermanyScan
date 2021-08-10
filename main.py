@@ -121,7 +121,7 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
                     try:
                         permissions = analysisTemp.get_permissions()
                         if permissions != None:
-                            logging.debug("static analysis returned "+len(permissions)+" permission(s) ")
+                            logging.debug("static analysis returned "+str(len(permissions))+" permission(s) ")
                             resultDict["permissions"] = permissions
                         else:
                             logging.error("parsing of 'permissions' for apk '"+str(apkFileTemp)+"' failed! -> error: result is None!")    
@@ -131,7 +131,7 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
                     try:
                         libraries = analysisTemp.get_libraries()
                         if libraries != None:
-                            logging.debug("static analysis returned "+len(libraries)+" libraries ")
+                            logging.debug("static analysis returned "+str(len(libraries))+" libraries ")
                             resultDict["libraries"] = libraries
                         else:
                             logging.error("parsing of 'libraries' for apk '"+str(apkFileTemp)+"' failed! -> error: result is None!")    
@@ -141,7 +141,7 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
                     try:
                         certificates = analysisTemp.get_certificates()
                         if certificates != None:
-                            logging.debug("static analysis returned "+len(certificates)+" certificate(s) ")
+                            logging.debug("static analysis returned "+str(len(certificates))+" certificate(s) ")
                             resultDict["certificates"] = certificates
                         else:
                             logging.error("parsing of 'certificates' for apk '"+str(apkFileTemp)+"' failed! -> error: result is None!")    
@@ -249,13 +249,6 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
                             fh.write(str(json.dumps(resultDict, indent=4)))
                     except Exception as e:
                         logging.error("while trying to save analysis result -> error: "+str(e))
-                    
-                    try:
-                        #pprint(analysisTemp.signatures[0])                        
-                        with open(str(Path(workingDir / "tracker-signatures.json").absolute()), "w+", encoding="utf-8") as fh:
-                            fh.write(str(json.dumps(analysisTemp.signatures, indent=4)))
-                    except Exception as e:
-                        logging.error("while trying to save tracker signatures -> error: "+str(e))
                     
                     try:
                         #pprint(analysisTemp.signatures[0])                        
