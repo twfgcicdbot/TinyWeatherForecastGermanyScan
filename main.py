@@ -49,7 +49,7 @@ searchCodebergReq = requests.get("https://codeberg.org/api/v1/repos/Starfish/Tin
 
 try:
     searchResultCodebergJson = json.loads(str(searchCodebergReq.text))
-    pprint(searchResultCodebergJson)
+    #pprint(searchResultCodebergJson)
     print("DEBUG: fetched Codeberg data")
 except Exception as e:
     print("ERROR: codeberg api request failed! -> error: "+str(e))
@@ -100,6 +100,11 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
             for apkFileTemp in apkFiles:
                 try:
                     print("DEBUG: apk file '"+str(apkFileTemp.absolute())+"' -> size: "+str(apkFileTemp.stat().st_size))
+                    
+                    sa = StaticAnalysis(str(apkFileTemp.absolute())) # init ExodusPrivacy StaticAnalysis for 'apkFileTemp'
+                    sa.print_apk_infos()
+                    sa.print_embedded_trackers()
+                    
                 except Exception as e:
                     print("ERROR: while processing '"+str(apkFileTemp)+"' -> error: "+str(e))
     except Exception as e:
