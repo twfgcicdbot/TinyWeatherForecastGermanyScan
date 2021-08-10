@@ -63,6 +63,9 @@ jobs:
       - name: list directory contents
         run: ls -lisha
       
+      - name: move apks to public
+        run: mkdir -p public && mv *.apk /public
+      
       - name: return directory size
         run: du -sh
 
@@ -71,12 +74,19 @@ jobs:
         with:
           name: reports-and-tracker-signatures
           path: |
-            *.json
-            *.md
+            */*.json
+            */*.md
+            */*.html
 
       - name: Archive analysed apk
         uses: actions/upload-artifact@v2
         with:
           name: analysed-apk
           path: |
-            *.apk
+            */*.apk
+      
+      - name: Deploy
+        uses: JamesIves/github-pages-deploy-action@4.1.4
+        with:
+          branch: gh-pages # The branch the action should deploy to.
+          folder: public # The folder the action should deploy.
