@@ -138,6 +138,8 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
                         logging.error("parsing of 'get_app_name()' for apk '"+str(apkFileTemp)+"' failed! -> error: "+str(e))
                         resultMarkdown += "# apk name missing \n\n"
 
+                    resultMarkdown += "\n\n[TOC]\n\n"
+                    
                     resultMarkdown += "\n## Metadata \n"
 
                     try:
@@ -370,27 +372,7 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
 
                     resultMarkdown += "\n\n This report was generated on " + str(datetime.now(tzutc()).strftime("%Y-%m-%d at %H:%M (%Z)")) + " using [`exodus-core`](https://github.com/Exodus-Privacy/exodus-core/).\n"
 
-                    try:
-                        #pprint(resultDict)                        
-                        with open(str(Path(workingDir / "analysis-result.json").absolute()), "w+", encoding="utf-8") as fh:
-                            fh.write(str(json.dumps(resultDict, indent=4)))
-                    except Exception as e:
-                        logging.error("while trying to save analysis result as json file -> error: "+str(e))
-                    
-                    try:
-                        #pprint(resultMarkdown)                        
-                        with open(str(Path(workingDir / "analysis-result.md").absolute()), "w+", encoding="utf-8") as fh:
-                            fh.write(str(resultMarkdown))
-                    except Exception as e:
-                        logging.error("while trying to save analysis result as markdown file -> error: "+str(e))
-
-                    try:
-                        reportFileHtml = markdown.markdown(resultMarkdown, extensions=['extra', 'sane_lists', TocExtension(baselevel=3, title='Table of contents', anchorlink=True)])
-                        
-                        with open(str(Path(workingDir / "index.html").absolute()), "w+", encoding="utf-8") as fh:
-                            fh.write(str(reportFileHtml))
-                    except Exception as e:
-                        logging.error("while trying to save analysis result as html file -> error: "+str(e))
+                    publicDir = Path(workingDir / "public").mkdir(parents=True, exist_ok=True)
 
                     try:
                         #pprint(analysisTemp.signatures[0])                        
@@ -412,12 +394,34 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
                         else:
                             logging.error("while trying to parse tracker signatures -> error: data length is invalid!")
 
-                        with open(str(Path(workingDir / "tracker-signatures.json").absolute()), "w+", encoding="utf-8") as fh:
+                        with open(str(Path(publicDir / "tracker-signatures.json").absolute()), "w+", encoding="utf-8") as fh:
                             fh.write(str(json.dumps(trackerSignatures, indent=4)))
 
                         resultMarkdown += "\nThe analysis has been conducted using "+str(len(analysisTemp.signatures))+" tracker signatures by ExodusPrivacy."
                     except Exception as e:
                         logging.error("while trying to save tracker signatures -> error: "+str(e))
+
+                    try:
+                        #pprint(resultDict)                        
+                        with open(str(Path(publicDir / "analysis-result.json").absolute()), "w+", encoding="utf-8") as fh:
+                            fh.write(str(json.dumps(resultDict, indent=4)))
+                    except Exception as e:
+                        logging.error("while trying to save analysis result as json file -> error: "+str(e))
+                    
+                    try:
+                        #pprint(resultMarkdown)                        
+                        with open(str(Path(publicDir / "analysis-result.md").absolute()), "w+", encoding="utf-8") as fh:
+                            fh.write(str(resultMarkdown))
+                    except Exception as e:
+                        logging.error("while trying to save analysis result as markdown file -> error: "+str(e))
+
+                    try:
+                        reportFileHtml = markdown.markdown(resultMarkdown, extensions=['extra', 'sane_lists', TocExtension(baselevel=3, title='Table of contents', anchorlink=True)])
+                        
+                        with open(str(Path(publicDir / "index.html").absolute()), "w+", encoding="utf-8") as fh:
+                            fh.write(str(reportFileHtml))
+                    except Exception as e:
+                        logging.error("while trying to save analysis result as html file -> error: "+str(e))
 
                 except Exception as e:
                     logging.error("while processing '"+str(apkFileTemp)+"' -> error: "+str(e))
