@@ -36,9 +36,6 @@ jobs:
       - name: install dexdump
         run: sudo apt-get install dexdump
         
-      - name: install python3-wheel
-        run: sudo apt-get install python3-wheel
-
       - name: install virtualenv
         run: pip install virtualenv
       
@@ -57,6 +54,9 @@ jobs:
       - name: install python requirements
         run: pip install -r TinyWeatherForecastGermanyScan/requirements.txt
       
+      - name: create public directory
+        run: mkdir -p public 
+        
       - name: run main.py
         run: python TinyWeatherForecastGermanyScan/main.py
       
@@ -64,7 +64,7 @@ jobs:
         run: ls -lisha
       
       - name: copy apks to public
-        run: mkdir -p public && cp *.apk public
+        run: cp *.apk public
         
       - name: list directory contents of public
         run: cd public && ls -lisha
@@ -87,6 +87,9 @@ jobs:
           name: analysed-apk
           path: |
             */*.apk
+      
+      - name: git init
+        run: git init -b gh-pages # docs see: https://git-scm.com/docs/git-init
       
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@4.1.4
