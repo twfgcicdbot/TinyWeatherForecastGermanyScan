@@ -99,7 +99,7 @@ jobs:
           cd TinyWeatherForecastGermanyScan
           git config --global user.name 'twfgcicdbot'
           git config --global user.email 'twfgcicdbot@users.noreply.github.com'
-          git checkout gh-pages
+          git checkout -b 'gh-pages'
           git add *.apk
           git add *.json
           git add *.md
