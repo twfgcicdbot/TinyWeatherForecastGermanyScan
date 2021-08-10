@@ -66,9 +66,10 @@ jobs:
       - name: Archive analysis report and tracker signatures
         uses: actions/upload-artifact@v2
         with:
-          name: report-and-tracker-signatures
+          name: reports-and-tracker-signatures
           path: |
             *.json
+            *.md
 
       - name: Archive analysed apk
         uses: actions/upload-artifact@v2
