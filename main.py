@@ -122,7 +122,12 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
                         permissions = analysisTemp.get_permissions()
                         if permissions != None:
                             logging.debug("static analysis returned "+str(len(permissions))+" permission(s) ")
-                            resultDict["permissions"] = permissions
+                            resultDict["permissions"] = []
+                            for permissionTemp in permissions:
+                                try:
+                                    resultDict["permissions"].append(str(permissionTemp))
+                                except Exception as e:
+                                    logging.error("saving of permission '"+str(permissionTemp)+"' of '"+str(apkFileTemp)+"' failed! -> error: "+str(e))
                         else:
                             logging.error("parsing of 'permissions' for apk '"+str(apkFileTemp)+"' failed! -> error: result is None!")    
                     except Exception as e:
@@ -132,7 +137,12 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
                         libraries = analysisTemp.get_libraries()
                         if libraries != None:
                             logging.debug("static analysis returned "+str(len(libraries))+" libraries ")
-                            resultDict["libraries"] = libraries
+                            resultDict["libraries"] = []
+                            for libraryTemp in libraries:
+                                try:
+                                    resultDict["libraries"].append(str(libraryTemp))
+                                except Exception as e:
+                                    logging.error("saving of library '"+str(libraryTemp)+"' of '"+str(apkFileTemp)+"' failed! -> error: "+str(e))
                         else:
                             logging.error("parsing of 'libraries' for apk '"+str(apkFileTemp)+"' failed! -> error: result is None!")    
                     except Exception as e:
@@ -142,7 +152,12 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
                         certificates = analysisTemp.get_certificates()
                         if certificates != None:
                             logging.debug("static analysis returned "+str(len(certificates))+" certificate(s) ")
-                            resultDict["certificates"] = certificates
+                            resultDict["certificates"] = []
+                            for certificateTemp in certificates:
+                                try:
+                                    resultDict["certificates"].append(str(certificateTemp))
+                                except Exception as e:
+                                    logging.error("saving of certificate '"+str(certificateTemp)+"' of '"+str(apkFileTemp)+"' failed! -> error: "+str(e))
                         else:
                             logging.error("parsing of 'certificates' for apk '"+str(apkFileTemp)+"' failed! -> error: result is None!")    
                     except Exception as e:
