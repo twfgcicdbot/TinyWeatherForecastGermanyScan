@@ -8,7 +8,6 @@
 
 **since**: August 2021
 
-
 ## Disclaimer
 
 No warranty or guarantee of any kind provided. Use at your own risk.
@@ -27,6 +26,7 @@ import shutil
 import sys
 import time
 
+from dateutil.tz import tzutc # timezone UTC -> docs: https://dateutil.readthedocs.io/en/stable/tz.html#dateutil.tz.tzutc
 from bs4 import BeautifulSoup
 import requests
 
@@ -87,20 +87,19 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
     response = requests.get(apkUrl, stream=True, headers=headers)
     with open(filename, 'wb') as out_file:
         shutil.copyfileobj(response.raw, out_file)
-    del response # free memory
+    del response
 
     logging.debug("file name: " + filename)
 
-    """
     sha256_hash = hashlib.sha256()
     with open(filename,"rb") as f: # source: https://www.quickprogrammingtips.com/python/how-to-calculate-sha256-hash-of-a-file-in-python.html
         # Read and update hash string value in blocks of 4K
         for byte_block in iter(lambda: f.read(4096),b""):
             sha256_hash.update(byte_block)
         sha256_hash = str(sha256_hash.hexdigest())
+
     sha256_hash = str(sha256_hash)
     logging.debug("file hash: " + sha256_hash)
-    """
     
     try:
         apkFiles = list(workingDir.glob('*.apk'))
@@ -274,7 +273,7 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
                                     certificateTempMd = certificateTempStr
                                     try:
                                         certificateTempStr = 'Issuer: {} \n Subject: {} \n Fingerprint: {} \n Serial: {}'.format(certificateTemp.issuer, certificateTemp.subject, certificateTemp.fingerprint, certificateTemp.serial)
-                                        certificateTempMd = '\n**Issuer**: {} \n**Subject**: {} \n**Fingerprint**: {} \n**Serial**: {}\n'.format(certificateTemp.issuer, certificateTemp.subject, certificateTemp.fingerprint, certificateTemp.serial)
+                                        certificateTempMd = '\n<details>\n<summary>click to expand</summary>\n\n**Issuer**: {} \n\n**Subject**: {} \n\n**Fingerprint**: {} \n\n**Serial**: {}\n\n</details>'.format(certificateTemp.issuer, certificateTemp.subject, certificateTemp.fingerprint, certificateTemp.serial)
                                     except Exception as e:
                                         logging.warning("serializing of certificate '"+str(certificateTemp)+"' of '"+str(apkFileTemp)+"' failed! -> error: "+str(e))
                                         logging.warning(" using fallback solution ")
@@ -309,7 +308,7 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
                             lenEmbeddedTrackers = len(embeddedTrackers)
 
                             logging.debug("static analysis returned "+str(lenEmbeddedTrackers)+" tracker(s): "+str(embeddedTrackers))
-                            resultMarkdown += "\n "+str(lenEmbeddedTrackers)+" tracker(s) detected \n\n"
+                            resultMarkdown += "\n<details>\n<summary>"+str(lenEmbeddedTrackers)+" tracker(s) detected</summary>\n\n"
                             resultDict["trackers"] = []
 
                             if lenEmbeddedTrackers > 0:
@@ -321,6 +320,8 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
                                         logging.error("saving of tracker '"+str(embeddedTrackerTemp)+"' from '"+str(apkFileTemp)+"' failed! -> error: "+str(e))
                             else:
                                 logging.debug("skipping iteration of trackers as 'lenEmbeddedTrackers' is "+str(lenEmbeddedTrackers))
+                            
+                            resultMarkdown += "\n</details>"
                         else:
                             resultMarkdown += "\n **failed** to detect trackers! \n\n"
                             logging.error("parsing of 'detect_trackers()' for apk '"+str(apkFileTemp)+"' failed! -> error: result is None!")    
@@ -340,7 +341,7 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
                             lenEmbeddedClasses = len(embeddedClasses)
 
                             logging.debug("static analysis returned "+str(lenEmbeddedClasses)+" class(es): "+str(embeddedClasses))
-                            resultMarkdown += "\n<details><summary>"+str(lenEmbeddedClasses)+" class(es) detected</summary>\n"
+                            resultMarkdown += "\n<details>\n<summary>"+str(lenEmbeddedClasses)+" class(es) detected</summary>\n\n"
                             
                             resultDict["classes"] = []
 
@@ -364,7 +365,7 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
                     
                     # --- end of embedded_classes ---
 
-                    resultMarkdown += "\n\n This report was generated on " + str(datetime.now()) + " using [`exodus-core`](https://github.com/Exodus-Privacy/exodus-core/).\n"
+                    resultMarkdown += "\n\n This report was generated on " + str(datetime.now(tzutc()).strftime("%Y-%m-%d at %H:%M (%Z)")) + " using [`exodus-core`](https://github.com/Exodus-Privacy/exodus-core/).\n"
 
                     try:
                         #pprint(resultDict)                        
@@ -384,6 +385,7 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
                         #pprint(analysisTemp.signatures[0])                        
                         with open(str(Path(workingDir / "tracker-signatures.json").absolute()), "w+", encoding="utf-8") as fh:
                             fh.write(str(json.dumps(analysisTemp.signatures, indent=4)))
+                        resultMarkdown += "\nThe analysis has been conducted using "+str(len(analysisTemp.signatures))+" tracker signatures by ExodusPrivacy."
                     except Exception as e:
                         logging.error("while trying to save tracker signatures -> error: "+str(e))
 
