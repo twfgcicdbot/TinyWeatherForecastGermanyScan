@@ -105,7 +105,7 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
     except Exception as e:
         print("ERROR: "+str(e))
 
- else:
+else:
     print("ERROR: content of codeberg json response is invalid! ")
 
     try:
