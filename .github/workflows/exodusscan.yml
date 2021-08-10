@@ -54,20 +54,14 @@ jobs:
       - name: install python requirements
         run: pip install -r TinyWeatherForecastGermanyScan/requirements.txt
       
-      - name: create public directory
-        run: mkdir -p public 
-        
       - name: run main.py
         run: python TinyWeatherForecastGermanyScan/main.py
       
       - name: list directory contents
         run: ls -lisha
       
-      - name: copy apks to public
-        run: cp *.apk public
-        
-      - name: list directory contents of public
-        run: cd public && ls -lisha
+      - name: list directory contents of TinyWeatherForecastGermanyScan
+        run: cd TinyWeatherForecastGermanyScan && ls -lisha
       
       - name: return directory size
         run: du -sh
@@ -87,9 +81,6 @@ jobs:
           name: analysed-apk
           path: |
             */*.apk
-      
-      - name: publish files
-        run: mv -v public/* TinyWeatherForecastGermanyScan
       
       - name: list directory contents of TinyWeatherForecastGermanyScan
         run: cd TinyWeatherForecastGermanyScan && ls -lisha
