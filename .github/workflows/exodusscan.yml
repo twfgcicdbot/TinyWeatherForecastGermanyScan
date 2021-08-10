@@ -98,4 +98,4 @@ jobs:
           git add *.html
           git status
           git commit -m "update github pages"
-          git push -u origin gh-pages
+          git push -f origin gh-pages
