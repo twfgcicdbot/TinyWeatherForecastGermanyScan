@@ -93,16 +93,16 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
     del response
 
     logging.debug("file name: " + filename)
+    
+    # sha256_hash = hashlib.sha256()
+    # with open(filename,"rb") as f: # source: https://www.quickprogrammingtips.com/python/how-to-calculate-sha256-hash-of-a-file-in-python.html
+    #     # Read and update hash string value in blocks of 4K
+    #     for byte_block in iter(lambda: f.read(4096),b""):
+    #         sha256_hash.update(byte_block)
+    #     sha256_hash = str(sha256_hash.hexdigest())
 
-    sha256_hash = hashlib.sha256()
-    with open(filename,"rb") as f: # source: https://www.quickprogrammingtips.com/python/how-to-calculate-sha256-hash-of-a-file-in-python.html
-        # Read and update hash string value in blocks of 4K
-        for byte_block in iter(lambda: f.read(4096),b""):
-            sha256_hash.update(byte_block)
-        sha256_hash = str(sha256_hash.hexdigest())
-
-    sha256_hash = str(sha256_hash)
-    logging.debug("file hash: " + sha256_hash)
+    # sha256_hash = str(sha256_hash)
+    # logging.debug("file hash: " + sha256_hash)
     
     try:
         apkFiles = list(workingDir.glob('*.apk'))
@@ -372,8 +372,6 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
 
                     resultMarkdown += "\n\n This report was generated on " + str(datetime.now(tzutc()).strftime("%Y-%m-%d at %H:%M (%Z)")) + " using [`exodus-core`](https://github.com/Exodus-Privacy/exodus-core/).\n"
 
-                    publicDir = Path(workingDir / "public").mkdir(parents=True, exist_ok=True)
-
                     try:
                         #pprint(analysisTemp.signatures[0])                        
 
@@ -394,7 +392,7 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
                         else:
                             logging.error("while trying to parse tracker signatures -> error: data length is invalid!")
 
-                        with open(str(Path(publicDir / "tracker-signatures.json").absolute()), "w+", encoding="utf-8") as fh:
+                        with open(str(Path(workingDir / "tracker-signatures.json").absolute()), "w+", encoding="utf-8") as fh:
                             fh.write(str(json.dumps(trackerSignatures, indent=4)))
 
                         resultMarkdown += "\nThe analysis has been conducted using "+str(len(analysisTemp.signatures))+" tracker signatures by ExodusPrivacy."
@@ -403,14 +401,14 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
 
                     try:
                         #pprint(resultDict)                        
-                        with open(str(Path(publicDir / "analysis-result.json").absolute()), "w+", encoding="utf-8") as fh:
+                        with open(str(Path(workingDir / "analysis-result.json").absolute()), "w+", encoding="utf-8") as fh:
                             fh.write(str(json.dumps(resultDict, indent=4)))
                     except Exception as e:
                         logging.error("while trying to save analysis result as json file -> error: "+str(e))
                     
                     try:
                         #pprint(resultMarkdown)                        
-                        with open(str(Path(publicDir / "analysis-result.md").absolute()), "w+", encoding="utf-8") as fh:
+                        with open(str(Path(workingDir / "analysis-result.md").absolute()), "w+", encoding="utf-8") as fh:
                             fh.write(str(resultMarkdown))
                     except Exception as e:
                         logging.error("while trying to save analysis result as markdown file -> error: "+str(e))
@@ -418,7 +416,7 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
                     try:
                         reportFileHtml = markdown.markdown(resultMarkdown, extensions=['extra', 'sane_lists', TocExtension(baselevel=3, title='Table of contents', anchorlink=True)])
                         
-                        with open(str(Path(publicDir / "index.html").absolute()), "w+", encoding="utf-8") as fh:
+                        with open(str(Path(workingDir / "index.html").absolute()), "w+", encoding="utf-8") as fh:
                             fh.write(str(reportFileHtml))
                     except Exception as e:
                         logging.error("while trying to save analysis result as html file -> error: "+str(e))
