@@ -84,15 +84,15 @@ jobs:
       
       - name: list directory contents of TinyWeatherForecastGermanyScan
         run: cd TinyWeatherForecastGermanyScan && ls -lisha
-        
+            
       - name: git push to origin
         run: |
           cd TinyWeatherForecastGermanyScan
           git config --global user.name 'twfgcicdbot'
           git config --global user.email 'twfgcicdbot@users.noreply.github.com'
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY
+          git fetch --all
           git checkout -b 'gh-pages'
-          git add *.apk
           git add *.json
           git add *.md
           git add *.html
