@@ -21,11 +21,17 @@ jobs:
       - name: clone remote repo
         run: git clone https://github.com/twfgcicdbot/TinyWeatherForecastGermanyMirror
           
+      - name: clone this repo
+        run: git clone https://github.com/twfgcicdbot/TinyWeatherForecastGermanyScan
+      
+      - name: update packages
+        run: sudo apt-get update && sudo apt-get upgrade
+      
       - name: Setup Python 3.x
         uses: actions/setup-python@v2.2.2
         
-      - name: clone this repo
-        run: git clone https://github.com/twfgcicdbot/TinyWeatherForecastGermanyScan
+      - name: install dexdump
+        run: sudo apt-get install dexdump
 
       - name: install virtualenv
         run: pip install virtualenv
