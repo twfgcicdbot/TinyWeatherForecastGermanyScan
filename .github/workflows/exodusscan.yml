@@ -90,6 +90,7 @@ jobs:
           cd TinyWeatherForecastGermanyScan
           git config --global user.name 'twfgcicdbot'
           git config --global user.email 'twfgcicdbot@users.noreply.github.com'
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY
           git checkout -b 'gh-pages'
           git add *.apk
           git add *.json
