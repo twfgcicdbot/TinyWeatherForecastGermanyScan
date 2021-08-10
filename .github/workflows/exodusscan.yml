@@ -1,0 +1,46 @@
+# This is a basic workflow to help you get started with Actions
+
+name: exodus-privacy scan
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the main branch
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout remote repo
+        uses: actions/checkout@v2.3.4
+        with:
+          repository: twfgcicdbot/TinyWeatherForecastGermanyMirror
+          
+      - name: Setup Python 3.x
+        uses: actions/setup-python@v2.2.2
+        
+      - name: Checkout repo
+        uses: actions/checkout@v2.3.4
+
+      - name: install virtualenv
+        run: pip install virtualenv
+      
+      - name: list directory contents
+        run: ls -lisha
+      
+      - name: init virtualenv
+        run: virtualenv venv && source venv/bin/activate
+
+      - name: install python requirements
+        run: pip install -r TinyWeatherForecastGermanyScan/requirements.txt
+      
+      - name: run main.py
+        run: python TinyWeatherForecastGermanyScan/main.py
+        
