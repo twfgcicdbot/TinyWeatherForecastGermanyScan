@@ -18,19 +18,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      #- name: Checkout remote repo
-      #  uses: actions/checkout@v2.3.4
-      #  with:
-      #    repository: twfgcicdbot/TinyWeatherForecastGermanyMirror
-      
       - name: clone remote repo
         run: git clone https://github.com/twfgcicdbot/TinyWeatherForecastGermanyMirror
           
       - name: Setup Python 3.x
         uses: actions/setup-python@v2.2.2
         
-      #- name: Checkout repo
-      #  uses: actions/checkout@v2.3.4
+      - name: clone this repo
+        run: git clone https://github.com/twfgcicdbot/TinyWeatherForecastGermanyScan
 
       - name: install virtualenv
         run: pip install virtualenv
@@ -48,7 +43,7 @@ jobs:
         run: ls -lisha
       
       - name: install python requirements
-        run: pip install -r requirements.txt
+        run: pip install -r TinyWeatherForecastGermanyScan/requirements.txt
       
       - name: run main.py
         run: python TinyWeatherForecastGermanyScan/main.py
