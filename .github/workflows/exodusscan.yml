@@ -29,7 +29,10 @@ jobs:
       
       - name: Setup Python 3.x
         uses: actions/setup-python@v2.2.2
-        
+      
+      - name: upgrade pip
+        run: python -m pip install --upgrade pip
+      
       - name: install dexdump
         run: sudo apt-get install dexdump
 
@@ -56,3 +59,20 @@ jobs:
       
       - name: list directory contents
         run: ls -lisha
+      
+      - name: return directory size
+        run: du -sh
+
+      - name: Archive analysis report and tracker signatures
+        uses: actions/upload-artifact@v2
+        with:
+          name: report-and-tracker-signatures
+          path: |
+            *.json
+
+      - name: Archive analysed apk
+        uses: actions/upload-artifact@v2
+        with:
+          name: analysed-apk
+          path: |
+            *.apk
