@@ -41,7 +41,7 @@ try:
 except Exception as e:
     logging.error("while logger init! -> error: "+str(e))
 
-workingDir = Path("TinyWeatherForecastGermanyScan")
+workingDir = Path("")
 
 # source of user agent data -> https://github.com/tamimibrahim17/List-of-user-agents/blob/master/Chrome.txt
 UserAgents = ["Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36","Mozilla/5.0 (X11; Ubuntu; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2919.83 Safari/537.36","Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2866.71 Safari/537.36","Mozilla/5.0 (X11; Ubuntu; Linux i686 on x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2820.59 Safari/537.36","Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2762.73 Safari/537.36","Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2656.18 Safari/537.36","Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.36 (KHTML like Gecko) Chrome/44.0.2403.155 Safari/537.36","Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36","Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2227.1 Safari/537.36","Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2227.0 Safari/537.36","Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2227.0 Safari/537.36","Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2226.0 Safari/537.36","Mozilla/5.0 (Windows NT 6.4; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2225.0 Safari/537.36"]
@@ -88,12 +88,11 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
     logging.debug("downloading '"+str(filename)+"' from -> "+str(apkUrl)+" ... ")
     
     response = requests.get(apkUrl, stream=True, headers=headers)
-    with open(str(Path(workingDir / filename).absolute()), 'wb') as out_file:
+    with open(filename, 'wb') as out_file:
         shutil.copyfileobj(response.raw, out_file)
     del response
 
     logging.debug("file name: " + filename)
-    logging.debug("file path: " + str(Path(workingDir / filename).absolute()))
     
     # sha256_hash = hashlib.sha256()
     # with open(filename,"rb") as f: # source: https://www.quickprogrammingtips.com/python/how-to-calculate-sha256-hash-of-a-file-in-python.html
@@ -279,7 +278,7 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
                                     certificateTempMd = certificateTempStr
                                     try:
                                         certificateTempStr = 'Issuer: {} \n Subject: {} \n Fingerprint: {} \n Serial: {}'.format(certificateTemp.issuer, certificateTemp.subject, certificateTemp.fingerprint, certificateTemp.serial)
-                                        certificateTempMd = '\n<details>\n<summary>click to expand</summary>\n\n**Issuer**: {} \n\n**Subject**: {} \n\n**Fingerprint**: {} \n\n**Serial**: {}\n\n</details>\n\n'.format(certificateTemp.issuer, certificateTemp.subject, certificateTemp.fingerprint, certificateTemp.serial)
+                                        certificateTempMd = '\n<details>\n<summary>click to expand</summary>\n\n<b>Issuer</b>: {} \n\n<b>Subject</b>: {} \n\n<b>Fingerprint</b>: {} \n\n<b>Serial</b>: {}\n\n</details>\n\n'.format(certificateTemp.issuer, certificateTemp.subject, certificateTemp.fingerprint, certificateTemp.serial)
                                     except Exception as e:
                                         logging.warning("serializing of certificate '"+str(certificateTemp)+"' of '"+str(apkFileTemp)+"' failed! -> error: "+str(e))
                                         logging.warning(" using fallback solution ")
@@ -314,20 +313,20 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
                             lenEmbeddedTrackers = len(embeddedTrackers)
 
                             logging.debug("static analysis returned "+str(lenEmbeddedTrackers)+" tracker(s): "+str(embeddedTrackers))
-                            resultMarkdown += "\n<details>\n<summary>"+str(lenEmbeddedTrackers)+" tracker(s) detected</summary>\n\n"
+                            resultMarkdown += "\n<details>\n<summary>"+str(lenEmbeddedTrackers)+" tracker(s) detected</summary>\n\n<ul>"
                             resultDict["trackers"] = []
 
                             if lenEmbeddedTrackers > 0:
                                 for embeddedTrackerTemp in embeddedTrackers:
                                     try:
                                         resultDict["trackers"].append(str(embeddedTrackerTemp))
-                                        resultMarkdown += "* "+str(embeddedTrackerTemp)+" \n"
+                                        resultMarkdown += "<li>"+str(embeddedTrackerTemp)+"</li> \n"
                                     except Exception as e:
                                         logging.error("saving of tracker '"+str(embeddedTrackerTemp)+"' from '"+str(apkFileTemp)+"' failed! -> error: "+str(e))
                             else:
                                 logging.debug("skipping iteration of trackers as 'lenEmbeddedTrackers' is "+str(lenEmbeddedTrackers))
                             
-                            resultMarkdown += "\n</details>\n\n"
+                            resultMarkdown += "\n</ul>\n</details>\n\n"
                         else:
                             resultMarkdown += "\n **failed** to detect trackers! \n\n"
                             logging.error("parsing of 'detect_trackers()' for apk '"+str(apkFileTemp)+"' failed! -> error: result is None!")    
@@ -347,7 +346,7 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
                             lenEmbeddedClasses = len(embeddedClasses)
 
                             logging.debug("static analysis returned "+str(lenEmbeddedClasses)+" class(es): "+str(embeddedClasses))
-                            resultMarkdown += "\n<details>\n<summary>"+str(lenEmbeddedClasses)+" class(es) detected</summary>\n\n"
+                            resultMarkdown += "\n<details>\n<summary>"+str(lenEmbeddedClasses)+" class(es) detected</summary>\n\n<ul>"
                             
                             resultDict["classes"] = []
 
@@ -355,13 +354,13 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
                                 for embeddedClassTemp in embeddedClasses:
                                     try:
                                         resultDict["classes"].append(str(embeddedClassTemp))
-                                        resultMarkdown += "* "+str(embeddedClassTemp)+" \n"
+                                        resultMarkdown += "<li>"+str(embeddedClassTemp)+"</li> \n"
                                     except Exception as e:
                                         logging.error("saving of class '"+str(embeddedClassTemp)+"' of '"+str(apkFileTemp)+"' failed! -> error: "+str(e))
                             else:
                                 logging.debug("skipping iteration of classes as 'lenEmbeddedClasses' is "+str(lenEmbeddedClasses))
                             
-                            resultMarkdown += "\n</details>"
+                            resultMarkdown += "\n</ul>\n</details>"
                         else:
                             resultMarkdown += "\n **failed** to detect classes! \n\n"
                             logging.error("parsing of 'get_embedded_classes()' for apk '"+str(apkFileTemp)+"' failed! -> error: result is None!")    
@@ -415,8 +414,46 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
                         logging.error("while trying to save analysis result as markdown file -> error: "+str(e))
 
                     try:
-                        reportFileHtml = markdown.markdown(resultMarkdown, extensions=['extra', 'sane_lists', TocExtension(baselevel=3, title='Table of contents', anchorlink=True)])
+                        reportFileHtml = """
+<!DOCTYPE html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width, initial-scale=1.0"><title>TinyWeatherForecastGermany | open source android app using open weather data from Deutscher Wetterdienst (DWD)</title><link rel=apple-touch-icon sizes=180x180 href=images/apple-touch-icon.png><link rel=icon type=image/png sizes=32x32 href=images/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=images/favicon-16x16.png><link rel=manifest href=images/site.webmanifest><link rel=mask-icon href=images/safari-pinned-tab.svg color=#293235><link rel="shortcut icon" href=images/favicon.ico><meta name=apple-mobile-web-app-title content=TinyWeatherForecastGermany><meta name=application-name content=TinyWeatherForecastGermany><meta name=msapplication-TileColor content=#293235><meta name=msapplication-config content=images/browserconfig.xml><meta name=theme-color content=#293235><link rel=stylesheet href=https://tinyweatherforecastgermanygroup.gitlab.io/index/css/style_5b8f9938.min.css><meta name=description content="TinyWeatherForecastGermany - android app using DWD open weather data"><meta name=keywords content="dwd, Deutscher Wetterdienst, android, app, open source, weather, wetter, rainradar, regenradar, map, charts, open data, germany, deutschland, allemagne, duitsland"><meta name=robots content="index, follow"><meta name=audience content=all><meta name=thumbnail content=images/icon.png><meta name=revisit-after content="2 days"><meta name=page-topic content="Android App"><meta name=google-site-verification content=MdTS4FWQKzHI34uGnZwU87K2sivqjVQjGe3E-yGd09Y><meta name=pubdate content=20210810><meta property=og:title content="TinyWeatherForecastGermany - android app using DWD open weather data"><meta property=og:description content="TinyWeatherForecastGermany is an open source android app using open weather data provided by Deutscher Wetterdienst (DWD)"><meta property=og:image content=images/twfg-repository-open-graph-graphic.png><meta content=https://tinyweatherforecastgermanygroup.gitlab.io/index/ property=og:url><meta name=twitter:title content="TinyWeatherForecastGermany - android app using DWD open weather data"><meta name=twitter:description content="TinyWeatherForecastGermany is an open source android app using open weather data provided by Deutscher Wetterdienst (DWD)"><meta name=twitter:image content=images/twfg-repository-open-graph-graphic.png><meta name=twitter:card content=summary_large_image><script type=application/ld+json>
+    {
+        "@context" : "http://schema.org",
+        "@type" : "MobileApplication",
+        "applicationCategory" : "Weather",
+        "genre" : "Weather",
+        "name" : "TinyWeatherForecastGermany",
+        "description" : "Weather forecast based on open data from the Deutscher Wetterdienst.",
+        "operatingSystem" : "Android 4.4+",
+        "installUrl" : "https://f-droid.org/packages/de.kaffeemitkoffein.tinyweatherforecastgermany/",
+        "image" : "https://tinyweatherforecastgermanygroup.gitlab.io/index/images/icon.png",
+        "screenshot" : "https://f-droid.org/repo/de.kaffeemitkoffein.tinyweatherforecastgermany/en-US/phoneScreenshots/1.png",
+        "creator" : {
+            "@context" : "http://schema.org",
+            "@type" : "Person",
+            "name" : "Pawel Dube (Starfish)",
+            "url" : "https://codeberg.org/Starfish"
+        },
+        "sourceOrganization" : {
+            "@context" : "http://schema.org",
+            "@type" : "Organization",
+            "name" : "TinyWeatherForecastGermanyGroup",
+            "url" : "https://gitlab.com/tinyweatherforecastgermanygroup"
+            },
+        "offers" : {
+            "@type" : "Offer",
+            "url" : "https://f-droid.org/packages/de.kaffeemitkoffein.tinyweatherforecastgermany/",
+            "price": 0,
+            "priceCurrency" : "EUR"
+        }
+    }
+</script></head><body><article>
+                        """
+                        reportFileHtml += markdown.markdown(resultMarkdown, extensions=['extra', 'sane_lists', TocExtension(baselevel=3, title='Table of contents', anchorlink=True)])
                         
+                        reportFileHtml += """
+</article></body></html>
+                        """
+
                         with open(str(Path(workingDir / "index.html").absolute()), "w+", encoding="utf-8") as fh:
                             fh.write(str(reportFileHtml))
                     except Exception as e:
