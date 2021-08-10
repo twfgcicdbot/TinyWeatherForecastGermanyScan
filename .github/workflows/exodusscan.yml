@@ -35,6 +35,9 @@ jobs:
       
       - name: install dexdump
         run: sudo apt-get install dexdump
+        
+      - name: install python3-wheel
+        run: sudo apt-get install python3-wheel
 
       - name: install virtualenv
         run: pip install virtualenv
