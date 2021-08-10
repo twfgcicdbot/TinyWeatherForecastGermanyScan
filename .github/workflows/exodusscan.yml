@@ -63,8 +63,11 @@ jobs:
       - name: list directory contents
         run: ls -lisha
       
-      - name: move apks to public
-        run: mkdir -p public && mv *.apk /public
+      - name: copy apks to public
+        run: mkdir -p public && cp *.apk public
+        
+      - name: list directory contents of public
+        run: cd public && ls -lisha
       
       - name: return directory size
         run: du -sh
