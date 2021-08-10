@@ -8,7 +8,9 @@
 
 **since**: August 2021
 
+
 ## Disclaimer
+
 No warranty or guarantee of any kind provided. Use at your own risk.
 Not meant to be used in commercial or in general critical/productive environments at all.
 
@@ -85,19 +87,20 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
     response = requests.get(apkUrl, stream=True, headers=headers)
     with open(filename, 'wb') as out_file:
         shutil.copyfileobj(response.raw, out_file)
-    del response
+    del response # free memory
 
     logging.debug("file name: " + filename)
 
+    """
     sha256_hash = hashlib.sha256()
     with open(filename,"rb") as f: # source: https://www.quickprogrammingtips.com/python/how-to-calculate-sha256-hash-of-a-file-in-python.html
         # Read and update hash string value in blocks of 4K
         for byte_block in iter(lambda: f.read(4096),b""):
             sha256_hash.update(byte_block)
         sha256_hash = str(sha256_hash.hexdigest())
-
     sha256_hash = str(sha256_hash)
     logging.debug("file hash: " + sha256_hash)
+    """
     
     try:
         apkFiles = list(workingDir.glob('*.apk'))
@@ -133,7 +136,7 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
                         logging.error("parsing of 'get_app_name()' for apk '"+str(apkFileTemp)+"' failed! -> error: "+str(e))
                         resultMarkdown += "# apk name missing \n\n"
 
-                    resultMarkdown += "\n ## Metadata \n"
+                    resultMarkdown += "\n## Metadata \n"
 
                     try:
                         apkPackage = str(analysisTemp.get_package())
@@ -200,7 +203,7 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
                         logging.error("parsing of 'get_application_universal_id()' (UID) for apk '"+str(apkFileTemp)+"' failed! -> error: "+str(e))
                         resultMarkdown += "* **app UID**: *unknown* \n"
                     
-                    resultMarkdown += "\n ## Permissions \n"
+                    resultMarkdown += "\n## Permissions \n"
                  
                     try:
                         permissions = analysisTemp.get_permissions()
@@ -227,7 +230,7 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
                         resultMarkdown += "\n **failed** to detect permissions! \n\n"
                         logging.error("parsing of 'permissions' for apk '"+str(apkFileTemp)+"' failed! -> error: "+str(e))
                     
-                    resultMarkdown += "\n ## Libraries \n"
+                    resultMarkdown += "\n## Libraries \n"
 
                     try:
                         libraries = analysisTemp.get_libraries()
@@ -253,7 +256,7 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
                         resultMarkdown += "\n **failed** to detect libraries! \n\n"
                         logging.error("parsing of 'libraries' for apk '"+str(apkFileTemp)+"' failed! -> error: "+str(e))
 
-                    resultMarkdown += "\n ## Certificates \n"
+                    resultMarkdown += "\n## Certificates \n"
 
                     try:
                         certificates = analysisTemp.get_certificates()
@@ -271,13 +274,13 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
                                     certificateTempMd = certificateTempStr
                                     try:
                                         certificateTempStr = 'Issuer: {} \n Subject: {} \n Fingerprint: {} \n Serial: {}'.format(certificateTemp.issuer, certificateTemp.subject, certificateTemp.fingerprint, certificateTemp.serial)
-                                        certificateTempMd = '\n**Issuer**: {} \n **Subject**: {} \n **Fingerprint**: {} \n **Serial**: {}\n'.format(certificateTemp.issuer, certificateTemp.subject, certificateTemp.fingerprint, certificateTemp.serial)
+                                        certificateTempMd = '\n**Issuer**: {} \n**Subject**: {} \n**Fingerprint**: {} \n**Serial**: {}\n'.format(certificateTemp.issuer, certificateTemp.subject, certificateTemp.fingerprint, certificateTemp.serial)
                                     except Exception as e:
                                         logging.warning("serializing of certificate '"+str(certificateTemp)+"' of '"+str(apkFileTemp)+"' failed! -> error: "+str(e))
                                         logging.warning(" using fallback solution ")
                                     try:
                                         resultDict["certificates"].append(str(certificateTempStr))
-                                        resultMarkdown += "* "+str(certificateTempMd)+" \n"
+                                        resultMarkdown += str(certificateTempMd)+" \n\n"
                                     except Exception as e:
                                         logging.error("saving of certificate '"+str(certificateTemp)+"' of '"+str(apkFileTemp)+"' failed! -> error: "+str(e))
                             else:
@@ -298,7 +301,7 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
                     except Exception as e:
                         logging.error("printing of 'embedded_trackers' to console failed! -> error: "+str(e))                    
                     
-                    resultMarkdown += "\n ## Trackers \n"
+                    resultMarkdown += "\n## Trackers \n"
 
                     try:
                         embeddedTrackers = analysisTemp.detect_trackers()
@@ -329,7 +332,7 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
 
                     # --- start of embedded_classes ---
                     
-                    resultMarkdown += "\n ## Classes \n"
+                    resultMarkdown += "\n## Classes \n"
 
                     try:
                         embeddedClasses = analysisTemp.get_embedded_classes()
@@ -337,7 +340,7 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
                             lenEmbeddedClasses = len(embeddedClasses)
 
                             logging.debug("static analysis returned "+str(lenEmbeddedClasses)+" class(es): "+str(embeddedClasses))
-                            resultMarkdown += "\n "+str(lenEmbeddedClasses)+" class(es) detected \n\n"
+                            resultMarkdown += "\n<details><summary>"+str(lenEmbeddedClasses)+" class(es) detected</summary>\n"
                             
                             resultDict["classes"] = []
 
@@ -350,6 +353,8 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
                                         logging.error("saving of class '"+str(embeddedClassTemp)+"' of '"+str(apkFileTemp)+"' failed! -> error: "+str(e))
                             else:
                                 logging.debug("skipping iteration of classes as 'lenEmbeddedClasses' is "+str(lenEmbeddedClasses))
+                            
+                            resultMarkdown += "\n</details>"
                         else:
                             resultMarkdown += "\n **failed** to detect classes! \n\n"
                             logging.error("parsing of 'get_embedded_classes()' for apk '"+str(apkFileTemp)+"' failed! -> error: result is None!")    
@@ -359,7 +364,7 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
                     
                     # --- end of embedded_classes ---
 
-                    resultMarkdown += "\n\n This report was generated on " + str(datetime.now()) + " using the [exodus-core](https://github.com/Exodus-Privacy/exodus-core/).\n"
+                    resultMarkdown += "\n\n This report was generated on " + str(datetime.now()) + " using [`exodus-core`](https://github.com/Exodus-Privacy/exodus-core/).\n"
 
                     try:
                         #pprint(resultDict)                        
