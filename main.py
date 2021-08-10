@@ -17,6 +17,7 @@ from datetime import datetime
 from pathlib import Path
 from pprint import pprint
 import hashlib
+import logging
 import json
 import random
 import shutil
@@ -28,6 +29,11 @@ import requests
 
 from exodus_core.analysis.static_analysis import StaticAnalysis
 from exodus_core.analysis.apk_signature import ApkSignature
+
+try:
+    logging.basicConfig(format=u'%(asctime)-s %(levelname)s [%(name)s]: %(message)s', level=logging.DEBUG)
+except Exception as e:
+    print("ERROR: while logger init! -> error: "+str(e))
 
 workingDir = Path("")
 
@@ -104,6 +110,16 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
                     sa = StaticAnalysis(str(apkFileTemp.absolute())) # init ExodusPrivacy StaticAnalysis for 'apkFileTemp'
                     sa.print_apk_infos()
                     sa.print_embedded_trackers()
+                    
+                    
+                    
+                    try:
+                        pprint(sa.signatures[0])
+                        
+                        with open(str(Path(workingDir / "tracker-signatures.json").absolute()), "w+", encoding="utf-8") as fh:
+                            fh.write(str(json.dumps(sa.signatures, indent=4)))
+                    except Exception as e:
+                        print("ERROR: trying to save tracker signatures -> error: "+str(e))
                     
                 except Exception as e:
                     print("ERROR: while processing '"+str(apkFileTemp)+"' -> error: "+str(e))
