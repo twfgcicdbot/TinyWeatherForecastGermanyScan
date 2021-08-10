@@ -1,13 +1,14 @@
 """
 
-@title TinyWeatherForecastGermany - exodusprivacy apk scan
+**title**: TinyWeatherForecastGermany - exodusprivacy local apk scan
 
-@author Jean-Luc Tibaux (https://gitlab.com/eUgEntOptIc44)
+**author**: Jean-Luc Tibaux (https://gitlab.com/eUgEntOptIc44)
 
-@license GPLv3
+**license**: GPLv3
 
-@since August 2021
+**since**: August 2021
 
+## Disclaimer
 No warranty or guarantee of any kind provided. Use at your own risk.
 Not meant to be used in commercial or in general critical/productive environments at all.
 
@@ -33,7 +34,7 @@ from exodus_core.analysis.apk_signature import ApkSignature
 try:
     logging.basicConfig(format=u'%(asctime)-s %(levelname)s [%(name)s]: %(message)s', level=logging.DEBUG)
 except Exception as e:
-    print("ERROR: while logger init! -> error: "+str(e))
+    logging.error("while logger init! -> error: "+str(e))
 
 workingDir = Path("")
 
@@ -44,7 +45,7 @@ random.shuffle(UserAgents)
 
 UserAgent = str(random.choice(UserAgents))
 
-print("DEBUG: querying data as '"+UserAgent+"' ")
+logging.debug("querying data as '"+UserAgent+"' ")
 
 headers = {
     "User-Agent": UserAgent,
@@ -56,9 +57,9 @@ searchCodebergReq = requests.get("https://codeberg.org/api/v1/repos/Starfish/Tin
 try:
     searchResultCodebergJson = json.loads(str(searchCodebergReq.text))
     #pprint(searchResultCodebergJson)
-    print("DEBUG: fetched Codeberg data")
+    logging.debug("fetched Codeberg data")
 except Exception as e:
-    print("ERROR: codeberg api request failed! -> error: "+str(e))
+    logging.error("codeberg api request failed! -> error: "+str(e))
 
 if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
     twfgJson = searchResultCodebergJson[0]
@@ -66,27 +67,27 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
     pprint(twfgJson)
     
     if twfgJson == None:
-        print("ERROR: content of key 'results' in codeberg json response is 'None' ")
+        logging.error("content of key 'results' in codeberg json response is 'None' ")
 
         try:
             pprint(str(searchCodebergReq.headers))
             pprint(str(searchCodebergReq.text))
         except Exception as e:
-            print("ERROR: failed to print request raw data to console! -> error: "+str(e))
+            logging.error("failed to print request raw data to console! -> error: "+str(e))
 
         sys.exit(1)
     
     apkUrl = str(twfgJson["assets"][0]["browser_download_url"])
     filename = str(twfgJson["assets"][0]["name"])
 
-    print("DEBUG: downloading '"+str(filename)+"' from -> "+str(apkUrl)+" ... ")
+    logging.debug("downloading '"+str(filename)+"' from -> "+str(apkUrl)+" ... ")
     
     response = requests.get(apkUrl, stream=True, headers=headers)
     with open(filename, 'wb') as out_file:
         shutil.copyfileobj(response.raw, out_file)
     del response
 
-    print("DEBUG: file name: " + filename)
+    logging.debug("file name: " + filename)
 
     sha256_hash = hashlib.sha256()
     with open(filename,"rb") as f: # source: https://www.quickprogrammingtips.com/python/how-to-calculate-sha256-hash-of-a-file-in-python.html
@@ -96,7 +97,7 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
         sha256_hash = str(sha256_hash.hexdigest())
 
     sha256_hash = str(sha256_hash)
-    print("DEBUG: file hash: " + sha256_hash)
+    logging.debug("file hash: " + sha256_hash)
     
     try:
         apkFiles = list(workingDir.glob('*.apk'))
@@ -105,34 +106,178 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
         if len(apkFiles) > 0:
             for apkFileTemp in apkFiles:
                 try:
-                    print("DEBUG: apk file '"+str(apkFileTemp.absolute())+"' -> size: "+str(apkFileTemp.stat().st_size))
+                    logging.debug("apk file '"+str(apkFileTemp.absolute())+"' -> size: "+str(apkFileTemp.stat().st_size))
                     
-                    sa = StaticAnalysis(str(apkFileTemp.absolute())) # init ExodusPrivacy StaticAnalysis for 'apkFileTemp'
-                    sa.print_apk_infos()
-                    sa.print_embedded_trackers()
+                    resultDict = {}
                     
-                    
+                    analysisTemp = StaticAnalysis(str(apkFileTemp.absolute())) # init ExodusPrivacy StaticAnalysis for 'apkFileTemp'
                     
                     try:
-                        pprint(sa.signatures[0])
-                        
-                        with open(str(Path(workingDir / "tracker-signatures.json").absolute()), "w+", encoding="utf-8") as fh:
-                            fh.write(str(json.dumps(sa.signatures, indent=4)))
+                        analysisTemp.print_apk_infos()
                     except Exception as e:
-                        print("ERROR: trying to save tracker signatures -> error: "+str(e))
+                        logging.error("printing of 'apk_infos' to console failed! -> error: "+str(e))
                     
+                    # --- start of apk_infos ---
+                    try:
+                        permissions = analysisTemp.get_permissions()
+                        if permissions != None:
+                            logging.debug("static analysis returned "+len(permissions)+" permission(s) ")
+                            resultDict["permissions"] = permissions
+                        else:
+                            logging.error("parsing of 'permissions' for apk '"+str(apkFileTemp)+"' failed! -> error: result is None!")    
+                    except Exception as e:
+                        logging.error("parsing of 'permissions' for apk '"+str(apkFileTemp)+"' failed! -> error: "+str(e))
+                        
+                    try:
+                        libraries = analysisTemp.get_libraries()
+                        if libraries != None:
+                            logging.debug("static analysis returned "+len(libraries)+" libraries ")
+                            resultDict["libraries"] = libraries
+                        else:
+                            logging.error("parsing of 'libraries' for apk '"+str(apkFileTemp)+"' failed! -> error: result is None!")    
+                    except Exception as e:
+                        logging.error("parsing of 'libraries' for apk '"+str(apkFileTemp)+"' failed! -> error: "+str(e))
+
+                    try:
+                        certificates = analysisTemp.get_certificates()
+                        if certificates != None:
+                            logging.debug("static analysis returned "+len(certificates)+" certificate(s) ")
+                            resultDict["certificates"] = certificates
+                        else:
+                            logging.error("parsing of 'certificates' for apk '"+str(apkFileTemp)+"' failed! -> error: result is None!")    
+                    except Exception as e:
+                        logging.error("parsing of 'certificates' for apk '"+str(apkFileTemp)+"' failed! -> error: "+str(e))
+
+                    try:
+                        apkSum = str(analysisTemp.get_sha256())
+                        if apkSum != "None":
+                            logging.debug("static analysis returned apk hash (sha256): "+str(apkSum))
+                            resultDict["hash_sha256"] = apkSum
+                        else:
+                            logging.error("parsing of 'get_sha256()' for apk '"+str(apkFileTemp)+"' failed! -> error: result is None!")    
+                    except Exception as e:
+                        logging.error("parsing of 'get_sha256()' for apk '"+str(apkFileTemp)+"' failed! -> error: "+str(e))
+                    
+                    try:
+                        apkVersion = str(analysisTemp.get_version())
+                        if apkVersion != "None":
+                            logging.debug("static analysis returned apk version: "+str(apkVersion))
+                            resultDict["version"] = apkVersion
+                        else:
+                            logging.error("parsing of 'get_version()' for apk '"+str(apkFileTemp)+"' failed! -> error: result is None!")    
+                    except Exception as e:
+                        logging.error("parsing of 'get_version()' for apk '"+str(apkFileTemp)+"' failed! -> error: "+str(e))
+                    
+                    try:
+                        apkVersionCode = analysisTemp.get_version_code()
+                        if apkVersionCode != None:
+                            logging.debug("static analysis returned apk version code: "+str(apkVersionCode))
+                            resultDict["version_code"] = apkVersionCode
+                        else:
+                            logging.error("parsing of 'get_version_code()' for apk '"+str(apkFileTemp)+"' failed! -> error: result is None!")    
+                    except Exception as e:
+                        logging.error("parsing of 'get_version_code()' for apk '"+str(apkFileTemp)+"' failed! -> error: "+str(e))
+                    
+                    try:
+                        apkUID = str(analysisTemp.get_application_universal_id())
+                        if apkUID != "None":
+                            logging.debug("static analysis returned apk UID: "+str(apkUID))
+                            resultDict["UID"] = apkUID
+                        else:
+                            logging.error("parsing of 'get_application_universal_id()' (UID) for apk '"+str(apkFileTemp)+"' failed! -> error: result is None!")    
+                    except Exception as e:
+                        logging.error("parsing of 'get_application_universal_id()' (UID) for apk '"+str(apkFileTemp)+"' failed! -> error: "+str(e))
+                    
+                    try:
+                        apkName = str(analysisTemp.get_app_name())
+                        if apkName != "None":
+                            logging.debug("static analysis returned app name: "+str(apkName))
+                            resultDict["name"] = apkName
+                        else:
+                            logging.error("parsing of 'get_app_name()' for apk '"+str(apkFileTemp)+"' failed! -> error: result is None!")    
+                    except Exception as e:
+                        logging.error("parsing of 'get_app_name()' for apk '"+str(apkFileTemp)+"' failed! -> error: "+str(e))
+                    
+                    try:
+                        apkPackage = str(analysisTemp.get_package())
+                        if apkPackage != "None":
+                            logging.debug("static analysis returned app package: "+str(apkPackage))
+                            resultDict["package"] = apkPackage
+                        else:
+                            logging.error("parsing of 'get_package()' for apk '"+str(apkFileTemp)+"' failed! -> error: result is None!")    
+                    except Exception as e:
+                        logging.error("parsing of 'get_package()' for apk '"+str(apkFileTemp)+"' failed! -> error: "+str(e))
+                    
+                    # --- end of apk_infos ---
+                    
+                    # --- start of embedded_trackers ---
+                    
+                    try:
+                        analysisTemp.print_embedded_trackers()
+                    except Exception as e:
+                        logging.error("printing of 'embedded_trackers' to console failed! -> error: "+str(e))                    
+                    
+                    try:
+                        embeddedTrackers = analysisTemp.detect_trackers()
+                        if embeddedTrackers != None:
+                            logging.debug("static analysis returned the following trackers: "+str(embeddedTrackers))
+                            resultDict["trackers"] = embeddedTrackers
+                        else:
+                            logging.error("parsing of 'detect_trackers()' for apk '"+str(apkFileTemp)+"' failed! -> error: result is None!")    
+                    except Exception as e:
+                        logging.error("parsing of 'detect_trackers()' for apk '"+str(apkFileTemp)+"' failed! -> error: "+str(e))
+                    
+                    # --- end of embedded_trackers ---
+
+                    # --- start of embedded_classes ---
+                    
+                    try:
+                        embeddedClasses = analysisTemp.get_embedded_classes()
+                        if embeddedClasses != None:
+                            logging.debug("static analysis returned the following classes: "+str(embeddedClasses))
+                            resultDict["classes"] = embeddedClasses
+                        else:
+                            logging.error("parsing of 'get_embedded_classes()' for apk '"+str(apkFileTemp)+"' failed! -> error: result is None!")    
+                    except Exception as e:
+                        logging.error("parsing of 'get_embedded_classes()' for apk '"+str(apkFileTemp)+"' failed! -> error: "+str(e))
+                    
+                    # --- end of embedded_classes ---
+
+                    try:
+                        #pprint(resultDict)                        
+                        with open(str(Path(workingDir / "analysis-result.json").absolute()), "w+", encoding="utf-8") as fh:
+                            fh.write(str(json.dumps(resultDict, indent=4)))
+                    except Exception as e:
+                        logging.error("while trying to save analysis result -> error: "+str(e))
+                    
+                    try:
+                        #pprint(analysisTemp.signatures[0])                        
+                        with open(str(Path(workingDir / "tracker-signatures.json").absolute()), "w+", encoding="utf-8") as fh:
+                            fh.write(str(json.dumps(analysisTemp.signatures, indent=4)))
+                    except Exception as e:
+                        logging.error("while trying to save tracker signatures -> error: "+str(e))
+                    
+                    try:
+                        #pprint(analysisTemp.signatures[0])                        
+                        with open(str(Path(workingDir / "tracker-signatures.json").absolute()), "w+", encoding="utf-8") as fh:
+                            fh.write(str(json.dumps(analysisTemp.signatures, indent=4)))
+                    except Exception as e:
+                        logging.error("while trying to save tracker signatures -> error: "+str(e))
+
                 except Exception as e:
-                    print("ERROR: while processing '"+str(apkFileTemp)+"' -> error: "+str(e))
+                    logging.error("while processing '"+str(apkFileTemp)+"' -> error: "+str(e))
     except Exception as e:
-        print("ERROR: "+str(e))
+        logging.error(""+str(e))
 
 else:
-    print("ERROR: content of codeberg json response is invalid! ")
+    logging.error("content of codeberg json response is invalid! ")
 
     try:
         pprint(str(searchCodebergReq.headers))
         pprint(str(searchCodebergReq.text))
     except Exception as e:
-        print("ERROR: failed to print request raw data to console! -> error: "+str(e))
+        logging.error("failed to print request raw data to console! -> error: "+str(e))
 
     sys.exit(1)
+
+print("done")
