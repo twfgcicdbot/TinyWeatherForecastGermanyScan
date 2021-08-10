@@ -141,7 +141,7 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
 
                     resultMarkdown += "\n\n[TOC]\n\n"
                     
-                    resultMarkdown += "\n## Metadata \n"
+                    resultMarkdown += "\n## Metadata \n\n"
 
                     try:
                         apkPackage = str(analysisTemp.get_package())
@@ -415,45 +415,64 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
                         logging.error("while trying to save analysis result as markdown file -> error: "+str(e))
 
                     try:
-                        reportFileHtml = """
-<!DOCTYPE html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width, initial-scale=1.0"><title>TinyWeatherForecastGermany | open source android app using open weather data from Deutscher Wetterdienst (DWD)</title><link rel=apple-touch-icon sizes=180x180 href=images/apple-touch-icon.png><link rel=icon type=image/png sizes=32x32 href=images/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=images/favicon-16x16.png><link rel=manifest href=images/site.webmanifest><link rel=mask-icon href=images/safari-pinned-tab.svg color=#293235><link rel="shortcut icon" href=images/favicon.ico><meta name=apple-mobile-web-app-title content=TinyWeatherForecastGermany><meta name=application-name content=TinyWeatherForecastGermany><meta name=msapplication-TileColor content=#293235><meta name=msapplication-config content=images/browserconfig.xml><meta name=theme-color content=#293235><link rel=stylesheet href=https://tinyweatherforecastgermanygroup.gitlab.io/index/css/style_5b8f9938.min.css><meta name=description content="TinyWeatherForecastGermany - android app using DWD open weather data"><meta name=keywords content="dwd, Deutscher Wetterdienst, android, app, open source, weather, wetter, rainradar, regenradar, map, charts, open data, germany, deutschland, allemagne, duitsland"><meta name=robots content="index, follow"><meta name=audience content=all><meta name=thumbnail content=images/icon.png><meta name=revisit-after content="2 days"><meta name=page-topic content="Android App"><meta name=google-site-verification content=MdTS4FWQKzHI34uGnZwU87K2sivqjVQjGe3E-yGd09Y><meta name=pubdate content=20210810><meta property=og:title content="TinyWeatherForecastGermany - android app using DWD open weather data"><meta property=og:description content="TinyWeatherForecastGermany is an open source android app using open weather data provided by Deutscher Wetterdienst (DWD)"><meta property=og:image content=images/twfg-repository-open-graph-graphic.png><meta content=https://tinyweatherforecastgermanygroup.gitlab.io/index/ property=og:url><meta name=twitter:title content="TinyWeatherForecastGermany - android app using DWD open weather data"><meta name=twitter:description content="TinyWeatherForecastGermany is an open source android app using open weather data provided by Deutscher Wetterdienst (DWD)"><meta name=twitter:image content=images/twfg-repository-open-graph-graphic.png><meta name=twitter:card content=summary_large_image><script type=application/ld+json>
-    {
-        "@context" : "http://schema.org",
-        "@type" : "MobileApplication",
-        "applicationCategory" : "Weather",
-        "genre" : "Weather",
-        "name" : "TinyWeatherForecastGermany",
-        "description" : "Weather forecast based on open data from the Deutscher Wetterdienst.",
-        "operatingSystem" : "Android 4.4+",
-        "installUrl" : "https://f-droid.org/packages/de.kaffeemitkoffein.tinyweatherforecastgermany/",
-        "image" : "https://tinyweatherforecastgermanygroup.gitlab.io/index/images/icon.png",
-        "screenshot" : "https://f-droid.org/repo/de.kaffeemitkoffein.tinyweatherforecastgermany/en-US/phoneScreenshots/1.png",
-        "creator" : {
-            "@context" : "http://schema.org",
-            "@type" : "Person",
-            "name" : "Pawel Dube (Starfish)",
-            "url" : "https://codeberg.org/Starfish"
-        },
-        "sourceOrganization" : {
-            "@context" : "http://schema.org",
-            "@type" : "Organization",
-            "name" : "TinyWeatherForecastGermanyGroup",
-            "url" : "https://gitlab.com/tinyweatherforecastgermanygroup"
-            },
-        "offers" : {
-            "@type" : "Offer",
-            "url" : "https://f-droid.org/packages/de.kaffeemitkoffein.tinyweatherforecastgermany/",
-            "price": 0,
-            "priceCurrency" : "EUR"
-        }
-    }
-</script></head><body><article>
-                        """
-                        reportFileHtml += markdown.markdown(resultMarkdown, extensions=['extra', 'sane_lists', TocExtension(baselevel=3, title='Table of contents', anchorlink=True)])
                         
-                        reportFileHtml += """
-</article></body></html>
+                        indexHtmlReq = requests.get("https://tinyweatherforecastgermanygroup.gitlab.io/index/index.html", headers=headers)
+
+                        indexHtmlContent = str(indexHtmlReq.text).strip()
+
+                        indexHtmlContent = indexHtmlContent.replace("Last update of this GitLab Pages page","Last update of this GitHub Pages page")
+
+                        indexHtmlSoup = BeautifulSoup(indexHtmlContent, features='html.parser')
+
+                        for tagGroup in [indexHtmlSoup.select('#repo-latest-release-container'), indexHtmlSoup.select('#readme-content-container'), indexHtmlSoup.select('#readme-content-container')]:
+                            for tag in tagGroup:
+                                tag.decompose()
+
+                        indexMarkdownSoup = BeautifulSoup('<div role="document" aria-label="ExodusPrivacy tracker report about TinyWeatherForecastGermany" id="exodus-privacy-report">'+str(markdown.markdown(resultMarkdown, extensions=['extra', 'sane_lists', TocExtension(baselevel=3, title='Table of contents', anchorlink=True)]))+'</div>', features='html.parser')
+
+                        if len(indexHtmlSoup.select("#repo-metadata-container")) > 0:
+                                indexHtmlSoup.select("#repo-metadata-container")[0].insert_after(indexMarkdownSoup)
+                        else:
+                            logging.error(" could NOT insert converted markdown markup from report! ")
+
+                        indexHtmlSoup.title.string = "ExodusPrivacy report | TinyWeatherForecastGermany | open source android weather weather app"
+
+                        indexHtmlSoup.select('meta[name="google-site-verification"]')[0]["token"] = "mhMOK6N-uaWdgNAlNJp3cIQSkqJ2kFOzRZhySgF4cgQ"
+
+                        indexHtmlSoup.select("#page-timestamp-last-update")[0].string = str(datetime.now(tzutc()).strftime("%Y-%m-%d at %H:%M (%Z)"))
+                        indexHtmlSoup.select("#page-timestamp-last-update")[0]["data-timestamp"] = str(datetime.now(tzutc()).strftime("%Y-%m-%dT%H:%M:000"))
+
+                        schemaOrgMetadata = ",".join(list(indexHtmlSoup.select('script[type="application/ld+json"]')[0].contents)).strip()
+
                         """
+                        {
+                            "@context": "https://schema.org",
+                            "@type": "Organization",
+                            "url": "http://www.example.com",
+                            "logo": "http://www.example.com/images/logo.png"
+                        }
+                        """
+
+                        schemaOrgMetadata += """, {
+                            "@context": "https://schema.org",
+                            "@type": "BreadcrumbList",
+                            "itemListElement": [{
+                                "@type": "ListItem",
+                                "position": 1,
+                                "name": "Index",
+                                "item": "https://tinyweatherforecastgermanygroup.gitlab.io/index/"
+                            },{
+                                "@type": "ListItem",
+                                "position": 2,
+                                "name": "ExodusPrivacy report",
+                                "item": "https://twfgcicdbot.github.io/TinyWeatherForecastGermanyScan/"
+                            }]
+                        }
+
+                        """
+                        indexHtmlSoup.select('script[type="application/ld+json"]')[0].string = schemaOrgMetadata
+
+                        reportFileHtml = str(indexHtmlSoup)
 
                         with open(str(Path(workingDir / "index.html").absolute()), "w+", encoding="utf-8") as fh:
                             fh.write(str(reportFileHtml))
