@@ -96,6 +96,7 @@ jobs:
         
       - name: git push to origin
         run: |
+          cd TinyWeatherForecastGermanyScan
           git config --global user.name 'twfgcicdbot'
           git config --global user.email 'twfgcicdbot@users.noreply.github.com'
           git checkout gh-pages
@@ -103,5 +104,6 @@ jobs:
           git add *.json
           git add *.md
           git add *.html
+          git status
           git commit -m "update github pages"
-          git push origin gh-pages
+          git push -u origin gh-pages
