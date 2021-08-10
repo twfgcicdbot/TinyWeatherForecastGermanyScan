@@ -88,11 +88,12 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
     logging.debug("downloading '"+str(filename)+"' from -> "+str(apkUrl)+" ... ")
     
     response = requests.get(apkUrl, stream=True, headers=headers)
-    with open(filename, 'wb') as out_file:
+    with open(str(Path(workingDir / filename).absolute()), 'wb') as out_file:
         shutil.copyfileobj(response.raw, out_file)
     del response
 
     logging.debug("file name: " + filename)
+    logging.debug("file path: " + str(Path(workingDir / filename).absolute()))
     
     # sha256_hash = hashlib.sha256()
     # with open(filename,"rb") as f: # source: https://www.quickprogrammingtips.com/python/how-to-calculate-sha256-hash-of-a-file-in-python.html
