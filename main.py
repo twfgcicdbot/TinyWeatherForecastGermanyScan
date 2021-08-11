@@ -474,7 +474,7 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
                         indexHtmlSoup.select('script[type="application/ld+json"]')[0].string = schemaOrgMetadata
 
                         try:
-                            if len(list(indexHtmlSoup.select('body script[src="application/ld+json"]'))) > 0:
+                            if len(list(indexHtmlSoup.select('body script[src*="gitlab"]'))) > 0:
                                 for scriptTag in indexHtmlSoup.select('body script[src*="gitlab"]'):
                                     scriptTag.decompose()
                         except Exception as e:
@@ -498,7 +498,7 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
                         with open(str(Path(workingDir / "robots.txt").absolute()), "w+", encoding="utf-8") as fh:
                             fh.write(str(robotsTXT))
                     except Exception as e:
-                        logging.error("failed to generate meta tag 'pubdate' -> error: "+str(e))
+                        logging.error("failed to generate robots.txt -> error: "+str(e))
 
                     lastModPageStrSiteMap = ""
                     try:

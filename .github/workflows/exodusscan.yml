@@ -38,8 +38,8 @@ jobs:
       - name: install dexdump
         run: sudo apt-get install dexdump
       
-      - name: install brotli
-        run: apt-get install brotli || true
+      #- name: install brotli
+      #  run: apt-get install brotli || true
 
       - name: install virtualenv
         run: pip install virtualenv
@@ -90,11 +90,15 @@ jobs:
       - name: list directory contents of TinyWeatherForecastGermanyScan
         run: cd TinyWeatherForecastGermanyScan && ls -lisha
       
-      - name: compress assets gzip and brotli
-        run: |
-          gzip -k -6 $(find TinyWeatherForecastGermanyScan -type f -regex '.*\.\(htm\|html\|txt\|text\|js\|css\)$') || true
-          find TinyWeatherForecastGermanyScan -type f -regex '.*\.\(htm\|html\|txt\|text\|js\|css\)$' -exec brotli -f -k {} \; || true
+      # also see here: https://github.community/t/support-for-pre-compressed-assets-and-brotli-compression/10605 
+      #- name: compress assets using gzip and brotli
+      #  run: |
+      #    gzip -k -6 $(find TinyWeatherForecastGermanyScan -type f -regex '.*\.\(htm\|html\|txt\|text\|js\|css\)$') || true
+      #    find TinyWeatherForecastGermanyScan -type f -regex '.*\.\(htm\|html\|txt\|text\|js\|css\)$' -exec brotli -f -k {} \; || true
 
+      - name: list directory contents of TinyWeatherForecastGermanyScan
+        run: cd TinyWeatherForecastGermanyScan && ls -lisha
+      
       - name: git push to origin
         run: |
           cd TinyWeatherForecastGermanyScan
@@ -109,6 +113,7 @@ jobs:
           git add *.html
           git add images/ || true
           git add sitemap.xml || true
+          git add robots.txt || true
           git status
           git commit -m "update github pages"
           git push -f origin gh-pages
