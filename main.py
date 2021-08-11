@@ -489,10 +489,10 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
 
                     try:
                         robotsTXT = """
-                        User-agent: *
-                        Allow: /
+User-agent: *
+Allow: /
 
-                        Sitemap: https://twfgcicdbot.github.io/TinyWeatherForecastGermanyScan/sitemap.xml
+Sitemap: https://twfgcicdbot.github.io/TinyWeatherForecastGermanyScan/sitemap.xml
                         """
 
                         with open(str(Path(workingDir / "robots.txt").absolute()), "w+", encoding="utf-8") as fh:
