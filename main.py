@@ -428,16 +428,17 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
                             for tag in tagGroup:
                                 tag.decompose()
 
-                        indexMarkdownSoup = BeautifulSoup('<div role="document" aria-label="ExodusPrivacy tracker report about TinyWeatherForecastGermany" id="exodus-privacy-report">'+str(markdown.markdown(resultMarkdown, extensions=['extra', 'sane_lists', TocExtension(baselevel=3, title='Table of contents', anchorlink=True)]))+'</div>', features='html.parser')
+                        indexMarkdownSoup = BeautifulSoup('<div role="document" aria-label="ExodusPrivacy tracker report about TinyWeatherForecastGermany" id="exodus-privacy-report">'+str(markdown.markdown(resultMarkdown, extensions=['extra', 'sane_lists', TocExtension(baselevel=2, title='Table of contents', anchorlink=True)]))+'</div>', features='html.parser')
 
                         if len(indexHtmlSoup.select("#repo-metadata-container")) > 0:
                                 indexHtmlSoup.select("#repo-metadata-container")[0].insert_after(indexMarkdownSoup)
                         else:
                             logging.error(" could NOT insert converted markdown markup from report! ")
 
-                        indexHtmlSoup.title.string = "ExodusPrivacy report | TinyWeatherForecastGermany | open source android weather weather app"
+                        indexHtmlSoup.title.string = "ExodusPrivacy report | TinyWeatherForecastGermany | open source android weather app"
 
-                        indexHtmlSoup.select('meta[name="google-site-verification"]')[0]["token"] = "mhMOK6N-uaWdgNAlNJp3cIQSkqJ2kFOzRZhySgF4cgQ"
+                        if len(list(indexHtmlSoup.select('meta[name="google-site-verification"]'))) > 0:
+                            indexHtmlSoup.select('meta[name="google-site-verification"]')[0].decompose()
 
                         indexHtmlSoup.select("#page-timestamp-last-update")[0].string = str(datetime.now(tzutc()).strftime("%Y-%m-%d at %H:%M (%Z)"))
                         indexHtmlSoup.select("#page-timestamp-last-update")[0]["data-timestamp"] = str(datetime.now(tzutc()).strftime("%Y-%m-%dT%H:%M:000"))
@@ -472,12 +473,58 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
                         """
                         indexHtmlSoup.select('script[type="application/ld+json"]')[0].string = schemaOrgMetadata
 
+                        try:
+                            if len(list(indexHtmlSoup.select('body script[src="application/ld+json"]'))) > 0:
+                                for scriptTag in indexHtmlSoup.select('body script[src*="gitlab"]'):
+                                    scriptTag.decompose()
+                        except Exception as e:
+                            logging.error("failed to remove script tags from body -> error: "+str(e))
+                        
                         reportFileHtml = str(indexHtmlSoup)
 
                         with open(str(Path(workingDir / "index.html").absolute()), "w+", encoding="utf-8") as fh:
                             fh.write(str(reportFileHtml))
                     except Exception as e:
                         logging.error("while trying to save analysis result as html file -> error: "+str(e))
+
+                    try:
+                        robotsTXT = """
+                        User-agent: *
+                        Allow: /
+
+                        Sitemap: https://twfgcicdbot.github.io/TinyWeatherForecastGermanyScan/sitemap.xml
+                        """
+
+                        with open(str(Path(workingDir / "robots.txt").absolute()), "w+", encoding="utf-8") as fh:
+                            fh.write(str(robotsTXT))
+                    except Exception as e:
+                        logging.error("failed to generate meta tag 'pubdate' -> error: "+str(e))
+
+                    lastModPageStrSiteMap = ""
+                    try:
+                        lastModPageStrSiteMap = '<lastmod>'+str(datetime.now(tzutc()).strftime("%Y-%m-%dT%H:%M+00:00"))+'</lastmod>'
+                    except Exception as e:
+                        logging.error("failed to generate meta tag 'pubdate' -> error: "+str(e))
+
+
+                    try:
+                        
+                        sitemapXML = """<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:content="http://www.google.com/schemas/sitemap-content/1.0">
+ <url>
+   <loc>https://twfgcicdbot.github.io/TinyWeatherForecastGermanyScan</loc>
+    """+lastModPageStrSiteMap+"""
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+    </url>
+</urlset>
+                        """
+
+                        with open(str(Path(workingDir / "sitemap.xml").absolute()), "w+", encoding="utf-8") as fh:
+                            fh.write(str(sitemapXML))
+
+                    except Exception as e:
+                        logging.error("while generarting sitemap.xml -> error: "+str(e))
 
                 except Exception as e:
                     logging.error("while processing '"+str(apkFileTemp)+"' -> error: "+str(e))
