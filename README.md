@@ -4,9 +4,9 @@
 
 tl;dr -> scan code of [**TinyWeatherForecastGermany**](https://codeberg.org/Starfish/TinyWeatherForecastGermany) (TWFG) for tracker signatures provided by [**ExodusPrivacy**](https://exodus-privacy.eu.org/en/) using the python module [exodus-core](https://github.com/Exodus-Privacy/exodus-core/)
 
-[TinyWeatherForecastGermany](https://tinyweatherforecastgermanygroup.gitlab.io/index/) is an android open source weather app focused on Germany developped by Pawel Dube ([@Starfish](https://codeberg.org/Starfish)) using [open data](https://opendata.dwd.de/) provided by Deutscher Wetterdienst (DWD)
+[TinyWeatherForecastGermany](https://tinyweatherforecastgermanygroup.gitlab.io/index/) is an android open source weather app focused on Germany developped by Pawel Dube ([@Starfish](https://codeberg.org/Starfish)) using [open data](https://opendata.dwd.de/) provided by Deutscher Wetterdienst (DWD).
 
-DWD is the Germany's **national weather agency** (similiar to **N**ational **O**ceanic **a**nd **A**tmospheric **A**dministration ([NOAA](https://www.noaa.gov/about-our-agency)) in the US).
+The DWD is Germany's **national weather agency** (similiar to **N**ational **O**ceanic **a**nd **A**tmospheric **A**dministration ([NOAA](https://www.noaa.gov/about-our-agency)) in the US).
 
 ***Note**: 'TWFG' is an unofficial abbreviation for **T**iny **W**eather **F**orecast **G**ermany.*
 
@@ -14,7 +14,7 @@ DWD is the Germany's **national weather agency** (similiar to **N**ational **O**
 
 *The non-profit running ExodusPrivacy provides reports itself so ... why wasting resources when generating them on your own?*
 
-At the time of writing (Mid-August 2021) ExodusPrivacy [only allows](https://reports.exodus-privacy.eu.org/de/analysis/submit/) the submission of apps retrieved directly either from Google Play Store or the open source F-Droid app store. But uploading apk files is not possible afaik. Waiting for the update approval process after releasing apps needs patience as (to my personal understanding) it (partly) relays on interactions of human beings. So that's why I (*Jean-Luc Tibaux* -> [*@eUgEntOptIc44*](https://codeberg.org/eUgEntOptIc44)) setup my own solution to scan the apk release artifacts of TWFG.
+At the time of writing (Mid-August 2021) ExodusPrivacy [only allows](https://reports.exodus-privacy.eu.org/de/analysis/submit/) the submission of apps retrieved directly either from Google Play Store or the open source F-Droid app store. But uploading apk files is not possible afaik. Waiting for the update approval process after releasing apps needs patience as (to my personal understanding) it needs interactions of human beings. So that's why I (*Jean-Luc Tibaux* -> [*@eUgEntOptIc44*](https://codeberg.org/eUgEntOptIc44)) setup [my own](https://twfgcicdbot.github.io/TinyWeatherForecastGermanyScan/) solution to scan the apk release artifacts of TWFG.
 
 To scan apks on your android mobile on your own please see either the official ExodusPrivacy app or [ClassyShark3xodus](https://bitbucket.org/oF2pks/fdroid-classyshark3xodus/src/master/ClassySharkAndroid/). The latter works 100% offline.
 
@@ -30,7 +30,7 @@ data formats:
 
 ## License and Copyright
 
-This repository is licensed under **GPLv3** see [`LICENSE`](https://github.com/twfgcicdbot/TinyWeatherForecastGermanyScan/blob/bb7593cd5436a1be6495c068a3557ca4e4bf646f/LICENSE) for details. Please also see the legal terms noted inline in the code base.
+This repository is licensed under **GPLv3** see [`LICENSE`](https://github.com/twfgcicdbot/TinyWeatherForecastGermanyScan/blob/bb7593cd5436a1be6495c068a3557ca4e4bf646f/LICENSE) for details. Please also see the legal terms noted inline in the code base. The author highly encourages everyone reading this to get in touch **before** using any of the contents of this repository for **commercial or by any means critical applications**.
 
 **Copyright** of the *main* project -> **Tiny Weather Forecast Germany** -> Pawel Dube ([@Starfish](https://codeberg.org/Starfish))
 
@@ -41,7 +41,7 @@ Please be aware that the code used here is by no means production-ready. Before 
 
 Please also see [this GitLab Pages page](https://tinyweatherforecastgermanygroup.gitlab.io/index/) containing references to all linked resources of [TinyWeatherForecastGermany](https://tinyweatherforecastgermanygroup.gitlab.io/index/).
 
-This project is **not affialited** with ClassyShark3xodus, Codeberg, the DWD, ExodusPrivacy, Google, GitLab or GitHub in any way.
+This project is **not affialited** with any of the following organizations: ClassyShark3xodus, Codeberg, the DWD, ExodusPrivacy, Google, GitLab or GitHub or related individuals in any way.
 
 ## Contributing
 
@@ -50,4 +50,3 @@ This project is **not affialited** with ClassyShark3xodus, Codeberg, the DWD, Ex
 * Feel free to contribute to this script by opening issues and/or merge requests.
 * Please also see the automatically generated *javadoc* **code documentation** of Tiny Weather Forecast Germany [at GitLab](https://gitlab.com/tinyweatherforecastgermanygroup/twfg-javadoc).
 * For cybersec, privacy and/or copyright related issues regarding this repository please directly contact the maintainer [**Jean-Luc Tibaux**](https://codeberg.org/eUgEntOptIc44)
-
