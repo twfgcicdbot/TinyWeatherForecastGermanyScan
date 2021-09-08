@@ -161,7 +161,7 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
                         if apkSum != "None":
                             logging.debug("static analysis returned apk hash (sha256): "+str(apkSum))
                             resultDict["hash_sha256"] = apkSum
-                            resultMarkdown += "* **sha256 hash**: " + apkSum + "\n"
+                            resultMarkdown += "* **sha256 hash**: [" + str(apkSum) + "](https://www.virustotal.com/gui/file/" + str(apkSum) + "/detection){ title='click to get the VirusTotal report' } \n"
                         else:
                             resultMarkdown += "* **sha256 hash**: *unknown* \n"
                             logging.error("parsing of 'get_sha256()' for apk '"+str(apkFileTemp)+"' failed! -> error: result is None!")    
@@ -279,7 +279,11 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
                                     certificateTempMd = certificateTempStr
                                     try:
                                         certificateTempStr = 'Issuer: {} \n Subject: {} \n Fingerprint: {} \n Serial: {}'.format(certificateTemp.issuer, certificateTemp.subject, certificateTemp.fingerprint, certificateTemp.serial)
-                                        certificateTempMd = '\n<details>\n<summary>click to expand</summary>\n\n<b>Issuer</b>: {} \n\n<b>Subject</b>: {} \n\n<b>Fingerprint</b>: {} \n\n<b>Serial</b>: {}\n\n</details>\n\n'.format(certificateTemp.issuer, certificateTemp.subject, certificateTemp.fingerprint, certificateTemp.serial)
+                                        
+                                        if str(certificateTemp.issuer).strip().lower() == str(certificateTemp.subject).strip().lower():
+                                            certificateTempMd = '\n<details>\n<summary>click to expand</summary>\n\n<b>Subject</b>: {} <br><b>Fingerprint</b>: {} <br><b>Serial</b>: {}<br></details><br><br>'.format(certificateTemp.subject, certificateTemp.fingerprint, certificateTemp.serial)
+                                        else:
+                                            certificateTempMd = '\n<details>\n<summary>click to expand</summary>\n\n<b>Issuer</b>: {} <br><b>Subject</b>: {} <br><b>Fingerprint</b>: {} <br><b>Serial</b>: {}<br></details><br><br>'.format(certificateTemp.issuer, certificateTemp.subject, certificateTemp.fingerprint, certificateTemp.serial)
                                     except Exception as e:
                                         logging.warning("serializing of certificate '"+str(certificateTemp)+"' of '"+str(apkFileTemp)+"' failed! -> error: "+str(e))
                                         logging.warning(" using fallback solution ")
@@ -435,7 +439,7 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
                         else:
                             logging.error(" could NOT insert converted markdown markup from report! ")
 
-                        indexHtmlSoup.title.string = "ExodusPrivacy report | TinyWeatherForecastGermany | open source android weather app"
+                        indexHtmlSoup.title.string = "ExodusPrivacy report | Tiny Weather Forecast Germany"
 
                         if len(list(indexHtmlSoup.select('meta[name="google-site-verification"]'))) > 0:
                             indexHtmlSoup.select('meta[name="google-site-verification"]')[0].decompose()
