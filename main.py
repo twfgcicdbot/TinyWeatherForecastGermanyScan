@@ -484,6 +484,43 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
                         except Exception as e:
                             logging.error("failed to remove script tags from body -> error: "+str(e))
                         
+                        try:
+                            tocJSstr = """
+    <script>
+        try {
+            if (document.querySelectorAll(".toc > ul > li").length > 0) {
+                document.querySelectorAll(".toc > ul > li").forEach(function(element) {
+                    if (element.querySelectorAll("ul > li").length > 0) {
+                        tocLinkTemp = element.querySelector("a");
+                        tocLinkTemp.title = "click to toggle childrens";
+                        tocLinkTemp.setAttribute("aria-roledescription", "click to toggle childrens");
+                        tocLinkTemp.addEventListener('click', function(event) {
+                            event.preventDefault();
+                            console.log(event);
+                            event.target.parentElement.querySelectorAll("ul").forEach(function(listchild) {
+                                console.log(listchild.style.display);
+                                if (listchild.style.display.length > 0) {
+                                    listchild.style.display = listchild.style.display === 'none' ? 'block' : 'none';
+                                } else {
+                                    listchild.style.display = 'block';
+                                }
+                                console.log(listchild.style.display);
+                            })
+                        })
+                    }
+                });
+            }
+        } catch (error) {
+            console.log("ERROR: failed to make level 3 toc entries toggle visibility of children items on click -> error: " + e);
+        }
+    </script>
+                            """
+
+                            tocJSstrSoup = BeautifulSoup(tocJSstr, features='html.parser')
+                            indexHtmlSoup.select("#page-footer-text")[0].insert_after(tocJSstrSoup)
+                        except Exception as e:
+                            logging.error("failed to add ToC JavaScript code -> error: "+str(e))
+                        
                         reportFileHtml = str(indexHtmlSoup)
 
                         with open(str(Path(workingDir / "index.html").absolute()), "w+", encoding="utf-8") as fh:
