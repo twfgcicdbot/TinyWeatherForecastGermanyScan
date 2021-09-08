@@ -148,7 +148,7 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
                         if apkPackage != "None":
                             logging.debug("static analysis returned app package: "+str(apkPackage))
                             resultDict["package"] = apkPackage
-                            resultMarkdown += "* **package**: " + apkPackage + "\n"
+                            resultMarkdown += "* **package**: [" + str(apkPackage) + "](https://f-droid.org/packages/"+str(apkPackage)+"/){ title='F-Droid Store package site' } \n"
                         else:
                             resultMarkdown += "* **package**: *unknown* \n"
                             logging.error("parsing of 'get_package()' for apk '"+str(apkFileTemp)+"' failed! -> error: result is None!")    
@@ -200,10 +200,10 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
                         if apkUID != "None":
                             logging.debug("static analysis returned apk UID: "+str(apkUID))
                             resultDict["UID"] = apkUID
-                            resultMarkdown += "* **app UID**: " + apkUID + " \n"
+                            resultMarkdown += "* [**app UID**](https://stackoverflow.com/questions/5708906/what-is-uid-on-android/5709279){ title='android app UID explanation on StackOverflow' }: " + apkUID + " \n"
                         else:
-                            resultMarkdown += "* **app UID**: *unknown* \n"
-                            logging.error("parsing of 'get_application_universal_id()' (UID) for apk '"+str(apkFileTemp)+"' failed! -> error: result is None!")    
+                            resultMarkdown += "* [**app UID**](https://stackoverflow.com/questions/5708906/what-is-uid-on-android/5709279){ title='android app UID explanation on StackOverflow' }: *unknown* \n"
+                            logging.error("parsing of 'get_application_universal_id()' (UID) for apk '"+str(apkFileTemp)+"' failed! -> error: result is None!")
                     except Exception as e:
                         logging.error("parsing of 'get_application_universal_id()' (UID) for apk '"+str(apkFileTemp)+"' failed! -> error: "+str(e))
                         resultMarkdown += "* **app UID**: *unknown* \n"
@@ -281,9 +281,9 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
                                         certificateTempStr = 'Issuer: {} \n Subject: {} \n Fingerprint: {} \n Serial: {}'.format(certificateTemp.issuer, certificateTemp.subject, certificateTemp.fingerprint, certificateTemp.serial)
                                         
                                         if str(certificateTemp.issuer).strip().lower() == str(certificateTemp.subject).strip().lower():
-                                            certificateTempMd = '\n<details>\n<summary>click to expand</summary>\n\n<b>Subject</b>: {} <br><b>Fingerprint</b>: {} <br><b>Serial</b>: {}<br></details><br><br>'.format(certificateTemp.subject, certificateTemp.fingerprint, certificateTemp.serial)
+                                            certificateTempMd = '\n<details>\n<summary>click to expand</summary>\n\n<b>Issuer</b>: {} <br><b>Fingerprint</b>: {} <br><b>Serial</b>: {}<br></details>\n'.format(certificateTemp.issuer, certificateTemp.fingerprint, certificateTemp.serial)
                                         else:
-                                            certificateTempMd = '\n<details>\n<summary>click to expand</summary>\n\n<b>Issuer</b>: {} <br><b>Subject</b>: {} <br><b>Fingerprint</b>: {} <br><b>Serial</b>: {}<br></details><br><br>'.format(certificateTemp.issuer, certificateTemp.subject, certificateTemp.fingerprint, certificateTemp.serial)
+                                            certificateTempMd = '\n<details>\n<summary>click to expand</summary>\n\n<b>Issuer</b>: {} <br><b>Subject</b>: {} <br><b>Fingerprint</b>: {} <br><b>Serial</b>: {}<br></details>\n'.format(certificateTemp.issuer, certificateTemp.subject, certificateTemp.fingerprint, certificateTemp.serial)
                                     except Exception as e:
                                         logging.warning("serializing of certificate '"+str(certificateTemp)+"' of '"+str(apkFileTemp)+"' failed! -> error: "+str(e))
                                         logging.warning(" using fallback solution ")
