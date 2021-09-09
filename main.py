@@ -28,6 +28,7 @@ import time
 
 from dateutil.tz import tzutc # timezone UTC -> docs: https://dateutil.readthedocs.io/en/stable/tz.html#dateutil.tz.tzutc
 from bs4 import BeautifulSoup
+import regex
 import requests
 
 import markdown
@@ -35,16 +36,20 @@ from markdown.extensions.toc import TocExtension
 
 from exodus_core.analysis.static_analysis import StaticAnalysis
 from exodus_core.analysis.apk_signature import ApkSignature
+from permissions_en import AOSP_PERMISSIONS_EN
 
 try:
-    logging.basicConfig(format=u'%(asctime)-s %(levelname)s [%(name)s]: %(message)s', level=logging.DEBUG)
+    logging.basicConfig(format=u'%(asctime)-s %(levelname)s [%(name)s]: %(message)s', level=logging.INFO) #TODO: use DEBUG
 except Exception as e:
     logging.error("while logger init! -> error: "+str(e))
 
 workingDir = Path("TinyWeatherForecastGermanyScan")
+workingDir.mkdir(parents=True, exist_ok=True) # create directory if not exists
 
-# source of user agent data -> https://github.com/tamimibrahim17/List-of-user-agents/blob/master/Chrome.txt
-UserAgents = ["Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36","Mozilla/5.0 (X11; Ubuntu; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2919.83 Safari/537.36","Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2866.71 Safari/537.36","Mozilla/5.0 (X11; Ubuntu; Linux i686 on x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2820.59 Safari/537.36","Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2762.73 Safari/537.36","Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2656.18 Safari/537.36","Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.36 (KHTML like Gecko) Chrome/44.0.2403.155 Safari/537.36","Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36","Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2227.1 Safari/537.36","Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2227.0 Safari/537.36","Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2227.0 Safari/537.36","Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2226.0 Safari/537.36","Mozilla/5.0 (Windows NT 6.4; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2225.0 Safari/537.36"]
+# sources of user agent data -> License: MIT
+#  -> https://github.com/tamimibrahim17/List-of-user-agents/blob/master/Chrome.txt
+#  -> https://github.com/tamimibrahim17/List-of-user-agents/blob/master/Firefox.txt
+UserAgents = ["Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36","Mozilla/5.0 (X11; Ubuntu; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2919.83 Safari/537.36","Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2866.71 Safari/537.36","Mozilla/5.0 (X11; Ubuntu; Linux i686 on x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2820.59 Safari/537.36","Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2762.73 Safari/537.36","Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2656.18 Safari/537.36","Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.36 (KHTML like Gecko) Chrome/44.0.2403.155 Safari/537.36","Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36","Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2227.1 Safari/537.36","Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2227.0 Safari/537.36","Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2227.0 Safari/537.36","Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2226.0 Safari/537.36","Mozilla/5.0 (Windows NT 6.4; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2225.0 Safari/537.36","Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10; rv:33.0) Gecko/20100101 Firefox/33.0","Mozilla/5.0 (Windows ME 4.9; rv:31.0) Gecko/20100101 Firefox/31.7","Mozilla/5.0 (X11; Linux i586; rv:31.0) Gecko/20100101 Firefox/31.0","Mozilla/5.0 (Windows NT 6.1; WOW64; rv:31.0) Gecko/20130401 Firefox/31.0","Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:28.0) Gecko/20100101 Firefox/31.0","Mozilla/5.0 (Windows NT 5.1; rv:31.0) Gecko/20100101 Firefox/31.0","Mozilla/5.0 (Windows NT 6.1; WOW64; rv:29.0) Gecko/20120101 Firefox/29.0","Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:25.0) Gecko/20100101 Firefox/29.0","Mozilla/5.0 (X11; OpenBSD amd64; rv:28.0) Gecko/20100101 Firefox/28.0","Mozilla/5.0 (X11; Linux x86_64; rv:28.0) Gecko/20100101  Firefox/28.0","Mozilla/5.0 (Windows NT 6.1; rv:27.3) Gecko/20130101 Firefox/27.3","Mozilla/5.0 (Windows NT 6.2; Win64; x64; rv:27.0) Gecko/20121011 Firefox/27.0","Mozilla/5.0 (Windows NT 6.2; rv:20.0) Gecko/20121202 Firefox/26.0","Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:25.0) Gecko/20100101 Firefox/25.0","Mozilla/5.0 (Macintosh; Intel Mac OS X 10.6; rv:25.0) Gecko/20100101 Firefox/25.0","Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:24.0) Gecko/20100101 Firefox/24.0","Mozilla/5.0 (Windows NT 6.0; WOW64; rv:24.0) Gecko/20100101 Firefox/24.0","Mozilla/5.0 (Macintosh; Intel Mac OS X 10.8; rv:24.0) Gecko/20100101 Firefox/24.0","Mozilla/5.0 (Windows NT 6.2; rv:22.0) Gecko/20130405 Firefox/23.0","Mozilla/5.0 (Windows NT 6.1; WOW64; rv:23.0) Gecko/20130406 Firefox/23.0","Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:23.0) Gecko/20131011 Firefox/23.0","Mozilla/5.0 (Windows NT 6.2; rv:22.0) Gecko/20130405 Firefox/22.0","Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:22.0) Gecko/20130328 Firefox/22.0","Mozilla/5.0 (Windows NT 6.1; rv:22.0) Gecko/20130405 Firefox/22.0","Mozilla/5.0 (Microsoft Windows NT 6.2.9200.0); rv:22.0) Gecko/20130405 Firefox/22.0","Mozilla/5.0 (Windows NT 6.2; Win64; x64; rv:16.0.1) Gecko/20121011 Firefox/21.0.1","Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:16.0.1) Gecko/20121011 Firefox/21.0.1","Mozilla/5.0 (Windows NT 6.2; Win64; x64; rv:21.0.0) Gecko/20121011 Firefox/21.0.0","Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:21.0) Gecko/20130331 Firefox/21.0","Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:21.0) Gecko/20100101 Firefox/21.0","Mozilla/5.0 (X11; Linux i686; rv:21.0) Gecko/20100101 Firefox/21.0"]
 
 random.shuffle(UserAgents)
 
@@ -220,12 +225,37 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
                             
                             resultDict["permissions"] = []
                             if lenPermissions > 0:
+                                #pprint(permissions)
+                                resultMarkdown += '<ul id="permissions-list">'
+
                                 for permissionTemp in permissions:
                                     try:
-                                        resultDict["permissions"].append(str(permissionTemp))
-                                        resultMarkdown += "* "+str(permissionTemp)+" \n"
+                                        permissionDictTemp = AOSP_PERMISSIONS_EN["permissions"][str(permissionTemp).strip()]
+                                        
+                                        permissionDesc = str(permissionDictTemp["description"]).replace("\n","").strip()
+                                        permissionDesc = regex.sub(r"(?im)\n","",permissionDesc)
+                                        while "  " in permissionDesc:
+                                            permissionDesc = regex.sub(r"(?im)(  )+"," ",permissionDesc)
+                                        permissionDictTemp["description"] = permissionDesc
+
+                                        pprint(permissionDictTemp)
+                                    except Exception as e:
+                                        permissionDictTemp = {"name":str(permissionTemp)}
+                                        permissionDesc = ""
+                                        logging.error("parsing of exodus knowledge data for permission '"+str(permissionTemp)+"' of '"+str(apkFileTemp)+"' failed! -> error: "+str(e))
+
+                                    try:
+                                        resultDict["permissions"].append(permissionDictTemp)
+                                        resultMarkdown += "<li> <b>"+str(permissionTemp)+"</b> "
+
+                                        if len(str(permissionDesc).lower().replace("none","")) > 5:
+                                            resultMarkdown += '<p id="permission-desc-'+regex.sub(r"(?im)[^A-z0-9]+","",str(permissionTemp))+'" class="permission-description">'+permissionDesc+"</p>"
+                                        
+                                        resultMarkdown += "</li>\n"
                                     except Exception as e:
                                         logging.error("saving of permission '"+str(permissionTemp)+"' of '"+str(apkFileTemp)+"' failed! -> error: "+str(e))
+                                
+                                resultMarkdown += '</ul>'
                             else:
                                 logging.debug("skipping iteration of permissions as 'lenPermissions' is "+str(lenPermissions))
                         else:
@@ -457,7 +487,7 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
                             "logo": "http://www.example.com/images/logo.png"
                         }
                         """
-
+                        schemaOrgMetadata = "[" + schemaOrgMetadata
                         schemaOrgMetadata += """, {
                             "@context": "https://schema.org",
                             "@type": "BreadcrumbList",
@@ -472,7 +502,7 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
                                 "name": "ExodusPrivacy report",
                                 "item": "https://twfgcicdbot.github.io/TinyWeatherForecastGermanyScan/"
                             }]
-                        }
+                        }]
 
                         """
                         indexHtmlSoup.select('script[type="application/ld+json"]')[0].string = schemaOrgMetadata
