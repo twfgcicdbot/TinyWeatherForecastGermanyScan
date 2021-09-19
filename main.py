@@ -4,9 +4,11 @@
 
 **author**: Jean-Luc Tibaux (https://gitlab.com/eUgEntOptIc44)
 
-**license**: GPLv3
+**license**: GPLv3 (https://github.com/twfgcicdbot/TinyWeatherForecastGermanyScan/blob/d19eb5eeeda3649ecd93a3b52f018878dd24ec81/LICENSE)
 
 **since**: August 2021
+
+**url**: https://twfgcicdbot.github.io/TinyWeatherForecastGermanyScan/
 
 ## Disclaimer
 
@@ -38,13 +40,18 @@ from exodus_core.analysis.static_analysis import StaticAnalysis
 from exodus_core.analysis.apk_signature import ApkSignature
 from permissions_en import AOSP_PERMISSIONS_EN
 
-try:
-    logging.basicConfig(format=u'%(asctime)-s %(levelname)s [%(name)s]: %(message)s', level=logging.INFO) #TODO: use DEBUG
-except Exception as e:
-    logging.error("while logger init! -> error: "+str(e))
-
 workingDir = Path("TinyWeatherForecastGermanyScan")
 workingDir.mkdir(parents=True, exist_ok=True) # create directory if not exists
+
+try:
+    logging.basicConfig(format=u'%(asctime)-s %(levelname)s [%(name)s]: %(message)s',
+        level=logging.DEBUG,
+        handlers=[
+            logging.FileHandler(str(Path(workingDir / "debug.log").absolute()), encoding="utf-8"),
+            logging.StreamHandler()
+    ])
+except Exception as e:
+    logging.error("while logger init! -> error: "+str(e))
 
 # sources of user agent data -> License: MIT
 #  -> https://github.com/tamimibrahim17/List-of-user-agents/blob/master/Chrome.txt
@@ -153,7 +160,7 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
                         if apkPackage != "None":
                             logging.debug("static analysis returned app package: "+str(apkPackage))
                             resultDict["package"] = apkPackage
-                            resultMarkdown += "* **package**: [" + str(apkPackage) + "](https://f-droid.org/packages/"+str(apkPackage)+"/){ title='F-Droid Store package site' } \n"
+                            resultMarkdown += "* **package**: [" + str(apkPackage) + "](https://f-droid.org/packages/"+str(apkPackage)+"/){ title='F-Droid Store package site' #fdroidproductpage } \n"
                         else:
                             resultMarkdown += "* **package**: *unknown* \n"
                             logging.error("parsing of 'get_package()' for apk '"+str(apkFileTemp)+"' failed! -> error: result is None!")    
@@ -166,7 +173,13 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
                         if apkSum != "None":
                             logging.debug("static analysis returned apk hash (sha256): "+str(apkSum))
                             resultDict["hash_sha256"] = apkSum
-                            resultMarkdown += "* **sha256 hash**: [" + str(apkSum) + "](https://www.virustotal.com/gui/file/" + str(apkSum) + "/detection){ title='click to get the VirusTotal report' } \n"
+                            resultMarkdown += "* **sha256 hash**: [" + str(apkSum) + "](https://www.virustotal.com/gui/file/" + str(apkSum) + "/detection){ title='click to get the VirusTotal report' #virustotalhash } \n"
+
+                            try:
+                                with open(str(Path(workingDir / "sha256.html").absolute()), "w+", encoding="utf-8") as fh:
+                                    fh.write(str(apkSum))
+                            except Exception as e:
+                                logging.error("failed to write sha256 hash to '"+str(Path(workingDir / "sha256.html").absolute())+"' -> error: "+str(e))
                         else:
                             resultMarkdown += "* **sha256 hash**: *unknown* \n"
                             logging.error("parsing of 'get_sha256()' for apk '"+str(apkFileTemp)+"' failed! -> error: result is None!")    
@@ -213,6 +226,8 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
                         logging.error("parsing of 'get_application_universal_id()' (UID) for apk '"+str(apkFileTemp)+"' failed! -> error: "+str(e))
                         resultMarkdown += "* **app UID**: *unknown* \n"
                     
+                    logging.debug("working on permissions ... ")
+
                     resultMarkdown += "\n## Permissions \n"
                  
                     try:
@@ -265,6 +280,8 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
                         resultMarkdown += "\n **failed** to detect permissions! \n\n"
                         logging.error("parsing of 'permissions' for apk '"+str(apkFileTemp)+"' failed! -> error: "+str(e))
                     
+                    logging.debug("working on libraries ... ")
+
                     resultMarkdown += "\n## Libraries \n"
 
                     try:
@@ -335,6 +352,8 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
                     
                     # --- start of embedded_trackers ---
                     
+                    logging.debug("working on embedded_trackers ... ")
+
                     try:
                         analysisTemp.print_embedded_trackers()
                     except Exception as e:
@@ -373,6 +392,8 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
 
                     # --- start of embedded_classes ---
                     
+                    logging.debug("working on classes ... ")
+
                     resultMarkdown += "\n## Classes \n"
 
                     try:
@@ -430,7 +451,9 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
                         with open(str(Path(workingDir / "tracker-signatures.json").absolute()), "w+", encoding="utf-8") as fh:
                             fh.write(str(json.dumps(trackerSignatures, indent=4)))
 
-                        resultMarkdown += "\nThe analysis has been conducted using "+str(len(analysisTemp.signatures))+" tracker signatures by ExodusPrivacy."
+                        logging.debug("created tracker signature dump '"+str(Path(workingDir / "tracker-signatures.json").absolute())+"' ("+str(Path(workingDir / "tracker-signatures.json").stat().st_size)+") ")
+
+                        resultMarkdown += "\nThe analysis has been conducted using "+str(len(analysisTemp.signatures))+" tracker signatures by [ExodusPrivacy](https://exodus-privacy.eu.org/)."
                     except Exception as e:
                         logging.error("while trying to save tracker signatures -> error: "+str(e))
 
@@ -438,18 +461,21 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
                         #pprint(resultDict)                        
                         with open(str(Path(workingDir / "analysis-result.json").absolute()), "w+", encoding="utf-8") as fh:
                             fh.write(str(json.dumps(resultDict, indent=4)))
+                        
+                        logging.debug("created report '"+str(Path(workingDir / "analysis-result.json").absolute())+"' ("+str(Path(workingDir / "analysis-result.json").stat().st_size)+") ")
                     except Exception as e:
-                        logging.error("while trying to save analysis result as json file -> error: "+str(e))
+                        logging.error("while trying to save analysis result as json file '"+str(Path(workingDir / "analysis-result.json").absolute())+"' -> error: "+str(e))
                     
                     try:
                         #pprint(resultMarkdown)                        
                         with open(str(Path(workingDir / "analysis-result.md").absolute()), "w+", encoding="utf-8") as fh:
                             fh.write(str(resultMarkdown))
+
+                        logging.debug("created report '"+str(Path(workingDir / "analysis-result.md").absolute())+"' ("+str(Path(workingDir / "analysis-result.md").stat().st_size)+") ")
                     except Exception as e:
-                        logging.error("while trying to save analysis result as markdown file -> error: "+str(e))
+                        logging.error("while trying to save analysis result as markdown file '"+str(Path(workingDir / "analysis-result.md").absolute())+"' -> error: "+str(e))
 
                     try:
-                        
                         indexHtmlReq = requests.get("https://tinyweatherforecastgermanygroup.gitlab.io/index/index.html", headers=headers)
 
                         indexHtmlContent = str(indexHtmlReq.text).strip()
@@ -551,6 +577,31 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
                         except Exception as e:
                             logging.error("failed to add ToC JavaScript code -> error: "+str(e))
                         
+                        try:
+                            if len(indexHtmlSoup.select("#page-footer-hosting-name")) > 0:
+                                indexHtmlSoup.select("#page-footer-hosting-name")[0].string = "GitHub Pages"
+                            else:
+                                logging.warning("failed to find '#page-footer-hosting-name' in index.html ")
+                        except Exception as e:
+                            logging.error("failed to change contents of '#page-footer-hosting-name' in index.html")
+
+                        try:
+                            if len(indexHtmlSoup.select("#page-footer-source-code-link")) > 0:
+                                indexHtmlSoup.select("#page-footer-source-code-link")[0]["href"] = "https://github.com/twfgcicdbot/TinyWeatherForecastGermanyScan/tree/gh-pages"
+                            else:
+                                logging.warning("failed to find '#page-footer-source-code-link' in index.html ")
+                        except Exception as e:
+                            logging.error("failed to change contents of '#page-footer-source-code-link' in index.html")
+
+                        try:
+                            if len(indexHtmlSoup.select("#page-footer-repo-license-link")) > 0:
+                                indexHtmlSoup.select("#page-footer-repo-license-link")[0]["href"] = "https://github.com/twfgcicdbot/TinyWeatherForecastGermanyScan/blob/d19eb5eeeda3649ecd93a3b52f018878dd24ec81/LICENSE"
+                            else:
+                                logging.warning("failed to find '#page-footer-repo-license-link' in index.html ")
+                        except Exception as e:
+                            logging.error("failed to change contents of '#page-footer-repo-license-link' in index.html")
+
+
                         reportFileHtml = str(indexHtmlSoup)
 
                         with open(str(Path(workingDir / "index.html").absolute()), "w+", encoding="utf-8") as fh:
@@ -614,3 +665,4 @@ else:
     sys.exit(1)
 
 print("done")
+logging.info("finished execution of main.py")

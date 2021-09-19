@@ -64,6 +64,9 @@ jobs:
       - name: run main.py
         run: python TinyWeatherForecastGermanyScan/main.py
       
+      - name: run logtohtml.py
+        run: python TinyWeatherForecastGermanyScan/logtohtml.py || true
+
       - name: list directory contents
         run: ls -lisha
       

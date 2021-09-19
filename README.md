@@ -32,11 +32,24 @@ data formats:
 
 * **JSON** see [`analysis-result.json`](https://twfgcicdbot.github.io/TinyWeatherForecastGermanyScan/analysis-result.json)
 
+## Dependencies
+
+* see [`requirements.txt`](https://raw.githubusercontent.com/twfgcicdbot/TinyWeatherForecastGermanyScan/main/requirements.txt) for Python dependencies
+* `exodus-core` requires the package `dexdump` to be installed -> therefore it is strongly recommended to use a Linux OS for this project
+
+### Installation of `dexdump` on ubuntu
+
+```bash
+sudo apt-get install -y dexdump
+```
+
 ## License and Copyright
 
 This repository is licensed under **GPLv3** see [`LICENSE`](https://github.com/twfgcicdbot/TinyWeatherForecastGermanyScan/blob/bb7593cd5436a1be6495c068a3557ca4e4bf646f/LICENSE) for details. Please also see the legal terms noted inline in the code base. The author highly encourages everyone reading this to get in touch **before** using any of the contents of this repository for **commercial or by any means critical applications**.
 
 **Copyright** of the *main* project -> **Tiny Weather Forecast Germany** -> Pawel Dube ([@Starfish](https://codeberg.org/Starfish))
+
+The file [`permissions_en.py`](https://raw.githubusercontent.com/twfgcicdbot/TinyWeatherForecastGermanyScan/main/permissions_en.py) [-> source](https://github.com/Exodus-Privacy/exodus/blob/c365dfd9f5044f48bc5ddac794073ed664b3a82a/exodus/exodus/core/permissions_en.py) is licensed under [GPLv3](https://github.com/Exodus-Privacy/exodus/blob/v1/LICENSE) under the copyright of the french non-profit [ExodusPrivacy](https://exodus-privacy.eu.org/en/).
 
 The CI/CD script producing the reports displayed here is a ['GitHub action workflow'](https://github.com/twfgcicdbot/TinyWeatherForecastGermanyScan/actions/workflows/exodusscan.yml) created by Jean-Luc Tibaux (->[eUgEntOptIc44](https://gitlab.com/eUgEntOptIc44)).
 Feel free to use it as a inspiration for your own projects. I'd be very grateful if this was helpful to you. Please let me know if so.
