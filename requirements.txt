@@ -6,3 +6,4 @@ wheel==0.37.0
 Markdown==3.3.4
 htmlmin==0.1.12
 pygments==2.10.0
+ripgrepy==1.1.0

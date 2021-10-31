@@ -38,8 +38,14 @@ jobs:
         run: python -m pip install --upgrade pip
       
       - name: install dexdump
-        run: sudo apt-get install dexdump
+        run: sudo apt-get install -y dexdump
       
+      - name: install ripgrep
+        run: sudo apt-get install -y ripgrep
+      
+      - name: install apktool
+        run: sudo apt-get install -y apktool
+
       #- name: install brotli
       #  run: apt-get install brotli || true
 
@@ -63,6 +69,9 @@ jobs:
       
       - name: run main.py
         run: python TinyWeatherForecastGermanyScan/main.py
+
+      - name: run rg-pattern-search.py
+        run: python TinyWeatherForecastGermanyScan/rg-pattern-search.py || true
       
       - name: run logtohtml.py
         run: python TinyWeatherForecastGermanyScan/logtohtml.py || true
