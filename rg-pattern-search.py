@@ -1,5 +1,5 @@
 """
-ATTENTION: status -> WIP! -> early development
+ATTENTION: status -> WIP! -> development in early stage
 
 license: GPLv3
 
@@ -105,7 +105,42 @@ pprint(email_cleaned_matches)
 #with open("temp2.json","w+",encoding="utf-8") as fh:
 #    fh.write(str(json.dumps(email_cleaned_matches, indent=4)))
 
+# --------------- ipaddress ----------------------
+"""
+# IPv4
+rg = Ripgrepy('(?im)\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3}', 'TinyWeatherForecastGermanyApk/smali')
+ipaddress_matches_list = rg.H().n().json().run().as_dict
+
+# IPv6
+rg = Ripgrepy('(?im)(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))', 'TinyWeatherForecastGermanyApk/smali')
+ipaddress_matches_list2 = rg.H().n().json().run().as_dict
+ 
+ipaddress_matches_list += ipaddress_matches_list2
+
+logging.debug("found "+str(len(ipaddress_matches_list))+" matches for the ipaddress patterns in smali code ")
+
+#with open("temp.json","w+",encoding="utf-8") as fh:
+#    fh.write(str(json.dumps(ipaddress_matches_list, indent=4)))
+"""
+ipaddress_cleaned_matches = {}
+"""
+for ipaddress_match_dict in ipaddress_matches_list:
+    try:
+        ipaddress_temp = str(ipaddress_match_dict["data"]["lines"]["text"]).strip()
+        if ipaddress_temp not in ipaddress_cleaned_matches:
+            ipaddress_cleaned_matches[ipaddress_temp] = 1
+        else:
+            ipaddress_cleaned_matches[ipaddress_temp] += 1
+    except Exception as e:
+        logging.error("failed to parse ipaddress match dict -> error: "+str(e))
+
+pprint(ipaddress_cleaned_matches)
+
+#with open("temp2.json","w+",encoding="utf-8") as fh:
+#    fh.write(str(json.dumps(ipaddress_cleaned_matches, indent=4)))
+"""
+
 with open("TinyWeatherForecastGermanyScan/rg-pattern-matches.json","w+",encoding="utf-8") as fh:
-    fh.write(str(json.dumps({"http":http_cleaned_matches,"emails":email_cleaned_matches}, indent=4)))
+    fh.write(str(json.dumps({"http":http_cleaned_matches,"emails":email_cleaned_matches, "ipaddress":ipaddress_cleaned_matches}, indent=4)))
 
 print("done")
