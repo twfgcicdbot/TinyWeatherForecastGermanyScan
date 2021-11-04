@@ -1,5 +1,5 @@
 """
-ATTENTION: status -> WIP!
+ATTENTION: status -> WIP! -> early development
 
 license: GPLv3
 
@@ -18,6 +18,7 @@ import json
 import regex
 import logging
 import subprocess
+import sys
 
 from ripgrepy import Ripgrepy
 # The Ripgrepy class takes two arguments. The regex to search for and the folder path to search in
