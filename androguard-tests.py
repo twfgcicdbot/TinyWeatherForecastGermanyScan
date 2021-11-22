@@ -53,15 +53,24 @@ for embeddedClassTemp in embeddedClasses:
 
 printClassesResult = "<details><summary>"+str(len(list(embeddedClassTemp)))+" class(es) detected</summary>\n"
 
-def printClassesTree(tree, result):
+def printClassesTree(tree, result, level):
     for leaf in list(tree):
-        result += "\t<details><summary>"+str(leaf)+"</summary>\n"
+        levelIndent = ""
+        for levelIndex in range (0, level):
+            levelIndent += "-"
+        
+        leafName = str(leaf)
+        if level == 1:
+            leafName = "<b>"+str(leafName)+"</b>"
+        result += "\t<details><summary>|"+str(levelIndent)+"> "+str(leafName)+"</summary>\n"
+        
         if len(list(dict(tree[leaf]))) > 0:
-            result = printClassesTree(tree[leaf], result)
+            level += 1
+            result = printClassesTree(tree[leaf], result, level)
         result += "</details>"
     return result
 
-printClassesResult = str(printClassesTree(dict(classesTree), printClassesResult))
+printClassesResult = str(printClassesTree(dict(classesTree), printClassesResult, 1))
 printClassesResult += "</details>\n"
 
 printClassesResult = str(BeautifulSoup(printClassesResult, features="html.parser").prettify())

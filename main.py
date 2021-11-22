@@ -442,18 +442,22 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
 
                             printClassesResult = "<details><summary>"+str(len(list(embeddedClassTemp)))+" class(es) detected</summary>\n"
 
-                            def printClassesTree(tree, result):
+                            def printClassesTree(tree, result, level):
                                 for leaf in list(tree):
-                                    result += "\t<details><summary>"+str(leaf)+"</summary>\n"
+                                    levelIndent = ""
+                                    for levelIndex in range (0, level):
+                                        levelIndent += "-"
+                                    result += "\t<details><summary>|"+str(levelIndent)+"> "+str(leaf)+"</summary>\n"
                                     if len(list(dict(tree[leaf]))) > 0:
-                                        result = printClassesTree(tree[leaf], result)
+                                        level += 1
+                                        result = printClassesTree(tree[leaf], result, level)
                                     result += "</details>"
                                 return result
 
-                            printClassesResult = str(printClassesTree(dict(classesTree), printClassesResult))
+                            printClassesResult = str(printClassesTree(dict(classesTree), printClassesResult, 1))
                             printClassesResult += "</details>\n"
 
-                            printClassesResult = str(BeautifulSoup(printClassesResult, features="html.parser").prettify())
+                            #printClassesResult = str(BeautifulSoup(printClassesResult, features="html.parser").prettify())
 
                             resultMarkdown += "\n" + printClassesResult + "\n"
                         else:
