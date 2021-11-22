@@ -447,10 +447,14 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
                                     levelIndent = ""
                                     for levelIndex in range (0, level):
                                         levelIndent += "-"
-                                    result += "\t<details><summary>|"+str(levelIndent)+"> "+str(leaf)+"</summary>\n"
+                                    
+                                    leafName = str(leaf)
+                                    if level == 1:
+                                        leafName = "<b>"+str(leafName)+"</b>"
+                                    result += "\t<details><summary>|"+str(levelIndent)+"> "+str(leafName)+"</summary>\n"
+                                    
                                     if len(list(dict(tree[leaf]))) > 0:
-                                        level += 1
-                                        result = printClassesTree(tree[leaf], result, level)
+                                        result = printClassesTree(tree[leaf], result, level+1)
                                     result += "</details>"
                                 return result
 

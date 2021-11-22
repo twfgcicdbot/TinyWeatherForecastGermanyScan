@@ -65,8 +65,7 @@ def printClassesTree(tree, result, level):
         result += "\t<details><summary>|"+str(levelIndent)+"> "+str(leafName)+"</summary>\n"
         
         if len(list(dict(tree[leaf]))) > 0:
-            level += 1
-            result = printClassesTree(tree[leaf], result, level)
+            result = printClassesTree(tree[leaf], result, level+1)
         result += "</details>"
     return result
 
