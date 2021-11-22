@@ -13,6 +13,7 @@ from androguard.misc import AnalyzeAPK
 from exodus_core.analysis.static_analysis import StaticAnalysis
 from exodus_core.analysis.apk_signature import ApkSignature
 
+from bs4 import BeautifulSoup
 
 apkFileTemp = Path("TinyWeatherForecastGermanyScan/TinyWeatherForecastGermany-build031-version_0.57.3_20211028.apk")
 
@@ -45,19 +46,25 @@ for embeddedClassTemp in embeddedClasses:
     except Exception as e:
         print("ERROR:" + str(e))
 
-pprint(classesTree)
+#pprint(classesTree)
 
-with open(str(Path("test.json").absolute()), "w+", encoding="utf-8") as fh:
-    fh.write(str(json.dumps(dict(classesTree))))
+#with open(str(Path("test.json").absolute()), "w+", encoding="utf-8") as fh:
+#    fh.write(str(json.dumps(dict(classesTree), indent=4)))
 
-def printClassesTree(tree):
-    tree = dict(tree)
-    result = "<details><summary>"+str(dict(dict(tree)[list(tree)[0]]))+"</summary>"
-    #if len(list(list(tree)[1])) > 0:
-    #    printClassesTree(list(tree)[1])
-    result += "</details>"
+printClassesResult = "<details><summary>"+str(len(list(embeddedClassTemp)))+" class(es) detected</summary>\n"
+
+def printClassesTree(tree, result):
+    for leaf in list(tree):
+        result += "\t<details><summary>"+str(leaf)+"</summary>\n"
+        if len(list(dict(tree[leaf]))) > 0:
+            result = printClassesTree(tree[leaf], result)
+        result += "</details>"
     return result
 
-pprint(printClassesTree(classesTree))
+printClassesResult = str(printClassesTree(dict(classesTree), printClassesResult))
+printClassesResult += "</details>\n"
 
-#pprint(print_blockdiag(dict(classesTree)))
+printClassesResult = str(BeautifulSoup(printClassesResult, features="html.parser").prettify())
+
+with open(str(Path("index.html").absolute()), "w+", encoding="utf-8") as fh:
+    fh.write(printClassesResult)

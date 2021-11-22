@@ -17,6 +17,7 @@ Not meant to be used in commercial or in general critical/productive environment
 
 """
 
+from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
 from pprint import pprint
@@ -402,6 +403,8 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
                             lenEmbeddedClasses = len(embeddedClasses)
 
                             logging.debug("static analysis returned "+str(lenEmbeddedClasses)+" class(es): "+str(embeddedClasses))
+                            
+                            """
                             resultMarkdown += "\n<details>\n<summary>"+str(lenEmbeddedClasses)+" class(es) detected</summary>\n\n<ul>"
                             
                             resultDict["classes"] = []
@@ -417,6 +420,42 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
                                 logging.debug("skipping iteration of classes as 'lenEmbeddedClasses' is "+str(lenEmbeddedClasses))
                             
                             resultMarkdown += "\n</ul>\n</details>"
+                            """
+
+                            # based on: https://gist.github.com/hrldcpr/2012250
+                            def tree(): return defaultdict(tree)
+
+                            def addLeafs(t, List):
+                                for node in List:
+                                    t = t[node]
+
+                            classesTree = tree()
+
+                            for embeddedClassTemp in embeddedClasses:
+                                try:
+                                    classPartsTemp = list(embeddedClassTemp.split("/"))
+                                    addLeafs(classesTree, classPartsTemp)
+                                except Exception as e:
+                                    logging.error("failed to parse class -> error: " + str(e))
+
+                            #pprint(classesTree)
+
+                            printClassesResult = "<details><summary>"+str(len(list(embeddedClassTemp)))+" class(es) detected</summary>\n"
+
+                            def printClassesTree(tree, result):
+                                for leaf in list(tree):
+                                    result += "\t<details><summary>"+str(leaf)+"</summary>\n"
+                                    if len(list(dict(tree[leaf]))) > 0:
+                                        result = printClassesTree(tree[leaf], result)
+                                    result += "</details>"
+                                return result
+
+                            printClassesResult = str(printClassesTree(dict(classesTree), printClassesResult))
+                            printClassesResult += "</details>\n"
+
+                            printClassesResult = str(BeautifulSoup(printClassesResult, features="html.parser").prettify())
+
+                            resultMarkdown += "\n" + printClassesResult + "\n"
                         else:
                             resultMarkdown += "\n **failed** to detect classes! \n\n"
                             logging.error("parsing of 'get_embedded_classes()' for apk '"+str(apkFileTemp)+"' failed! -> error: result is None!")    
