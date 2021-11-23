@@ -439,7 +439,7 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
                                     if sub_classes_count > 0:
                                         result += '\t<details><summary class="classes-tree-child" id="classes-tree-child-'+str(level)+'-'+str(sub_classes_count)+'" title="contains '+str(sub_classes_count)+' subclass(es)">|'+str(levelIndent)+'> '+str(leafName)+'</summary>\n'
                                     else:
-                                        result += '\t<span class="classes-tree-child" id="classes-tree-child-'+str(level)+'-'+str(sub_classes_count)+'" title="subclass '+str(leafName)+'">|'+str(levelIndent)+'> '+str(leafName)+'</span>\n'
+                                        result += '\t<span style="padding: 1px;display: block;margin-left: 13px;" class="classes-tree-child" id="classes-tree-child-'+str(level)+'-'+str(sub_classes_count)+'" title="subclass '+str(leafName)+'">|'+str(levelIndent)+'> '+str(leafName)+'</span>\n'
                                     
                                     if sub_classes_count > 0:
                                         result = printClassesTree(tree[leaf], result, level+1)
