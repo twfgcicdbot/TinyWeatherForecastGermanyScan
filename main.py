@@ -404,24 +404,6 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
 
                             logging.debug("static analysis returned "+str(lenEmbeddedClasses)+" class(es): "+str(embeddedClasses))
                             
-                            """
-                            resultMarkdown += "\n<details>\n<summary>"+str(lenEmbeddedClasses)+" class(es) detected</summary>\n\n<ul>"
-                            
-                            resultDict["classes"] = []
-
-                            if lenEmbeddedClasses > 0:
-                                for embeddedClassTemp in embeddedClasses:
-                                    try:
-                                        resultDict["classes"].append(str(embeddedClassTemp))
-                                        resultMarkdown += "<li>"+str(embeddedClassTemp)+"</li> \n"
-                                    except Exception as e:
-                                        logging.error("saving of class '"+str(embeddedClassTemp)+"' of '"+str(apkFileTemp)+"' failed! -> error: "+str(e))
-                            else:
-                                logging.debug("skipping iteration of classes as 'lenEmbeddedClasses' is "+str(lenEmbeddedClasses))
-                            
-                            resultMarkdown += "\n</ul>\n</details>"
-                            """
-
                             # based on: https://gist.github.com/hrldcpr/2012250
                             def tree(): return defaultdict(tree)
 
@@ -448,14 +430,22 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
                                     for levelIndex in range (0, level):
                                         levelIndent += "-"
                                     
+                                    sub_classes_count = len(list(dict(tree[leaf])))
+
                                     leafName = str(leaf)
                                     if level == 1:
                                         leafName = "<b>"+str(leafName)+"</b>"
-                                    result += "\t<details><summary>|"+str(levelIndent)+"> "+str(leafName)+"</summary>\n"
+
+                                    if sub_classes_count > 0:
+                                        result += '\t<details><summary class="classes-tree-child" id="classes-tree-child-'+str(level)+'-'+str(sub_classes_count)+'" title="contains '+str(sub_classes_count)+' subclass(es)">|'+str(levelIndent)+'> '+str(leafName)+'</summary>\n'
+                                    else:
+                                        result += '\t<span class="classes-tree-child" id="classes-tree-child-'+str(level)+'-'+str(sub_classes_count)+'" title="subclass '+str(leafName)+'">|'+str(levelIndent)+'> '+str(leafName)+'</span>\n'
                                     
-                                    if len(list(dict(tree[leaf]))) > 0:
+                                    if sub_classes_count > 0:
                                         result = printClassesTree(tree[leaf], result, level+1)
-                                    result += "</details>"
+                                    
+                                    if sub_classes_count > 0:
+                                        result += "</details>"
                                 return result
 
                             printClassesResult = str(printClassesTree(dict(classesTree), printClassesResult, 1))
