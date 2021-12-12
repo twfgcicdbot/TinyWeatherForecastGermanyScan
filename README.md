@@ -9,7 +9,7 @@ tl;dr -> scan code of [**TinyWeatherForecastGermany**](https://codeberg.org/Star
 The DWD is Germany's **national weather agency** (similiar to **N**ational **O**ceanic **a**nd **A**tmospheric **A**dministration ([NOAA](https://www.noaa.gov/about-our-agency)) in the US).
 
 **Note**:
-* *'TWFG'* is an unofficial abbreviation for ***T**iny **W**eather **F**orecast **G**ermany.*
+* *'TWFG'* is an inofficial abbreviation for ***T**iny **W**eather **F**orecast **G**ermany.*
 * *[ExodusPrivacy](https://github.com/Exodus-Privacy)* also partially uses the alternative spelling *'εxodus'*. To maintain readability the author sticks to the first version without the leading greek character.
 
 ## Purpose -> *Why?*
@@ -36,11 +36,13 @@ data formats:
 
 * see [`requirements.txt`](https://raw.githubusercontent.com/twfgcicdbot/TinyWeatherForecastGermanyScan/main/requirements.txt) for Python dependencies
 * `exodus-core` requires the package `dexdump` to be installed -> therefore it is strongly recommended to use a Linux OS for this project
+* `ripgrepy` requires `ripgrep` to be installed
 
-### Installation of `dexdump` on ubuntu
+### Installation of `dexdump` and `ripgrep` on ubuntu
 
 ```bash
 sudo apt-get install -y dexdump
+sudo apt-get install -y ripgrep
 ```
 
 ## License and Copyright
@@ -68,4 +70,4 @@ This project is **not affialited** with any of the following organizations: Clas
 * [**Translations**](https://weblate.bubu1.eu/engage/tiny-weather-forecast-germany/) are managed at the [**weblate** instance](https://weblate.bubu1.eu/projects/tiny-weather-forecast-germany/) provided by Marcus Hoffmann (@Bubu). 
 * Feel free to contribute to this script by opening issues and/or merge requests.
 * Please also see the automatically generated *javadoc* **code documentation** of Tiny Weather Forecast Germany [at GitLab](https://gitlab.com/tinyweatherforecastgermanygroup/twfg-javadoc).
-* For cybersec, privacy and/or copyright related issues regarding this repository please directly contact the maintainer [**Jean-Luc Tibaux**](https://codeberg.org/eUgEntOptIc44) or our [CI/CD bot](https://github.com/twfgcicdbot).
+* For cybersec, privacy and/or copyright related issues regarding this repository please directly contact the maintainer [**Jean-Luc Tibaux** (@eUgEntOptIc44)](https://codeberg.org/eUgEntOptIc44) or our [CI/CD bot](https://github.com/twfgcicdbot).
