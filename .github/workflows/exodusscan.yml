@@ -8,7 +8,7 @@ on:
   push:
     branches: [ main ]
   pull_request:
-    branches: [ main ]
+    branches: [ ]
   schedule:
     - cron: "5 7 * * *" # daily 7:05am UTC
 
