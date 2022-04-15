@@ -110,8 +110,8 @@ jobs:
       #    gzip -k -6 $(find TinyWeatherForecastGermanyScan -type f -regex '.*\.\(htm\|html\|txt\|text\|js\|css\)$') || true
       #    find TinyWeatherForecastGermanyScan -type f -regex '.*\.\(htm\|html\|txt\|text\|js\|css\)$' -exec brotli -f -k {} \; || true
 
-      - name: list directory contents of TinyWeatherForecastGermanyScan
-        run: cd TinyWeatherForecastGermanyScan && ls -lisha
+      #- name: list directory contents of TinyWeatherForecastGermanyScan
+      #  run: cd TinyWeatherForecastGermanyScan && ls -lisha
       
       - name: git push to origin
         run: |

@@ -242,7 +242,7 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
                             resultDict["permissions"] = []
                             if lenPermissions > 0:
                                 #pprint(permissions)
-                                resultMarkdown += '<ul id="permissions-list">'
+                                resultMarkdown += '<ul id="permissions-list" style="max-width:98%;">'
 
                                 for permissionTemp in permissions:
                                     try:
@@ -260,9 +260,15 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
                                         permissionDesc = ""
                                         logging.error("parsing of exodus knowledge data for permission '"+str(permissionTemp)+"' of '"+str(apkFileTemp)+"' failed! -> error: "+str(e))
 
+                                    perm_icon = ''
+                                    if 'icon' in permissionDictTemp:
+                                        perm_icon = str(permissionDictTemp["icon"]).replace("\n","").strip()
+                                    else:
+                                        logging.debug(f" failed to find icon for permission '{permissionTemp}' -> dict keys: {list(permissionDictTemp.keys())} ")
+
                                     try:
                                         resultDict["permissions"].append(permissionDictTemp)
-                                        resultMarkdown += "<li> <b>"+str(permissionTemp)+"</b> "
+                                        resultMarkdown += '<li style="max-width:98%;">'+str(perm_icon)+' <b style="max-width:98%;word-break:break-all;">'+str(permissionTemp)+'</b> '
 
                                         if len(str(permissionDesc).lower().replace("none","")) > 5:
                                             resultMarkdown += '<p id="permission-desc-'+regex.sub(r"(?im)[^A-z0-9]+","",str(permissionTemp))+'" class="permission-description">'+permissionDesc+"</p>"
@@ -329,9 +335,9 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
                                         certificateTempStr = 'Issuer: {} \n Subject: {} \n Fingerprint: {} \n Serial: {}'.format(certificateTemp.issuer, certificateTemp.subject, certificateTemp.fingerprint, certificateTemp.serial)
                                         
                                         if str(certificateTemp.issuer).strip().lower() == str(certificateTemp.subject).strip().lower():
-                                            certificateTempMd = '\n<details>\n<summary>click to expand</summary>\n\n<b>Issuer</b>: {} <br><b>Fingerprint</b>: {} <br><b>Serial</b>: {}<br></details>\n'.format(certificateTemp.issuer, certificateTemp.fingerprint, certificateTemp.serial)
+                                            certificateTempMd = '\n<details style="max-width:98%;">\n<summary>click to expand</summary>\n\n<b>Issuer</b>: {} <br><b>Fingerprint</b>: <span style="max-width:96%;word-break:all;">{}</span> <br><b>Serial</b>: {}<br></details>\n'.format(certificateTemp.issuer, certificateTemp.fingerprint, certificateTemp.serial)
                                         else:
-                                            certificateTempMd = '\n<details>\n<summary>click to expand</summary>\n\n<b>Issuer</b>: {} <br><b>Subject</b>: {} <br><b>Fingerprint</b>: {} <br><b>Serial</b>: {}<br></details>\n'.format(certificateTemp.issuer, certificateTemp.subject, certificateTemp.fingerprint, certificateTemp.serial)
+                                            certificateTempMd = '\n<details style="max-width:98%;">\n<summary>click to expand</summary>\n\n<b>Issuer</b>: {} <br><b>Subject</b>: {} <br><b>Fingerprint</b>: <span style="max-width:96%;word-break:all;">{}</span> <br><b>Serial</b>: {}<br></details>\n'.format(certificateTemp.issuer, certificateTemp.subject, certificateTemp.fingerprint, certificateTemp.serial)
                                     except Exception as e:
                                         logging.warning("serializing of certificate '"+str(certificateTemp)+"' of '"+str(apkFileTemp)+"' failed! -> error: "+str(e))
                                         logging.warning(" using fallback solution ")
