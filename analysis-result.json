@@ -1,0 +1,60 @@
+{
+    "name": "Tiny Weather Forecast Germany",
+    "package": "de.kaffeemitkoffein.tinyweatherforecastgermany",
+    "hash_sha256": "b486f19f36a35687892d6b8ba56598668042fc1fc2262c079cda2c57b3f8137c",
+    "version": "0.58.3",
+    "version_code": "35",
+    "UID": "9516B3B40C249FEC74C079FEC8ED9036E97A7830",
+    "permissions": [
+        {
+            "description": "Allows the app to create network sockets and use custom network protocols. The browser and other applications provide means to send data to the internet, so this permission is not required to send data to the internet.",
+            "description_ptr": "permdesc_createNetworkSockets",
+            "label": "have full network access",
+            "label_ptr": "permlab_createNetworkSockets",
+            "name": "android.permission.INTERNET",
+            "permission_group": "",
+            "protection_level": "normal|instant"
+        },
+        {
+            "description": "This app can get your location based on GPS or network location sources such as cell towers and Wi-Fi networks. These location services must be turned on and available on your phone for the app to be able to use them. This may increase battery consumption.",
+            "description_ptr": "permdesc_accessFineLocation",
+            "label": "access precise location (GPS and\n            network-based)",
+            "label_ptr": "permlab_accessFineLocation",
+            "name": "android.permission.ACCESS_FINE_LOCATION",
+            "permission_group": "android.permission-group.LOCATION",
+            "protection_level": "dangerous|instant"
+        },
+        {
+            "description": "Allows the app to have itself started as soon as the system has finished booting. This can make it take longer to start the phone and allow the app to slow down the overall phone by always running.",
+            "description_ptr": "permdesc_receiveBootCompleted",
+            "label": "run at startup",
+            "label_ptr": "permlab_receiveBootCompleted",
+            "name": "android.permission.RECEIVE_BOOT_COMPLETED",
+            "permission_group": "",
+            "protection_level": "normal"
+        },
+        {
+            "description": "Allows the app to make use of foreground services.",
+            "description_ptr": "permdesc_foregroundService",
+            "label": "run foreground service",
+            "label_ptr": "permlab_foregroundService",
+            "name": "android.permission.FOREGROUND_SERVICE",
+            "permission_group": "",
+            "protection_level": "normal|instant"
+        },
+        {
+            "description": "Allows the app to view information about network connections such as which networks exist and are connected.",
+            "description_ptr": "permdesc_accessNetworkState",
+            "label": "view network connections",
+            "label_ptr": "permlab_accessNetworkState",
+            "name": "android.permission.ACCESS_NETWORK_STATE",
+            "permission_group": "",
+            "protection_level": "normal|instant"
+        }
+    ],
+    "libraries": [],
+    "certificates": [
+        "Issuer: Common Name: Pawel Dube, Organizational Unit: Unknown, Organization: Unknown, Locality: Hamburg, State/Province: Hamburg, Country: DE \n Subject: Common Name: Pawel Dube, Organizational Unit: Unknown, Organization: Unknown, Locality: Hamburg, State/Province: Hamburg, Country: DE \n Fingerprint: f7a5b59b8fbd6a6d287916881f2a5ab9343c5323 \n Serial: 263314478"
+    ],
+    "trackers": []
+}

@@ -1,0 +1,22 @@
+{
+    "http": {
+        "https://opendata.dwd.de/weather/local_forecasts/mos/MOSMIX_L/single_stations/": 1,
+        "http://opendata.dwd.de/weather/local_forecasts/mos/MOSMIX_L/single_stations/": 1,
+        "http://opendata.dwd.de/weather/alerts/cap/COMMUNEUNION_DWD_STAT/Z_CAP_C_EDZW_LATEST_PVW_STATUS_PREMIUMDWD_COMMUNEUNION_EN.zip": 1,
+        "http://opendata.dwd.de/weather/alerts/cap/COMMUNEUNION_DWD_STAT/Z_CAP_C_EDZW_LATEST_PVW_STATUS_PREMIUMDWD_COMMUNEUNION_DE.zip": 1,
+        "http://opendata.dwd.de/weather/alerts/cap/COMMUNEUNION_DWD_STAT/Z_CAP_C_EDZW_LATEST_PVW_STATUS_PREMIUMDWD_COMMUNEUNION_ES.zip": 1,
+        "http://opendata.dwd.de/weather/alerts/cap/COMMUNEUNION_DWD_STAT/Z_CAP_C_EDZW_LATEST_PVW_STATUS_PREMIUMDWD_COMMUNEUNION_FR.zip": 1,
+        "https://opendata.dwd.de/weather/alerts/cap/COMMUNEUNION_DWD_STAT/Z_CAP_C_EDZW_LATEST_PVW_STATUS_PREMIUMDWD_COMMUNEUNION_EN.zip": 1,
+        "https://opendata.dwd.de/weather/alerts/cap/COMMUNEUNION_DWD_STAT/Z_CAP_C_EDZW_LATEST_PVW_STATUS_PREMIUMDWD_COMMUNEUNION_DE.zip": 1,
+        "https://opendata.dwd.de/weather/alerts/cap/COMMUNEUNION_DWD_STAT/Z_CAP_C_EDZW_LATEST_PVW_STATUS_PREMIUMDWD_COMMUNEUNION_ES.zip": 1,
+        "https://opendata.dwd.de/weather/alerts/cap/COMMUNEUNION_DWD_STAT/Z_CAP_C_EDZW_LATEST_PVW_STATUS_PREMIUMDWD_COMMUNEUNION_FR.zip": 1,
+        "https://opendata.dwd.de/weather/text_forecasts/txt/": 1,
+        "http://opendata.dwd.de/weather/text_forecasts/txt/": 1,
+        "https://opendata.dwd.de/weather/maritime/forecast/german/": 1,
+        "https://opendata.dwd.de/weather/maritime/forecast/english/": 1,
+        "https://maps.dwd.de/geoserver/dwd/wms?service=WMS&version=1.1.0&request=GetMap&layers=dwd%3AWN-Produkt&bbox=-543.462%2C-4808.645%2C556.538%2C-3608.645&width=1100&height=1200&srs=EPSG%3A1000001&styles=&format=image%2Fpng": 1,
+        "http://maps.dwd.de/geoserver/dwd/wms?service=WMS&version=1.1.0&request=GetMap&layers=dwd%3AWN-Produkt&bbox=-543.462%2C-4808.645%2C556.538%2C-3608.645&width=1100&height=1200&srs=EPSG%3A1000001&styles=&format=image%2Fpng": 1
+    },
+    "emails": {},
+    "ipaddress": {}
+}
