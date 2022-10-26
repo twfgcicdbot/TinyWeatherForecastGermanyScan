@@ -67,7 +67,7 @@ This project is **not affialited** with any of the following organizations: Clas
 ## Contributing
 
 * All contributions to **Tiny Weather Forecast Germany** are managed at the ['main'](https://codeberg.org/Starfish/TinyWeatherForecastGermany) code repository at [codeberg.org](https://codeberg.org/Starfish/TinyWeatherForecastGermany)
-* [**Translations**](https://weblate.bubu1.eu/engage/tiny-weather-forecast-germany/) are managed at the [**weblate** instance](https://weblate.bubu1.eu/projects/tiny-weather-forecast-germany/) provided by Marcus Hoffmann (@Bubu). 
+* [**Translations**](https://translate.codeberg.org/engage/tiny-weather-forecast-germany/) are managed at the [**weblate** instance](https://translate.codeberg.org/projects/tiny-weather-forecast-germany/) provided by Codeberg e.V. 
 * Feel free to contribute to this script by opening issues and/or merge requests.
 * Please also see the automatically generated *javadoc* **code documentation** of Tiny Weather Forecast Germany [at GitLab](https://gitlab.com/tinyweatherforecastgermanygroup/twfg-javadoc).
 * For cybersec, privacy and/or copyright related issues regarding this repository please directly contact the maintainer [**Jean-Luc Tibaux** (@eUgEntOptIc44)](https://codeberg.org/eUgEntOptIc44) or our [CI/CD bot](https://github.com/twfgcicdbot).
