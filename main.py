@@ -12,7 +12,7 @@
 
 ## Disclaimer
 
-No warranty or guarantee of any kind provided. Use at your own risk.
+No warranty or guarantee of any kind provided. Use at your own risk only.
 Not meant to be used in commercial or in general critical/productive environments at all.
 
 """
@@ -31,6 +31,7 @@ import time
 
 from dateutil.tz import tzutc # timezone UTC -> docs: https://dateutil.readthedocs.io/en/stable/tz.html#dateutil.tz.tzutc
 from bs4 import BeautifulSoup
+import htmlmin
 import regex
 import requests
 
@@ -41,14 +42,14 @@ from exodus_core.analysis.static_analysis import StaticAnalysis
 from exodus_core.analysis.apk_signature import ApkSignature
 from permissions_en import AOSP_PERMISSIONS_EN
 
-workingDir = Path("TinyWeatherForecastGermanyScan")
-workingDir.mkdir(parents=True, exist_ok=True) # create directory if not exists
+working_dir = Path("TinyWeatherForecastGermanyScan")
+working_dir.mkdir(parents=True, exist_ok=True) # create directory if not exists
 
 try:
     logging.basicConfig(format=u'%(asctime)-s %(levelname)s [%(name)s]: %(message)s',
         level=logging.DEBUG,
         handlers=[
-            logging.FileHandler(str(Path(workingDir / "debug.log").absolute()), encoding="utf-8"),
+            logging.FileHandler(str(Path(working_dir / "debug.log").absolute()), encoding="utf-8"),
             logging.StreamHandler()
     ])
 except Exception as e:
@@ -57,192 +58,188 @@ except Exception as e:
 # sources of user agent data -> License: MIT
 #  -> https://github.com/tamimibrahim17/List-of-user-agents/blob/master/Chrome.txt
 #  -> https://github.com/tamimibrahim17/List-of-user-agents/blob/master/Firefox.txt
-UserAgents = ["Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36","Mozilla/5.0 (X11; Ubuntu; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2919.83 Safari/537.36","Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2866.71 Safari/537.36","Mozilla/5.0 (X11; Ubuntu; Linux i686 on x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2820.59 Safari/537.36","Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2762.73 Safari/537.36","Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2656.18 Safari/537.36","Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.36 (KHTML like Gecko) Chrome/44.0.2403.155 Safari/537.36","Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36","Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2227.1 Safari/537.36","Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2227.0 Safari/537.36","Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2227.0 Safari/537.36","Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2226.0 Safari/537.36","Mozilla/5.0 (Windows NT 6.4; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2225.0 Safari/537.36","Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10; rv:33.0) Gecko/20100101 Firefox/33.0","Mozilla/5.0 (Windows ME 4.9; rv:31.0) Gecko/20100101 Firefox/31.7","Mozilla/5.0 (X11; Linux i586; rv:31.0) Gecko/20100101 Firefox/31.0","Mozilla/5.0 (Windows NT 6.1; WOW64; rv:31.0) Gecko/20130401 Firefox/31.0","Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:28.0) Gecko/20100101 Firefox/31.0","Mozilla/5.0 (Windows NT 5.1; rv:31.0) Gecko/20100101 Firefox/31.0","Mozilla/5.0 (Windows NT 6.1; WOW64; rv:29.0) Gecko/20120101 Firefox/29.0","Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:25.0) Gecko/20100101 Firefox/29.0","Mozilla/5.0 (X11; OpenBSD amd64; rv:28.0) Gecko/20100101 Firefox/28.0","Mozilla/5.0 (X11; Linux x86_64; rv:28.0) Gecko/20100101  Firefox/28.0","Mozilla/5.0 (Windows NT 6.1; rv:27.3) Gecko/20130101 Firefox/27.3","Mozilla/5.0 (Windows NT 6.2; Win64; x64; rv:27.0) Gecko/20121011 Firefox/27.0","Mozilla/5.0 (Windows NT 6.2; rv:20.0) Gecko/20121202 Firefox/26.0","Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:25.0) Gecko/20100101 Firefox/25.0","Mozilla/5.0 (Macintosh; Intel Mac OS X 10.6; rv:25.0) Gecko/20100101 Firefox/25.0","Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:24.0) Gecko/20100101 Firefox/24.0","Mozilla/5.0 (Windows NT 6.0; WOW64; rv:24.0) Gecko/20100101 Firefox/24.0","Mozilla/5.0 (Macintosh; Intel Mac OS X 10.8; rv:24.0) Gecko/20100101 Firefox/24.0","Mozilla/5.0 (Windows NT 6.2; rv:22.0) Gecko/20130405 Firefox/23.0","Mozilla/5.0 (Windows NT 6.1; WOW64; rv:23.0) Gecko/20130406 Firefox/23.0","Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:23.0) Gecko/20131011 Firefox/23.0","Mozilla/5.0 (Windows NT 6.2; rv:22.0) Gecko/20130405 Firefox/22.0","Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:22.0) Gecko/20130328 Firefox/22.0","Mozilla/5.0 (Windows NT 6.1; rv:22.0) Gecko/20130405 Firefox/22.0","Mozilla/5.0 (Microsoft Windows NT 6.2.9200.0); rv:22.0) Gecko/20130405 Firefox/22.0","Mozilla/5.0 (Windows NT 6.2; Win64; x64; rv:16.0.1) Gecko/20121011 Firefox/21.0.1","Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:16.0.1) Gecko/20121011 Firefox/21.0.1","Mozilla/5.0 (Windows NT 6.2; Win64; x64; rv:21.0.0) Gecko/20121011 Firefox/21.0.0","Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:21.0) Gecko/20130331 Firefox/21.0","Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:21.0) Gecko/20100101 Firefox/21.0","Mozilla/5.0 (X11; Linux i686; rv:21.0) Gecko/20100101 Firefox/21.0"]
+user_agents = ["Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36","Mozilla/5.0 (X11; Ubuntu; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2919.83 Safari/537.36","Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2866.71 Safari/537.36","Mozilla/5.0 (X11; Ubuntu; Linux i686 on x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2820.59 Safari/537.36","Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2762.73 Safari/537.36","Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2656.18 Safari/537.36","Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.36 (KHTML like Gecko) Chrome/44.0.2403.155 Safari/537.36","Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36","Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2227.1 Safari/537.36","Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2227.0 Safari/537.36","Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2227.0 Safari/537.36","Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2226.0 Safari/537.36","Mozilla/5.0 (Windows NT 6.4; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2225.0 Safari/537.36","Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10; rv:33.0) Gecko/20100101 Firefox/33.0","Mozilla/5.0 (Windows ME 4.9; rv:31.0) Gecko/20100101 Firefox/31.7","Mozilla/5.0 (X11; Linux i586; rv:31.0) Gecko/20100101 Firefox/31.0","Mozilla/5.0 (Windows NT 6.1; WOW64; rv:31.0) Gecko/20130401 Firefox/31.0","Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:28.0) Gecko/20100101 Firefox/31.0","Mozilla/5.0 (Windows NT 5.1; rv:31.0) Gecko/20100101 Firefox/31.0","Mozilla/5.0 (Windows NT 6.1; WOW64; rv:29.0) Gecko/20120101 Firefox/29.0","Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:25.0) Gecko/20100101 Firefox/29.0","Mozilla/5.0 (X11; OpenBSD amd64; rv:28.0) Gecko/20100101 Firefox/28.0","Mozilla/5.0 (X11; Linux x86_64; rv:28.0) Gecko/20100101  Firefox/28.0","Mozilla/5.0 (Windows NT 6.1; rv:27.3) Gecko/20130101 Firefox/27.3","Mozilla/5.0 (Windows NT 6.2; Win64; x64; rv:27.0) Gecko/20121011 Firefox/27.0","Mozilla/5.0 (Windows NT 6.2; rv:20.0) Gecko/20121202 Firefox/26.0","Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:25.0) Gecko/20100101 Firefox/25.0","Mozilla/5.0 (Macintosh; Intel Mac OS X 10.6; rv:25.0) Gecko/20100101 Firefox/25.0","Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:24.0) Gecko/20100101 Firefox/24.0","Mozilla/5.0 (Windows NT 6.0; WOW64; rv:24.0) Gecko/20100101 Firefox/24.0","Mozilla/5.0 (Macintosh; Intel Mac OS X 10.8; rv:24.0) Gecko/20100101 Firefox/24.0","Mozilla/5.0 (Windows NT 6.2; rv:22.0) Gecko/20130405 Firefox/23.0","Mozilla/5.0 (Windows NT 6.1; WOW64; rv:23.0) Gecko/20130406 Firefox/23.0","Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:23.0) Gecko/20131011 Firefox/23.0","Mozilla/5.0 (Windows NT 6.2; rv:22.0) Gecko/20130405 Firefox/22.0","Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:22.0) Gecko/20130328 Firefox/22.0","Mozilla/5.0 (Windows NT 6.1; rv:22.0) Gecko/20130405 Firefox/22.0","Mozilla/5.0 (Microsoft Windows NT 6.2.9200.0); rv:22.0) Gecko/20130405 Firefox/22.0","Mozilla/5.0 (Windows NT 6.2; Win64; x64; rv:16.0.1) Gecko/20121011 Firefox/21.0.1","Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:16.0.1) Gecko/20121011 Firefox/21.0.1","Mozilla/5.0 (Windows NT 6.2; Win64; x64; rv:21.0.0) Gecko/20121011 Firefox/21.0.0","Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:21.0) Gecko/20130331 Firefox/21.0","Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:21.0) Gecko/20100101 Firefox/21.0","Mozilla/5.0 (X11; Linux i686; rv:21.0) Gecko/20100101 Firefox/21.0"]
 
-random.shuffle(UserAgents)
+random.shuffle(user_agents)
 
-UserAgent = str(random.choice(UserAgents))
+user_agent = str(random.choice(user_agents))
 
-logging.debug("querying data as '"+UserAgent+"' ")
+logging.debug("querying data as '"+user_agent+"' ")
 
 headers = {
-    "User-Agent": UserAgent,
+    "User-Agent": user_agent,
     "DNT":"1"
 }
 
-searchCodebergReq = requests.get("https://codeberg.org/api/v1/repos/Starfish/TinyWeatherForecastGermany/releases?limit=1", headers=headers)
+search_cb_req = requests.get("https://codeberg.org/api/v1/repos/Starfish/TinyWeatherForecastGermany/releases?limit=1", headers=headers)
 
 try:
-    searchResultCodebergJson = json.loads(str(searchCodebergReq.text))
+    search_cb_json = json.loads(str(search_cb_req.text))
     #pprint(searchResultCodebergJson)
     logging.debug("fetched Codeberg data")
 except Exception as e:
     logging.error("codeberg api request failed! -> error: "+str(e))
 
-if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
-    twfgJson = searchResultCodebergJson[0]
+if len(search_cb_json) == 1 and search_cb_json != None:
+    twfg_json = search_cb_json[0]
     
-    pprint(twfgJson)
+    pprint(twfg_json)
     
-    if twfgJson == None:
+    if twfg_json == None:
         logging.error("content of key 'results' in codeberg json response is 'None' ")
 
         try:
-            pprint(str(searchCodebergReq.headers))
-            pprint(str(searchCodebergReq.text))
+            pprint(str(search_cb_req.headers))
+            pprint(str(search_cb_req.text))
         except Exception as e:
             logging.error("failed to print request raw data to console! -> error: "+str(e))
 
         sys.exit(1)
     
-    apkUrl = str(twfgJson["assets"][0]["browser_download_url"])
-    filename = str(twfgJson["assets"][0]["name"])
+    twfg_asset = twfg_json["assets"][0]
+    apk_url = str(twfg_asset["browser_download_url"])
+    apk_name = str(twfg_asset["name"])
 
-    logging.debug("downloading '"+str(filename)+"' from -> "+str(apkUrl)+" ... ")
-    
-    response = requests.get(apkUrl, stream=True, headers=headers)
-    with open(str(Path(workingDir / filename).absolute()), 'wb') as out_file:
-        shutil.copyfileobj(response.raw, out_file)
-    del response
+    apk_path = working_dir / apk_name
+    if not apk_path.exists():
+        logging.debug(f"downloading '{apk_name}' from -> {apk_url} ... ")
+        
+        response = requests.get(apk_url, stream=True, headers=headers)
+        with open(str(apk_path.absolute()), 'wb') as out_file:
+            shutil.copyfileobj(response.raw, out_file)
+        del response
+    else:
+        logging.info(f"skipped download of '{apk_name}' file '{apk_path}' already exists ")
 
-    logging.debug("file name: " + filename)
-    logging.debug("file path: " + str(Path(workingDir / filename).absolute()))
-    
-    # sha256_hash = hashlib.sha256()
-    # with open(filename,"rb") as f: # source: https://www.quickprogrammingtips.com/python/how-to-calculate-sha256-hash-of-a-file-in-python.html
-    #     # Read and update hash string value in blocks of 4K
-    #     for byte_block in iter(lambda: f.read(4096),b""):
-    #         sha256_hash.update(byte_block)
-    #     sha256_hash = str(sha256_hash.hexdigest())
-
-    # sha256_hash = str(sha256_hash)
-    # logging.debug("file hash: " + sha256_hash)
+    logging.debug("file name: " + apk_name)
+    logging.debug("file path: " + str(apk_path.absolute()))
     
     try:
-        apkFiles = list(workingDir.glob('*.apk'))
-        pprint(apkFiles)
+        apk_files = list(working_dir.glob('*.apk'))
+        pprint(apk_files)
         
-        if len(apkFiles) > 0:
-            for apkFileTemp in apkFiles:
+        if len(apk_files) > 0:
+            for apk_file_temp in apk_files:
                 try:
-                    logging.debug("apk file '"+str(apkFileTemp.absolute())+"' -> size: "+str(apkFileTemp.stat().st_size))
+                    logging.debug(f"apk file '{apk_file_temp.absolute()}' -> size: {apk_file_temp.stat().st_size}")
                     
-                    resultDict = {}
-                    resultMarkdown = ""
+                    result_dict = {}
+                    result_markdown = ""
                     
-                    analysisTemp = StaticAnalysis(str(apkFileTemp.absolute())) # init ExodusPrivacy StaticAnalysis for 'apkFileTemp'
+                    analysis_temp = StaticAnalysis(str(apk_file_temp.absolute())) # init ExodusPrivacy StaticAnalysis for 'apkFileTemp'
                     
                     try:
-                        analysisTemp.print_apk_infos()
+                        analysis_temp.print_apk_infos()
                     except Exception as e:
-                        logging.error("printing of 'apk_infos' to console failed! -> error: "+str(e))
+                        logging.error(f"printing of 'apk_infos' to console failed! -> error: {e}")
                     
                     # --- start of apk_infos ---
 
                     try:
-                        apkName = str(analysisTemp.get_app_name())
+                        apkName = str(analysis_temp.get_app_name())
                         if apkName != "None":
                             logging.debug("static analysis returned app name: "+str(apkName))
-                            resultDict["name"] = apkName
-                            resultMarkdown += "# " + apkName + "\n\n"
+                            result_dict["name"] = apkName
+                            result_markdown += "# " + apkName + "\n\n"
                         else:
-                            resultMarkdown += "# apk name missing \n\n"
-                            logging.error("parsing of 'get_app_name()' for apk '"+str(apkFileTemp)+"' failed! -> error: result is None!")
+                            result_markdown += "# apk name missing \n\n"
+                            logging.error(f"parsing of 'get_app_name()' for apk '{apk_file_temp}' failed! -> error: result is 'None'!")
                     except Exception as e:
-                        logging.error("parsing of 'get_app_name()' for apk '"+str(apkFileTemp)+"' failed! -> error: "+str(e))
-                        resultMarkdown += "# apk name missing \n\n"
+                        logging.error(f"parsing of 'get_app_name()' for apk '{apk_file_temp}' failed! -> error: {e}")
+                        result_markdown += "# apk name missing \n\n"
 
-                    resultMarkdown += "\n\n[TOC]\n\n"
+                    result_markdown += "\n\n[TOC]\n\n"
                     
-                    resultMarkdown += "\n## Metadata \n\n"
+                    result_markdown += "\n## Metadata \n\n"
 
                     try:
-                        apkPackage = str(analysisTemp.get_package())
-                        if apkPackage != "None":
-                            logging.debug("static analysis returned app package: "+str(apkPackage))
-                            resultDict["package"] = apkPackage
-                            resultMarkdown += "* **package**: [" + str(apkPackage) + "](https://f-droid.org/packages/"+str(apkPackage)+"/){ title='F-Droid Store package site' #fdroidproductpage } \n"
+                        apk_package = str(analysis_temp.get_package())
+                        if apk_package != "None":
+                            logging.debug(f"static analysis returned app package: {apk_package}")
+                            result_dict["package"] = apk_package
+                            result_markdown += f"* **package**: [{apk_package}](https://f-droid.org/packages/{apk_package}/)" + "{ title='F-Droid Store package site' #fdroidproductpage } \n"
                         else:
-                            resultMarkdown += "* **package**: *unknown* \n"
-                            logging.error("parsing of 'get_package()' for apk '"+str(apkFileTemp)+"' failed! -> error: result is None!")    
+                            result_markdown += "* **package**: *unknown* \n"
+                            logging.error(f"parsing of 'get_package()' for apk '{apk_file_temp}' failed! -> error: result is 'None'!")    
                     except Exception as e:
-                        logging.error("parsing of 'get_package()' for apk '"+str(apkFileTemp)+"' failed! -> error: "+str(e))
-                        resultMarkdown += "* **package**: *unknown* \n"
+                        logging.error(f"parsing of 'get_package()' for apk '{apk_file_temp}' failed! -> error: {e}")
+                        result_markdown += "* **package**: *unknown* \n"
 
                     try:
-                        apkSum = str(analysisTemp.get_sha256())
-                        if apkSum != "None":
-                            logging.debug("static analysis returned apk hash (sha256): "+str(apkSum))
-                            resultDict["hash_sha256"] = apkSum
-                            resultMarkdown += "* **sha256 hash**: [" + str(apkSum) + "](https://www.virustotal.com/gui/file/" + str(apkSum) + "/detection){ title='click to get the VirusTotal report' #virustotalhash } \n"
+                        apk_sum = str(analysis_temp.get_sha256())
+                        if apk_sum != "None":
+                            logging.debug(f"static analysis returned apk hash (sha256): {apk_sum}")
+                            result_dict["hash_sha256"] = apk_sum
+                            result_markdown += f"* **sha256 hash**: [{apk_sum}](https://www.virustotal.com/gui/file/{apk_sum}/detection)" + "{ title='click to get the VirusTotal report' #virustotalhash } \n"
 
                             try:
-                                with open(str(Path(workingDir / "sha256.html").absolute()), "w+", encoding="utf-8") as fh:
-                                    fh.write(str(apkSum))
+                                sha_path = Path(working_dir / "sha256.html")
+                                with open(str(sha_path.absolute()), "w+", encoding="utf-8") as fh:
+                                    fh.write(str(apk_sum))
                             except Exception as e:
-                                logging.error("failed to write sha256 hash to '"+str(Path(workingDir / "sha256.html").absolute())+"' -> error: "+str(e))
+                                logging.error(f"failed to write sha256 hash to '{sha_path}' -> error: {e}")
                         else:
-                            resultMarkdown += "* **sha256 hash**: *unknown* \n"
-                            logging.error("parsing of 'get_sha256()' for apk '"+str(apkFileTemp)+"' failed! -> error: result is None!")    
+                            result_markdown += "* **sha256 hash**: *unknown* \n"
+                            logging.error(f"parsing of 'get_sha256()' for apk '{apk_file_temp}' failed! -> error: result is 'None'!")    
                     except Exception as e:
-                        logging.error("parsing of 'get_sha256()' for apk '"+str(apkFileTemp)+"' failed! -> error: "+str(e))
-                        resultMarkdown += "* **sha256 hash**: *unknown* \n"
+                        logging.error(f"parsing of 'get_sha256()' for apk '{apk_file_temp}' failed! -> error: {e}")
+                        result_markdown += "* **sha256 hash**: *unknown* \n"
                     
                     try:
-                        apkVersion = str(analysisTemp.get_version())
-                        if apkVersion != "None":
-                            logging.debug("static analysis returned apk version: "+str(apkVersion))
-                            resultDict["version"] = apkVersion
-                            resultMarkdown += "* **version**: " + apkVersion + "\n"
+                        apk_version = str(analysis_temp.get_version())
+                        if apk_version != "None":
+                            logging.debug(f"static analysis returned apk version: {apk_version}")
+                            result_dict["version"] = apk_version
+                            result_markdown += f"* **version**: {apk_version}\n"
                         else:
-                            resultMarkdown += "* **version**: *unknown* \n"
-                            logging.error("parsing of 'get_version()' for apk '"+str(apkFileTemp)+"' failed! -> error: result is None!")    
+                            result_markdown += "* **version**: *unknown* \n"
+                            logging.error(f"parsing of 'get_version()' for apk '{apk_file_temp}' failed! -> error: result is 'None'!")    
                     except Exception as e:
-                        logging.error("parsing of 'get_version()' for apk '"+str(apkFileTemp)+"' failed! -> error: "+str(e))
-                        resultMarkdown += "* **version**: *unknown* \n"
+                        logging.error(f"parsing of 'get_version()' for apk '{apk_file_temp}' failed! -> error: {e}")
+                        result_markdown += "* **version**: *unknown* \n"
                     
                     try:
-                        apkVersionCode = analysisTemp.get_version_code()
-                        if apkVersionCode != None:
-                            logging.debug("static analysis returned apk version code: "+str(apkVersionCode))
-                            resultDict["version_code"] = apkVersionCode
-                            resultMarkdown += "* **version code**: " + apkVersionCode + "\n"
+                        apk_v_code = str(analysis_temp.get_version_code())
+                        if apk_v_code != None:
+                            logging.debug(f"static analysis returned apk version code: {apk_v_code}")
+                            result_dict["version_code"] = apk_v_code
+                            result_markdown += f"* **version code**: {apk_v_code}\n"
                         else:
-                            resultMarkdown += "* **version code**: *unknown* \n"
-                            logging.error("parsing of 'get_version_code()' for apk '"+str(apkFileTemp)+"' failed! -> error: result is None!")    
+                            result_markdown += "* **version code**: *unknown* \n"
+                            logging.error(f"parsing of 'get_version_code()' for apk '{apk_file_temp}' failed! -> error: result is None!")    
                     except Exception as e:
-                        logging.error("parsing of 'get_version_code()' for apk '"+str(apkFileTemp)+"' failed! -> error: "+str(e))
-                        resultMarkdown += "* **version code**: *unknown* \n"
+                        logging.error(f"parsing of 'get_version_code()' for apk '{apk_file_temp}' failed! -> error: {e}")
+                        result_markdown += "* **version code**: *unknown* \n"
                     
                     try:
-                        apkUID = str(analysisTemp.get_application_universal_id())
-                        if apkUID != "None":
-                            logging.debug("static analysis returned apk UID: "+str(apkUID))
-                            resultDict["UID"] = apkUID
-                            resultMarkdown += "* [**app UID**](https://stackoverflow.com/questions/5708906/what-is-uid-on-android/5709279){ title='android app UID explanation on StackOverflow' }: " + apkUID + " \n"
+                        apk_uid = str(analysis_temp.get_application_universal_id())
+                        if apk_uid != "None":
+                            logging.debug(f"static analysis returned apk UID: {apk_uid}")
+                            result_dict["UID"] = apk_uid
+                            result_markdown += "* [**app UID**](https://stackoverflow.com/a/5709279){ title='android app UID explanation on StackOverflow' }: " + apk_uid + " \n"
                         else:
-                            resultMarkdown += "* [**app UID**](https://stackoverflow.com/questions/5708906/what-is-uid-on-android/5709279){ title='android app UID explanation on StackOverflow' }: *unknown* \n"
-                            logging.error("parsing of 'get_application_universal_id()' (UID) for apk '"+str(apkFileTemp)+"' failed! -> error: result is None!")
+                            result_markdown += "* [**app UID**](https://stackoverflow.com/a/5709279){ title='android app UID explanation on StackOverflow' }: *unknown* \n"
+                            logging.error(f"parsing of 'get_application_universal_id()' (UID) for apk '{apk_file_temp}' failed! -> error: result is None!")
                     except Exception as e:
-                        logging.error("parsing of 'get_application_universal_id()' (UID) for apk '"+str(apkFileTemp)+"' failed! -> error: "+str(e))
-                        resultMarkdown += "* **app UID**: *unknown* \n"
+                        logging.error(f"parsing of 'get_application_universal_id()' (UID) for apk '{apk_file_temp}' failed! -> error: {e}")
+                        result_markdown += "* **app UID**: *unknown* \n"
                     
                     logging.debug("working on permissions ... ")
 
-                    resultMarkdown += "\n## Permissions \n"
+                    result_markdown += "\n## Permissions \n"
                  
                     try:
-                        permissions = analysisTemp.get_permissions()
+                        permissions = analysis_temp.get_permissions()
                         if permissions != None:
                             lenPermissions = len(permissions)
 
-                            logging.debug("static analysis returned "+str(lenPermissions)+" permission(s) ")
-                            resultMarkdown += "\n "+str(lenPermissions)+" permissions detected \n\n"
+                            logging.debug(f"static analysis returned {lenPermissions} permission(s) ")
+                            result_markdown += f"\n {lenPermissions} permissions detected \n\n"
                             
-                            resultDict["permissions"] = []
+                            result_dict["permissions"] = []
                             if lenPermissions > 0:
                                 #pprint(permissions)
-                                resultMarkdown += '<ul id="permissions-list" style="max-width:98%;">'
+                                result_markdown += '<ul id="permissions-list">'
 
                                 for permissionTemp in permissions:
                                     try:
@@ -258,7 +255,7 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
                                     except Exception as e:
                                         permissionDictTemp = {"name":str(permissionTemp)}
                                         permissionDesc = ""
-                                        logging.error("parsing of exodus knowledge data for permission '"+str(permissionTemp)+"' of '"+str(apkFileTemp)+"' failed! -> error: "+str(e))
+                                        logging.error("parsing of exodus knowledge data for permission '"+str(permissionTemp)+"' of '"+str(apk_file_temp)+"' failed! -> error: "+str(e))
 
                                     perm_icon = ''
                                     if 'icon' in permissionDictTemp:
@@ -267,93 +264,93 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
                                         logging.debug(f" failed to find icon for permission '{permissionTemp}' -> dict keys: {list(permissionDictTemp.keys())} ")
 
                                     try:
-                                        resultDict["permissions"].append(permissionDictTemp)
-                                        resultMarkdown += '<li style="max-width:98%;">'+str(perm_icon)+' <b style="max-width:98%;word-break:break-all;">'+str(permissionTemp)+'</b> '
+                                        result_dict["permissions"].append(permissionDictTemp)
+                                        result_markdown += '<li>'+str(perm_icon)+' <b class="permission-title">'+str(permissionTemp)+'</b> '
 
                                         if len(str(permissionDesc).lower().replace("none","")) > 5:
-                                            resultMarkdown += '<p id="permission-desc-'+regex.sub(r"(?im)[^A-z0-9]+","",str(permissionTemp))+'" class="permission-description">'+permissionDesc+"</p>"
+                                            result_markdown += '<p id="permission-desc-'+regex.sub(r"(?im)[^A-z0-9]+","",str(permissionTemp))+'" class="permission-description">'+permissionDesc+"</p>"
                                         
-                                        resultMarkdown += "</li>\n"
+                                        result_markdown += "</li>\n"
                                     except Exception as e:
-                                        logging.error("saving of permission '"+str(permissionTemp)+"' of '"+str(apkFileTemp)+"' failed! -> error: "+str(e))
+                                        logging.error("saving of permission '"+str(permissionTemp)+"' of '"+str(apk_file_temp)+"' failed! -> error: "+str(e))
                                 
-                                resultMarkdown += '</ul>'
+                                result_markdown += '</ul>'
                             else:
                                 logging.debug("skipping iteration of permissions as 'lenPermissions' is "+str(lenPermissions))
                         else:
-                            resultMarkdown += "\n **failed** to detect permissions! \n\n"
-                            logging.error("parsing of 'permissions' for apk '"+str(apkFileTemp)+"' failed! -> error: result is None!")
+                            result_markdown += "\n **failed** to detect permissions! \n\n"
+                            logging.error("parsing of 'permissions' for apk '"+str(apk_file_temp)+"' failed! -> error: result is None!")
                     except Exception as e:
-                        resultMarkdown += "\n **failed** to detect permissions! \n\n"
-                        logging.error("parsing of 'permissions' for apk '"+str(apkFileTemp)+"' failed! -> error: "+str(e))
+                        result_markdown += "\n **failed** to detect permissions! \n\n"
+                        logging.error("parsing of 'permissions' for apk '"+str(apk_file_temp)+"' failed! -> error: "+str(e))
                     
                     logging.debug("working on libraries ... ")
 
-                    resultMarkdown += "\n## Libraries \n"
+                    result_markdown += "\n## Libraries \n"
 
                     try:
-                        libraries = analysisTemp.get_libraries()
+                        libraries = analysis_temp.get_libraries()
                         if libraries != None:
                             lenLibraries = len(libraries)
                             logging.debug("static analysis returned "+str(lenLibraries)+" libraries ")
-                            resultMarkdown += "\n "+str(lenLibraries)+" libraries detected \n\n"
+                            result_markdown += "\n "+str(lenLibraries)+" libraries detected \n\n"
 
-                            resultDict["libraries"] = []
+                            result_dict["libraries"] = []
                             if lenLibraries > 0:
                                 for libraryTemp in libraries:
                                     try:
-                                        resultDict["libraries"].append(str(libraryTemp))
-                                        resultMarkdown += "* "+str(libraryTemp)+" \n"
+                                        result_dict["libraries"].append(str(libraryTemp))
+                                        result_markdown += "* "+str(libraryTemp)+" \n"
                                     except Exception as e:
-                                        logging.error("saving of library '"+str(libraryTemp)+"' of '"+str(apkFileTemp)+"' failed! -> error: "+str(e))
+                                        logging.error("saving of library '"+str(libraryTemp)+"' of '"+str(apk_file_temp)+"' failed! -> error: "+str(e))
                             else:
                                 logging.debug("skipping iteration of libraries as 'lenLibraries' is "+str(lenLibraries))
                         else:
-                            resultMarkdown += "\n **failed** to detect libraries! \n\n"
-                            logging.error("parsing of 'libraries' for apk '"+str(apkFileTemp)+"' failed! -> error: result is None!")
+                            result_markdown += "\n **failed** to detect libraries! \n\n"
+                            logging.error("parsing of 'libraries' for apk '"+str(apk_file_temp)+"' failed! -> error: result is None!")
                     except Exception as e:
-                        resultMarkdown += "\n **failed** to detect libraries! \n\n"
-                        logging.error("parsing of 'libraries' for apk '"+str(apkFileTemp)+"' failed! -> error: "+str(e))
+                        result_markdown += "\n **failed** to detect libraries! \n\n"
+                        logging.error("parsing of 'libraries' for apk '"+str(apk_file_temp)+"' failed! -> error: "+str(e))
 
-                    resultMarkdown += "\n## Certificates \n"
+                    result_markdown += "\n## Certificates \n"
 
                     try:
-                        certificates = analysisTemp.get_certificates()
+                        certificates = analysis_temp.get_certificates()
                         if certificates != None:
-                            lenCertificates = len(certificates)
+                            len_certs = len(certificates)
 
-                            logging.debug("static analysis returned "+str(lenCertificates)+" certificate(s) ")
-                            resultMarkdown += "\n "+str(lenCertificates)+" certificate(s) detected \n\n"
+                            logging.debug("static analysis returned "+str(len_certs)+" certificate(s) ")
+                            result_markdown += "\n "+str(len_certs)+" certificate(s) detected \n\n"
 
-                            resultDict["certificates"] = []
+                            result_dict["certificates"] = []
 
-                            if lenCertificates > 0:
+                            if len_certs > 0:
                                 for certificateTemp in certificates:
                                     certificateTempStr = str(certificateTemp)
-                                    certificateTempMd = certificateTempStr
+                                    cert_temp_md = certificateTempStr
                                     try:
                                         certificateTempStr = 'Issuer: {} \n Subject: {} \n Fingerprint: {} \n Serial: {}'.format(certificateTemp.issuer, certificateTemp.subject, certificateTemp.fingerprint, certificateTemp.serial)
                                         
                                         if str(certificateTemp.issuer).strip().lower() == str(certificateTemp.subject).strip().lower():
-                                            certificateTempMd = '\n<details style="max-width:98%;">\n<summary>click to expand</summary>\n\n<b>Issuer</b>: {} <br><b>Fingerprint</b>: <span style="max-width:96%;word-break:all;">{}</span> <br><b>Serial</b>: {}<br></details>\n'.format(certificateTemp.issuer, certificateTemp.fingerprint, certificateTemp.serial)
+                                            cert_temp_md = '\n<details class="cert-details">\n<summary>click to expand</summary>\n\n<b>Issuer</b>: {} <br><b>Fingerprint</b>: <span>{}</span> <br><b>Serial</b>: {}<br></details>\n'.format(certificateTemp.issuer, certificateTemp.fingerprint, certificateTemp.serial)
                                         else:
-                                            certificateTempMd = '\n<details style="max-width:98%;">\n<summary>click to expand</summary>\n\n<b>Issuer</b>: {} <br><b>Subject</b>: {} <br><b>Fingerprint</b>: <span style="max-width:96%;word-break:all;">{}</span> <br><b>Serial</b>: {}<br></details>\n'.format(certificateTemp.issuer, certificateTemp.subject, certificateTemp.fingerprint, certificateTemp.serial)
+                                            cert_temp_md = '\n<details class="cert-details">\n<summary>click to expand</summary>\n\n<b>Issuer</b>: {} <br><b>Subject</b>: {} <br><b>Fingerprint</b>: <span>{}</span> <br><b>Serial</b>: {}<br></details>\n'.format(certificateTemp.issuer, certificateTemp.subject, certificateTemp.fingerprint, certificateTemp.serial)
                                     except Exception as e:
-                                        logging.warning("serializing of certificate '"+str(certificateTemp)+"' of '"+str(apkFileTemp)+"' failed! -> error: "+str(e))
+                                        logging.warning("serializing of certificate '"+str(certificateTemp)+"' of '"+str(apk_file_temp)+"' failed! -> error: "+str(e))
                                         logging.warning(" using fallback solution ")
                                     try:
-                                        resultDict["certificates"].append(str(certificateTempStr))
-                                        resultMarkdown += str(certificateTempMd)+" \n\n"
+                                        result_dict["certificates"].append(str(certificateTempStr))
+                                        result_markdown += str(cert_temp_md)+" \n\n"
                                     except Exception as e:
-                                        logging.error("saving of certificate '"+str(certificateTemp)+"' of '"+str(apkFileTemp)+"' failed! -> error: "+str(e))
+                                        logging.error("saving of certificate '"+str(certificateTemp)+"' of '"+str(apk_file_temp)+"' failed! -> error: "+str(e))
                             else:
-                                logging.debug("skipping iteration of certificates as 'lenCertificates' is "+str(lenCertificates))
+                                logging.debug("skipping iteration of certificates as 'lenCertificates' is "+str(len_certs))
                         else:
-                            resultMarkdown += "\n **failed** to detect certificates! \n\n"
-                            logging.error("parsing of 'certificates' for apk '"+str(apkFileTemp)+"' failed! -> error: result is None!")    
+                            result_markdown += "\n **failed** to detect certificates! \n\n"
+                            logging.error("parsing of 'certificates' for apk '"+str(apk_file_temp)+"' failed! -> error: result is None!")    
                     except Exception as e:
-                        resultMarkdown += "\n **failed** to detect certificates! \n\n"
-                        logging.error("parsing of 'certificates' for apk '"+str(apkFileTemp)+"' failed! -> error: "+str(e))
+                        result_markdown += "\n **failed** to detect certificates! \n\n"
+                        logging.error("parsing of 'certificates' for apk '"+str(apk_file_temp)+"' failed! -> error: "+str(e))
                     
                     # --- end of apk_infos ---
                     
@@ -362,38 +359,38 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
                     logging.debug("working on embedded_trackers ... ")
 
                     try:
-                        analysisTemp.print_embedded_trackers()
+                        analysis_temp.print_embedded_trackers()
                     except Exception as e:
                         logging.error("printing of 'embedded_trackers' to console failed! -> error: "+str(e))                    
                     
-                    resultMarkdown += "\n## Trackers \n"
+                    result_markdown += "\n## Trackers \n"
 
                     try:
-                        embeddedTrackers = analysisTemp.detect_trackers()
+                        embeddedTrackers = analysis_temp.detect_trackers()
                         if embeddedTrackers != None:
                             lenEmbeddedTrackers = len(embeddedTrackers)
 
                             logging.debug("static analysis returned "+str(lenEmbeddedTrackers)+" tracker(s): "+str(embeddedTrackers))
-                            resultMarkdown += "\n<details>\n<summary>"+str(lenEmbeddedTrackers)+" tracker(s) detected</summary>\n\n<ul>"
-                            resultDict["trackers"] = []
+                            result_markdown += "\n<details>\n<summary>"+str(lenEmbeddedTrackers)+" tracker(s) detected</summary>\n\n<ul>"
+                            result_dict["trackers"] = []
 
                             if lenEmbeddedTrackers > 0:
                                 for embeddedTrackerTemp in embeddedTrackers:
                                     try:
-                                        resultDict["trackers"].append(str(embeddedTrackerTemp))
-                                        resultMarkdown += "<li>"+str(embeddedTrackerTemp)+"</li> \n"
+                                        result_dict["trackers"].append(str(embeddedTrackerTemp))
+                                        result_markdown += "<li>"+str(embeddedTrackerTemp)+"</li> \n"
                                     except Exception as e:
-                                        logging.error("saving of tracker '"+str(embeddedTrackerTemp)+"' from '"+str(apkFileTemp)+"' failed! -> error: "+str(e))
+                                        logging.error("saving of tracker '"+str(embeddedTrackerTemp)+"' from '"+str(apk_file_temp)+"' failed! -> error: "+str(e))
                             else:
                                 logging.debug("skipping iteration of trackers as 'lenEmbeddedTrackers' is "+str(lenEmbeddedTrackers))
                             
-                            resultMarkdown += "\n</ul>\n</details>\n\n"
+                            result_markdown += "\n</ul>\n</details>\n\n"
                         else:
-                            resultMarkdown += "\n **failed** to detect trackers! \n\n"
-                            logging.error("parsing of 'detect_trackers()' for apk '"+str(apkFileTemp)+"' failed! -> error: result is None!")    
+                            result_markdown += "\n **failed** to detect trackers! \n\n"
+                            logging.error("parsing of 'detect_trackers()' for apk '"+str(apk_file_temp)+"' failed! -> error: result is None!")    
                     except Exception as e:
-                        resultMarkdown += "\n **failed** to detect trackers! \n\n"
-                        logging.error("parsing of 'detect_trackers()' for apk '"+str(apkFileTemp)+"' failed! -> error: "+str(e))
+                        result_markdown += "\n **failed** to detect trackers! \n\n"
+                        logging.error("parsing of 'detect_trackers()' for apk '"+str(apk_file_temp)+"' failed! -> error: "+str(e))
                     
                     # --- end of embedded_trackers ---
 
@@ -401,10 +398,10 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
                     
                     logging.debug("working on classes ... ")
 
-                    resultMarkdown += "\n## Classes \n"
+                    result_markdown += "\n## Classes \n"
 
                     try:
-                        embeddedClasses = analysisTemp.get_embedded_classes()
+                        embeddedClasses = analysis_temp.get_embedded_classes()
                         if embeddedClasses != None:
                             lenEmbeddedClasses = len(embeddedClasses)
 
@@ -418,34 +415,42 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
                                     t = t[node]
 
                             classesTree = tree()
+                            classes_dict = {}
 
-                            for embeddedClassTemp in embeddedClasses:
+                            for class_temp in embeddedClasses:
                                 try:
-                                    classPartsTemp = list(embeddedClassTemp.split("/"))
-                                    addLeafs(classesTree, classPartsTemp)
+                                    class_parts = list(class_temp.split("/"))
+                                    addLeafs(classesTree, class_parts)
+                                    classes_dict[class_parts[-1]] = class_temp.replace(class_parts[-1],'').strip('/')
                                 except Exception as e:
-                                    logging.error("failed to parse class -> error: " + str(e))
+                                    logging.error(f"failed to parse class -> error: {e}")
 
-                            #pprint(classesTree)
-
-                            printClassesResult = "<details><summary>"+str(len(list(embeddedClassTemp)))+" class(es) detected</summary>\n"
+                            printClassesResult = f"<details><summary>{len(list(class_temp))} class(es) detected</summary>\n"
 
                             def printClassesTree(tree, result, level):
                                 for leaf in list(tree):
-                                    levelIndent = ""
+                                    lvl_indent = ""
                                     for levelIndex in range (0, level):
-                                        levelIndent += "-"
+                                        lvl_indent += "-"
                                     
                                     sub_classes_count = len(list(dict(tree[leaf])))
 
-                                    leafName = str(leaf)
+                                    leaf_name = str(leaf)
                                     if level == 1:
-                                        leafName = "<b>"+str(leafName)+"</b>"
+                                        leaf_name = "<b>"+str(leaf_name)+"</b>"
 
                                     if sub_classes_count > 0:
-                                        result += '\t<details><summary class="classes-tree-child" id="classes-tree-child-'+str(level)+'-'+str(sub_classes_count)+'" title="contains '+str(sub_classes_count)+' subclass(es)">|'+str(levelIndent)+'> '+str(leafName)+'</summary>\n'
+                                        result += '\t<details><summary class="classes-tree-child" id="classes-tree-child-'+str(level+1)+'-'+str(sub_classes_count)+'" title="contains '+str(sub_classes_count)+' subclass(es)">|'+str(lvl_indent)+'> '+str(leaf_name)+'</summary>\n'
                                     else:
-                                        result += '\t<span style="padding: 1px;display: block;margin-left: 13px;" class="classes-tree-child" id="classes-tree-child-'+str(level)+'-'+str(sub_classes_count)+'" title="subclass '+str(leafName)+'">|'+str(levelIndent)+'> '+str(leafName)+'</span>\n'
+                                        docs_a = ''
+                                        source_a = ''
+                                        if leaf_name in classes_dict:
+                                            class_path = classes_dict[leaf_name]
+                                            if class_path[0:3] == 'de/' or 'nodomain/freeyourgadget' in class_path or 'org/astronomie' in class_path:
+                                                source_a = ' -> <a class="subclass-source" title="open source at codeberg.org" target="_blank" href="https://codeberg.org/Starfish/TinyWeatherForecastGermany/src/branch/master/app/src/main/java/'+str(class_path)+'/'+str(leaf_name)+'.java">source</a>'
+                                                docs_a = ' -> <a class="subclass-docs" title="open javadocs" target="_blank" href="https://tinyweatherforecastgermanygroup.gitlab.io/twfg-javadoc/'+str(class_path)+'/'+str(leaf_name)+'.html">docs</a>'
+                                        
+                                        result += '\t<span class="classes-tree-child subclass-child" id="classes-tree-child-'+str(level+1)+'-'+str(sub_classes_count)+'" data-path="'+str(class_path)+str(leaf_name)+'.java" title="subclass '+str(leaf_name)+'">|'+str(lvl_indent)+'> '+str(leaf_name)+str(source_a)+str(docs_a)+'</span>\n'
                                     
                                     if sub_classes_count > 0:
                                         result = printClassesTree(tree[leaf], result, level+1)
@@ -459,23 +464,23 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
 
                             #printClassesResult = str(BeautifulSoup(printClassesResult, features="html.parser").prettify())
 
-                            resultMarkdown += "\n" + printClassesResult + "\n"
+                            result_markdown += "\n" + printClassesResult + "\n"
                         else:
-                            resultMarkdown += "\n **failed** to detect classes! \n\n"
-                            logging.error("parsing of 'get_embedded_classes()' for apk '"+str(apkFileTemp)+"' failed! -> error: result is None!")    
+                            result_markdown += "\n **failed** to detect classes! \n\n"
+                            logging.error("parsing of 'get_embedded_classes()' for apk '"+str(apk_file_temp)+"' failed! -> error: result is None!")    
                     except Exception as e:
-                        resultMarkdown += "\n **failed** to detect classes! \n\n"
-                        logging.error("parsing of 'get_embedded_classes()' for apk '"+str(apkFileTemp)+"' failed! -> error: "+str(e))
+                        result_markdown += "\n **failed** to detect classes! \n\n"
+                        logging.error("parsing of 'get_embedded_classes()' for apk '"+str(apk_file_temp)+"' failed! -> error: "+str(e))
                     
                     # --- end of embedded_classes ---
 
-                    resultMarkdown += "\n\n This report was generated on " + str(datetime.now(tzutc()).strftime("%Y-%m-%d at %H:%M (%Z)")) + " using [`exodus-core`](https://github.com/Exodus-Privacy/exodus-core/).\n"
+                    result_markdown += "\n\n This report was generated on " + str(datetime.now(tzutc()).strftime("%Y-%m-%d at %H:%M (%Z)")) + " using [`exodus-core`](https://github.com/Exodus-Privacy/exodus-core/).\n"
 
                     try:
                         #pprint(analysisTemp.signatures[0])                        
 
                         try:
-                            trackerSignatures = list(analysisTemp.signatures) # list of named tuples -> also see: https://stackoverflow.com/questions/26180528/convert-a-namedtuple-into-a-dictionary
+                            trackerSignatures = list(analysis_temp.signatures) # list of named tuples -> also see: https://stackoverflow.com/questions/26180528/convert-a-namedtuple-into-a-dictionary
                         except Exception as e:
                             trackerSignatures = []
                             logging.error("while trying to save tracker signatures -> error: "+str(e))
@@ -491,32 +496,32 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
                         else:
                             logging.error("while trying to parse tracker signatures -> error: data length is invalid!")
 
-                        with open(str(Path(workingDir / "tracker-signatures.json").absolute()), "w+", encoding="utf-8") as fh:
+                        with open(str(Path(working_dir / "tracker-signatures.json").absolute()), "w+", encoding="utf-8") as fh:
                             fh.write(str(json.dumps(trackerSignatures, indent=4)))
 
-                        logging.debug("created tracker signature dump '"+str(Path(workingDir / "tracker-signatures.json").absolute())+"' ("+str(Path(workingDir / "tracker-signatures.json").stat().st_size)+") ")
+                        logging.debug("created tracker signature dump '"+str(Path(working_dir / "tracker-signatures.json").absolute())+"' ("+str(Path(working_dir / "tracker-signatures.json").stat().st_size)+") ")
 
-                        resultMarkdown += "\nThe analysis has been conducted using "+str(len(analysisTemp.signatures))+" tracker signatures by [ExodusPrivacy](https://exodus-privacy.eu.org/)."
+                        result_markdown += "\nThe analysis has been conducted using "+str(len(analysis_temp.signatures))+" tracker signatures by [ExodusPrivacy](https://exodus-privacy.eu.org/)."
                     except Exception as e:
                         logging.error("while trying to save tracker signatures -> error: "+str(e))
 
                     try:
                         #pprint(resultDict)                        
-                        with open(str(Path(workingDir / "analysis-result.json").absolute()), "w+", encoding="utf-8") as fh:
-                            fh.write(str(json.dumps(resultDict, indent=4)))
+                        with open(str(Path(working_dir / "analysis-result.json").absolute()), "w+", encoding="utf-8") as fh:
+                            fh.write(str(json.dumps(result_dict, indent=4)))
                         
-                        logging.debug("created report '"+str(Path(workingDir / "analysis-result.json").absolute())+"' ("+str(Path(workingDir / "analysis-result.json").stat().st_size)+") ")
+                        logging.debug("created report '"+str(Path(working_dir / "analysis-result.json").absolute())+"' ("+str(Path(working_dir / "analysis-result.json").stat().st_size)+") ")
                     except Exception as e:
-                        logging.error("while trying to save analysis result as json file '"+str(Path(workingDir / "analysis-result.json").absolute())+"' -> error: "+str(e))
+                        logging.error("while trying to save analysis result as json file '"+str(Path(working_dir / "analysis-result.json").absolute())+"' -> error: "+str(e))
                     
                     try:
                         #pprint(resultMarkdown)                        
-                        with open(str(Path(workingDir / "analysis-result.md").absolute()), "w+", encoding="utf-8") as fh:
-                            fh.write(str(resultMarkdown))
+                        with open(str(Path(working_dir / "analysis-result.md").absolute()), "w+", encoding="utf-8") as fh:
+                            fh.write(str(result_markdown))
 
-                        logging.debug("created report '"+str(Path(workingDir / "analysis-result.md").absolute())+"' ("+str(Path(workingDir / "analysis-result.md").stat().st_size)+") ")
+                        logging.debug("created report '"+str(Path(working_dir / "analysis-result.md").absolute())+"' ("+str(Path(working_dir / "analysis-result.md").stat().st_size)+") ")
                     except Exception as e:
-                        logging.error("while trying to save analysis result as markdown file '"+str(Path(workingDir / "analysis-result.md").absolute())+"' -> error: "+str(e))
+                        logging.error("while trying to save analysis result as markdown file '"+str(Path(working_dir / "analysis-result.md").absolute())+"' -> error: "+str(e))
 
                     try:
                         indexHtmlReq = requests.get("https://tinyweatherforecastgermanygroup.gitlab.io/index/index.html", headers=headers)
@@ -525,39 +530,46 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
 
                         indexHtmlContent = indexHtmlContent.replace("Last update of this GitLab Pages page","Last update of this GitHub Pages page")
 
-                        indexHtmlSoup = BeautifulSoup(indexHtmlContent, features='html.parser')
+                        index_html_soup = BeautifulSoup(indexHtmlContent, features='html.parser')
 
-                        for tagGroup in [indexHtmlSoup.select('#repo-latest-release-container'), indexHtmlSoup.select('#readme-content-container'), indexHtmlSoup.select('#readme-content-container')]:
+                        for tagGroup in [index_html_soup.select('#repo-latest-release-container'), index_html_soup.select('#readme-content-container'), index_html_soup.select('#readme-content-container')]:
                             for tag in tagGroup:
                                 tag.decompose()
 
-                        indexMarkdownSoup = BeautifulSoup('<div role="document" aria-label="ExodusPrivacy tracker report about TinyWeatherForecastGermany" id="exodus-privacy-report">'+str(markdown.markdown(resultMarkdown, extensions=['extra', 'sane_lists', TocExtension(baselevel=2, title='Table of contents', anchorlink=True)]))+'</div>', features='html.parser')
+                        indexMarkdownSoup = BeautifulSoup('<div role="document" aria-label="ExodusPrivacy tracker report about TinyWeatherForecastGermany" id="exodus-privacy-report">'+str(markdown.markdown(result_markdown, extensions=['extra', 'sane_lists', TocExtension(baselevel=2, title='Table of contents', anchorlink=True)]))+'</div>', features='html.parser')
 
-                        if len(indexHtmlSoup.select("#repo-metadata-container")) > 0:
-                                indexHtmlSoup.select("#repo-metadata-container")[0].insert_after(indexMarkdownSoup)
+                        if len(index_html_soup.select("#repo-metadata-container")) > 0:
+                                index_html_soup.select("#repo-metadata-container")[0].insert_after(indexMarkdownSoup)
                         else:
                             logging.error(" could NOT insert converted markdown markup from report! ")
 
-                        indexHtmlSoup.title.string = "ExodusPrivacy report | Tiny Weather Forecast Germany"
+                        index_html_soup.title.string = "ExodusPrivacy report | Tiny Weather Forecast Germany"
 
-                        if len(list(indexHtmlSoup.select('meta[name="google-site-verification"]'))) > 0:
-                            indexHtmlSoup.select('meta[name="google-site-verification"]')[0].decompose()
+                        if len(list(index_html_soup.select('meta[name="google-site-verification"]'))) > 0:
+                            index_html_soup.select('meta[name="google-site-verification"]')[0].decompose()
 
-                        indexHtmlSoup.select("#page-timestamp-last-update")[0].string = str(datetime.now(tzutc()).strftime("%Y-%m-%d at %H:%M (%Z)"))
-                        indexHtmlSoup.select("#page-timestamp-last-update")[0]["data-timestamp"] = str(datetime.now(tzutc()).strftime("%Y-%m-%dT%H:%M:000"))
+                        try:
+                            page_timestamp = index_html_soup.select("#page-timestamp-last-update")
+                            if len(page_timestamp) > 0:
+                                page_timestamp[0].string = str(datetime.now(tzutc()).strftime("%Y-%m-%d at %H:%M (%Z)"))
+                                page_timestamp[0]["data-timestamp"] = str(datetime.now(tzutc()).strftime("%Y-%m-%dT%H:%M:000"))
+                            else:
+                                logging.error(f"failed to change contents of '#page-timestamp-last-update' in index.html -> error: selector did not match!")
+                        except Exception as e:
+                            logging.error(f"failed to change contents of '#page-timestamp-last-update' in index.html -> error: {e}")
 
-                        schemaOrgMetadata = ",".join(list(indexHtmlSoup.select('script[type="application/ld+json"]')[0].contents)).strip()
+                        schema_org_meta = ",".join(list(index_html_soup.select('script[type="application/ld+json"]')[0].contents)).strip()
 
                         """
-                        {
-                            "@context": "https://schema.org",
-                            "@type": "Organization",
-                            "url": "http://www.example.com",
-                            "logo": "http://www.example.com/images/logo.png"
-                        }
+                            {
+                                "@context": "https://schema.org",
+                                "@type": "Organization",
+                                "url": "http://www.example.com",
+                                "logo": "http://www.example.com/images/logo.png"
+                            }
                         """
-                        schemaOrgMetadata = "[" + schemaOrgMetadata
-                        schemaOrgMetadata += """, {
+                        schema_org_meta = "[" + schema_org_meta
+                        schema_org_meta += """, {
                             "@context": "https://schema.org",
                             "@type": "BreadcrumbList",
                             "itemListElement": [{
@@ -574,17 +586,79 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
                         }]
 
                         """
-                        indexHtmlSoup.select('script[type="application/ld+json"]')[0].string = schemaOrgMetadata
+                        schema_org_meta = regex.sub(r'(?im)[\r\t\n]+','',schema_org_meta)
+                        schema_org_meta = regex.sub(r'(?im)( )*(  ){2}',' ',schema_org_meta)
+                        index_html_soup.select('script[type="application/ld+json"]')[0].string = schema_org_meta
 
                         try:
-                            if len(list(indexHtmlSoup.select('body script[src*="gitlab"]'))) > 0:
-                                for scriptTag in indexHtmlSoup.select('body script[src*="gitlab"]'):
-                                    scriptTag.decompose()
+                            if len(list(index_html_soup.select('body script[src*="gitlab"]'))) > 0:
+                                for script_tag in index_html_soup.select('body script[src*="gitlab"]'):
+                                    script_tag.decompose()
                         except Exception as e:
-                            logging.error("failed to remove script tags from body -> error: "+str(e))
+                            logging.error(f"failed to remove 'script' tags from 'body' -> error: {e}")
                         
                         try:
-                            tocJSstr = """
+                            css_links = list(index_html_soup.select('head link[rel="stylesheet"]'))
+                            len_css = len(css_links)
+                            logging.debug(f"found {len_css} referenced stylesheets in 'head' -> {css_links} ")
+
+                            for css_index in range(len_css):
+                                css_link = css_links[css_index]
+                                try:
+                                    css_href = str(css_link.get('href'))
+                                    if len(css_href.replace('None','').strip()) > 0:
+                                        response = requests.get(css_href, stream=True, headers=headers)
+                                        dl_file = str(css_href.split('/')[-1])
+                                        dl_path = working_dir / dl_file
+
+                                        css_txt = str(response.text)
+                                        try:
+                                            if css_index == len_css - 1:
+                                                css_add = """
+                                                #permissions-list,
+                                                #permissions-list li {
+                                                    max-width: 98%;
+                                                }
+                                                .permission-title {
+                                                    max-width: 98%;
+                                                    word-break: break-all;
+                                                }
+
+                                                .cert-details {
+                                                    max-width: 98%;
+                                                }
+                                                .cert-details span {
+                                                    max-width: 96%;
+                                                    word-break: all;
+                                                }
+
+                                                .subclass-child {
+                                                    padding: 1px;
+                                                    display: block;
+                                                    margin-left: 13px;
+                                                }
+                                                """
+                                                css_add = regex.sub(r'(?im)[\r\t\n]+','',css_add)
+                                                css_add = regex.sub(r'(?im)( )*(  ){2}',' ',css_add)
+                                                css_txt += css_add
+                                                logging.debug(f"insert additional css")
+                                        except Exception as e:
+                                            logging.error(f"failed to insert additional css -> error: {e}")
+
+                                        with open(str(dl_path.absolute()), 'w+') as fh:
+                                            fh.write(css_txt)
+                                        del response
+                                        logging.debug(f"completed download of '{dl_path}' ({dl_path.stat().st_size}) ")
+                                        css_link['href'] = dl_file
+                                    else:
+                                        logging.error(f"failed to download stylesheet '{css_link}' -> error: value of 'href' -> '{css_href}' is invalid!")
+                                except Exception as e:
+                                    logging.error(f"failed to download stylesheet '{css_link}' -> error: {e}")    
+                        except Exception as e:
+                            logging.error(f"failed to remove stylesheet 'link' tags from 'head' -> error: {e}")
+
+                        try:
+                            toc_js_str = """
     <script>
         try {
             if (document.querySelectorAll(".toc > ul > li").length > 0) {
@@ -615,66 +689,92 @@ if len(searchResultCodebergJson) == 1 and searchResultCodebergJson != None:
     </script>
                             """
 
-                            tocJSstrSoup = BeautifulSoup(tocJSstr, features='html.parser')
-                            indexHtmlSoup.select("#page-footer-text")[0].insert_after(tocJSstrSoup)
+                            toc_js_str = regex.sub(r'(?im)[\r\t\n]+','',toc_js_str)
+                            toc_js_str = regex.sub(r'(?im)( )*(  ){2}',' ',toc_js_str)
+                            toc_js_soup = BeautifulSoup(toc_js_str, features='html.parser')
+                            index_html_soup.select("#page-footer-text")[0].insert_after(toc_js_soup)
                         except Exception as e:
                             logging.error("failed to add ToC JavaScript code -> error: "+str(e))
                         
                         try:
-                            if len(indexHtmlSoup.select("#page-footer-hosting-name")) > 0:
-                                indexHtmlSoup.select("#page-footer-hosting-name")[0].string = "GitHub Pages"
+                            if len(index_html_soup.select("#page-footer-hosting-name")) > 0:
+                                index_html_soup.select("#page-footer-hosting-name")[0].string = "GitHub Pages"
                             else:
                                 logging.warning("failed to find '#page-footer-hosting-name' in index.html ")
                         except Exception as e:
-                            logging.error("failed to change contents of '#page-footer-hosting-name' in index.html")
+                            logging.error(f"failed to change contents of '#page-footer-hosting-name' in index.html -> error: {e}")
 
                         try:
-                            if len(indexHtmlSoup.select("#page-footer-source-code-link")) > 0:
-                                indexHtmlSoup.select("#page-footer-source-code-link")[0]["href"] = "https://github.com/twfgcicdbot/TinyWeatherForecastGermanyScan/tree/gh-pages"
+                            if len(index_html_soup.select("#page-footer-source-code-link")) > 0:
+                                index_html_soup.select("#page-footer-source-code-link")[0]["href"] = "https://github.com/twfgcicdbot/TinyWeatherForecastGermanyScan/tree/gh-pages"
                             else:
                                 logging.warning("failed to find '#page-footer-source-code-link' in index.html ")
                         except Exception as e:
-                            logging.error("failed to change contents of '#page-footer-source-code-link' in index.html")
+                            logging.error(f"failed to change contents of '#page-footer-source-code-link' in index.html -> error: {e}")
 
                         try:
-                            if len(indexHtmlSoup.select("#page-footer-repo-license-link")) > 0:
-                                indexHtmlSoup.select("#page-footer-repo-license-link")[0]["href"] = "https://github.com/twfgcicdbot/TinyWeatherForecastGermanyScan/blob/d19eb5eeeda3649ecd93a3b52f018878dd24ec81/LICENSE"
+                            if len(index_html_soup.select("#page-footer-repo-license-link")) > 0:
+                                index_html_soup.select("#page-footer-repo-license-link")[0]["href"] = "https://github.com/twfgcicdbot/TinyWeatherForecastGermanyScan/blob/d19eb5eeeda3649ecd93a3b52f018878dd24ec81/LICENSE"
                             else:
-                                logging.warning("failed to find '#page-footer-repo-license-link' in index.html ")
+                                logging.warning("failed to find '#page-footer-repo-license-link' in index.html")
                         except Exception as e:
-                            logging.error("failed to change contents of '#page-footer-repo-license-link' in index.html")
+                            logging.error(f"failed to change contents of '#page-footer-repo-license-link' in index.html -> error: {e}")
 
+                        try:
+                            stars_count = index_html_soup.select("#repo-stars-count")
+                            if len(stars_count) > 0:
+                                stars_count[0]["href"] = "https://tinyweatherforecastgermanygroup.gitlab.io/index/stargazers.html"
+                                stars_count[0]["target"] = "_blank"
+                            else:
+                                logging.warning("failed to find '#repo-stars-count' in index.html")
+                        except Exception as e:
+                            logging.error(f"failed to change contents of '#repo-stars-count' in index.html -> error: {e}")
 
-                        reportFileHtml = str(indexHtmlSoup)
+                        try:
+                            watchers_count = index_html_soup.select("#repo-watchers-count")
+                            if len(watchers_count) > 0:
+                                watchers_count[0]["href"] = "https://tinyweatherforecastgermanygroup.gitlab.io/index/watchers.html"
+                                watchers_count[0]["target"] = "_blank"
+                            else:
+                                logging.warning("failed to find '#repo-watchers-count' in index.html")
+                        except Exception as e:
+                            logging.error(f"failed to change contents of '#repo-watchers-count' in index.html -> error: {e}")
 
-                        with open(str(Path(workingDir / "index.html").absolute()), "w+", encoding="utf-8") as fh:
-                            fh.write(str(reportFileHtml))
+                        report_file_html = str(index_html_soup).strip()
+
+                        report_html_file = str(Path(working_dir / "index.html").absolute())
+                        try:
+                            with open(report_html_file, "w+", encoding="utf-8") as fh:
+                                fh.write(htmlmin.minify(report_file_html, remove_empty_space=True))
+                        except Exception as e:
+                            logging.error(f"minification of '{report_html_file}' failed -> error: {e}")
+                            with open(report_html_file, "w+", encoding="utf-8") as fh:
+                                fh.write(report_file_html)
                     except Exception as e:
-                        logging.error("while trying to save analysis result as html file -> error: "+str(e))
+                        logging.error(f"while trying to save analysis result as html file -> error: {e}")
 
                     try:
-                        robotsTXT = """
+                        robots_txt = """
 User-agent: *
 Allow: /
 
 Sitemap: https://twfgcicdbot.github.io/TinyWeatherForecastGermanyScan/sitemap.xml
                         """
 
-                        with open(str(Path(workingDir / "robots.txt").absolute()), "w+", encoding="utf-8") as fh:
-                            fh.write(str(robotsTXT))
+                        with open(str(Path(working_dir / "robots.txt").absolute()), "w+", encoding="utf-8") as fh:
+                            fh.write(str(robots_txt).strip())
                     except Exception as e:
-                        logging.error("failed to generate robots.txt -> error: "+str(e))
+                        logging.error(f"failed to generate robots.txt -> error: {e}")
 
                     lastModPageStrSiteMap = ""
                     try:
                         lastModPageStrSiteMap = '<lastmod>'+str(datetime.now(tzutc()).strftime("%Y-%m-%dT%H:%M+00:00"))+'</lastmod>'
                     except Exception as e:
-                        logging.error("failed to generate meta tag 'pubdate' -> error: "+str(e))
+                        logging.error(f"failed to generate meta tag 'pubdate' -> error: {e}")
 
-
-                    try:
-                        
-                        sitemapXML = """<?xml version="1.0" encoding="UTF-8"?>
+                    try:                        
+                        sitemapXML = """
+<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:content="http://www.google.com/schemas/sitemap-content/1.0">
  <url>
    <loc>https://twfgcicdbot.github.io/TinyWeatherForecastGermanyScan</loc>
@@ -684,26 +784,25 @@ Sitemap: https://twfgcicdbot.github.io/TinyWeatherForecastGermanyScan/sitemap.xm
     </url>
 </urlset>
                         """
-
-                        with open(str(Path(workingDir / "sitemap.xml").absolute()), "w+", encoding="utf-8") as fh:
-                            fh.write(str(sitemapXML))
+                        with open(str(Path(working_dir / "sitemap.xml").absolute()), "w+", encoding="utf-8") as fh:
+                            fh.write(str(sitemapXML).strip())
 
                     except Exception as e:
-                        logging.error("while generarting sitemap.xml -> error: "+str(e))
+                        logging.error(f"while generarting sitemap.xml -> error: {e}")
 
                 except Exception as e:
-                    logging.error("while processing '"+str(apkFileTemp)+"' -> error: "+str(e))
+                    logging.error(f"while processing '{apk_file_temp}' -> error: {e}")
     except Exception as e:
         logging.error(""+str(e))
 
 else:
-    logging.error("content of codeberg json response is invalid! ")
+    logging.error("content of codeberg json response is invalid!")
 
     try:
-        pprint(str(searchCodebergReq.headers))
-        pprint(str(searchCodebergReq.text))
+        pprint(str(search_cb_req.headers))
+        pprint(str(search_cb_req.text))
     except Exception as e:
-        logging.error("failed to print request raw data to console! -> error: "+str(e))
+        logging.error(f"failed to print request raw data to console! -> error: {e}")
 
     sys.exit(1)
 
