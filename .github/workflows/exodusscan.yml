@@ -127,6 +127,7 @@ jobs:
           git add *.json
           git add *.md
           git add *.html
+          git add *.css
           git add BingSiteAuth.xml || true
           git add images/ || true
           git add sitemap.xml || true
