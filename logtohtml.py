@@ -14,7 +14,7 @@
 
 ## Disclaimer
 
-No warranty or guarantee of any kind provided. Use at your own risk.
+No warranty or guarantee of any kind provided. Use at your own risk only.
 Not meant to be used in commercial or in general critical/productive environments at all.
 
 """
@@ -25,6 +25,7 @@ import sys
 
 from bs4 import BeautifulSoup # for html parsing
 import htmlmin # html minifier
+import regex # extends feature set of 're' -> regular expressions
 
 from pygments import highlight # python code syntax hightlighter
 from pygments.lexers import get_lexer_by_name
@@ -99,8 +100,11 @@ debugFileSoup.title.insert_after(BeautifulSoup(headHtml, features='html.parser')
 
 logging.debug("added additional 'meta' tags ")
 
+first_css = debugFileSoup.select("head style")[0]
+css_txt = str(first_css.text)
+first_css.decompose()
+
 cssStr = """
-<style type="text/css">
 /*
     dark mode -> added by @eugenoptic44
 */
@@ -111,15 +115,27 @@ cssStr = """
     }
 }
 @media print {
+    * {
+        max-width: 98%!important;
+        color: #000000!important;
+    }
     body {
         filter: invert(0);
         background: transparent;
     }
+    code, pre {
+        word-break: break-word;
+        word-wrap: break-word;
+    }
 }
-</style>
 """
 
-debugFileSoup.select("head style")[0].insert_after(BeautifulSoup(cssStr, features='html.parser')) # parse html to modify elements
+css_txt += cssStr
+css_txt = regex.sub(r'(?im)[\r\t\n]+', '', css_txt)
+css_txt = regex.sub(r'(?im)( )*(  ){2}', ' ', css_txt)
+css_txt = regex.sub(r'(?m)\/\*([^\*]+)\*\/', '', css_txt)
+
+debugFileSoup.head.append(BeautifulSoup('<style type="text/css">'+css_txt+'</style>', features='html.parser')) # parse html to modify elements
 
 logging.debug("added additional 'css' tag ")
 
