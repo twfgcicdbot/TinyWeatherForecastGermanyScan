@@ -142,7 +142,8 @@ if len(search_cb_json) == 1 and search_cb_json is not None:
                     try:
                         apk_name = str(analysis_temp.get_app_name())
                         if apk_name != "None":
-                            logging.debug(f"static analysis returned app name: {e} ")
+                            logging.debug(f"static analysis returned app name:"
+                                          f" {apk_name} ")
                             result_dict["name"] = apk_name
                             result_markdown += "# " + apk_name + "\n\n"
                         else:
