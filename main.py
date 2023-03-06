@@ -17,43 +17,43 @@ Not meant to be used in commercial or in general critical/productive environment
 
 """
 
+import json
+import logging
+import random
+import shutil
+import sys
 from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
 from pprint import pprint
-import hashlib
-import logging
-import json
-import random
-import shutil
-import sys
-import time
 
-from dateutil.tz import tzutc # timezone UTC -> docs: https://dateutil.readthedocs.io/en/stable/tz.html#dateutil.tz.tzutc
-from bs4 import BeautifulSoup
 import htmlmin
+import markdown
 import regex
 import requests
-
-import markdown
+from bs4 import BeautifulSoup
+from dateutil.tz import (
+    tzutc,  # timezone UTC -> docs: https://dateutil.readthedocs.io/en/stable/tz.html#dateutil.tz.tzutc
+)
+from exodus_core.analysis.static_analysis import StaticAnalysis
 from markdown.extensions.toc import TocExtension
 
-from exodus_core.analysis.static_analysis import StaticAnalysis
-from exodus_core.analysis.apk_signature import ApkSignature
 from permissions_en import AOSP_PERMISSIONS_EN
 
 working_dir = Path("TinyWeatherForecastGermanyScan")
 working_dir.mkdir(parents=True, exist_ok=True) # create directory if not exists
 
+log_p = working_dir / "debug.log"
 try:
-    logging.basicConfig(format=u'%(asctime)-s %(levelname)s [%(name)s]: %(message)s',
+    logging.basicConfig(format='%(asctime)-s %(levelname)s [%(name)s]: %(message)s',
         level=logging.DEBUG,
         handlers=[
-            logging.FileHandler(str(Path(working_dir / "debug.log").absolute()), encoding="utf-8"),
+            logging.FileHandler(str(log_p.absolute()),
+                                encoding="utf-8"),
             logging.StreamHandler()
     ])
 except Exception as e:
-    logging.error("while logger init! -> error: "+str(e))
+    logging.error(f"while logger init! -> error: {e}")
 
 # sources of user agent data -> License: MIT
 #  -> https://github.com/tamimibrahim17/List-of-user-agents/blob/master/Chrome.txt
@@ -64,7 +64,7 @@ random.shuffle(user_agents)
 
 user_agent = str(random.choice(user_agents))
 
-logging.debug("querying data as '"+user_agent+"' ")
+logging.debug(f"querying data as '{user_agent}' ")
 
 headers = {
     "User-Agent": user_agent,
@@ -78,21 +78,21 @@ try:
     #pprint(searchResultCodebergJson)
     logging.debug("fetched Codeberg data")
 except Exception as e:
-    logging.error("codeberg api request failed! -> error: "+str(e))
+    logging.error(f"codeberg api request failed! -> error: {e} ")
 
-if len(search_cb_json) == 1 and search_cb_json != None:
+if len(search_cb_json) == 1 and search_cb_json is not None:
     twfg_json = search_cb_json[0]
     
     pprint(twfg_json)
     
-    if twfg_json == None:
+    if twfg_json is None:
         logging.error("content of key 'results' in codeberg json response is 'None' ")
 
         try:
             pprint(str(search_cb_req.headers))
             pprint(str(search_cb_req.text))
         except Exception as e:
-            logging.error("failed to print request raw data to console! -> error: "+str(e))
+            logging.error(f"failed to print request raw data to console! -> error: {e}")
 
         sys.exit(1)
     
@@ -109,7 +109,8 @@ if len(search_cb_json) == 1 and search_cb_json != None:
             shutil.copyfileobj(response.raw, out_file)
         del response
     else:
-        logging.info(f"skipped download of '{apk_name}' file '{apk_path}' already exists ")
+        logging.info(f"skipped download of '{apk_name}' file"
+                     f" '{apk_path}' already exists ")
 
     logging.debug("file name: " + apk_name)
     logging.debug("file path: " + str(apk_path.absolute()))
@@ -121,26 +122,29 @@ if len(search_cb_json) == 1 and search_cb_json != None:
         if len(apk_files) > 0:
             for apk_file_temp in apk_files:
                 try:
-                    logging.debug(f"apk file '{apk_file_temp.absolute()}' -> size: {apk_file_temp.stat().st_size}")
+                    logging.debug(f"apk file '{apk_file_temp.absolute()}' "
+                                  f"-> size: {apk_file_temp.stat().st_size}")
                     
                     result_dict = {}
                     result_markdown = ""
                     
-                    analysis_temp = StaticAnalysis(str(apk_file_temp.absolute())) # init ExodusPrivacy StaticAnalysis for 'apkFileTemp'
+                    # init ExodusPrivacy StaticAnalysis for 'apkFileTemp'
+                    analysis_temp = StaticAnalysis(str(apk_file_temp.absolute()))
                     
                     try:
                         analysis_temp.print_apk_infos()
                     except Exception as e:
-                        logging.error(f"printing of 'apk_infos' to console failed! -> error: {e}")
+                        logging.error(f"printing of 'apk_infos' to console failed!"
+                                      f" -> error: {e}")
                     
                     # --- start of apk_infos ---
 
                     try:
-                        apkName = str(analysis_temp.get_app_name())
-                        if apkName != "None":
-                            logging.debug("static analysis returned app name: "+str(apkName))
-                            result_dict["name"] = apkName
-                            result_markdown += "# " + apkName + "\n\n"
+                        apk_name = str(analysis_temp.get_app_name())
+                        if apk_name != "None":
+                            logging.debug(f"static analysis returned app name: {e} ")
+                            result_dict["name"] = apk_name
+                            result_markdown += "# " + apk_name + "\n\n"
                         else:
                             result_markdown += "# apk name missing \n\n"
                             logging.error(f"parsing of 'get_app_name()' for apk '{apk_file_temp}' failed! -> error: result is 'None'!")
@@ -200,7 +204,7 @@ if len(search_cb_json) == 1 and search_cb_json != None:
                     
                     try:
                         apk_v_code = str(analysis_temp.get_version_code())
-                        if apk_v_code != None:
+                        if apk_v_code is not None:
                             logging.debug(f"static analysis returned apk version code: {apk_v_code}")
                             result_dict["version_code"] = apk_v_code
                             result_markdown += f"* **version code**: {apk_v_code}\n"
@@ -230,7 +234,7 @@ if len(search_cb_json) == 1 and search_cb_json != None:
                  
                     try:
                         permissions = analysis_temp.get_permissions()
-                        if permissions != None:
+                        if permissions is not None:
                             lenPermissions = len(permissions)
 
                             logging.debug(f"static analysis returned {lenPermissions} permission(s) ")
@@ -290,13 +294,13 @@ if len(search_cb_json) == 1 and search_cb_json != None:
 
                     try:
                         libraries = analysis_temp.get_libraries()
-                        if libraries != None:
-                            lenLibraries = len(libraries)
-                            logging.debug("static analysis returned "+str(lenLibraries)+" libraries ")
-                            result_markdown += "\n "+str(lenLibraries)+" libraries detected \n\n"
+                        if libraries is not None:
+                            len_libraries = len(libraries)
+                            logging.debug(f"static analysis returned {len_libraries} libraries ")
+                            result_markdown += f"\n {len_libraries} libraries detected \n\n"
 
                             result_dict["libraries"] = []
-                            if lenLibraries > 0:
+                            if len_libraries > 0:
                                 for libraryTemp in libraries:
                                     try:
                                         result_dict["libraries"].append(str(libraryTemp))
@@ -304,7 +308,7 @@ if len(search_cb_json) == 1 and search_cb_json != None:
                                     except Exception as e:
                                         logging.error("saving of library '"+str(libraryTemp)+"' of '"+str(apk_file_temp)+"' failed! -> error: "+str(e))
                             else:
-                                logging.debug("skipping iteration of libraries as 'lenLibraries' is "+str(lenLibraries))
+                                logging.debug("skipping iteration of libraries as 'lenLibraries' is "+str(len_libraries))
                         else:
                             result_markdown += "\n **failed** to detect libraries! \n\n"
                             logging.error("parsing of 'libraries' for apk '"+str(apk_file_temp)+"' failed! -> error: result is None!")
@@ -316,7 +320,7 @@ if len(search_cb_json) == 1 and search_cb_json != None:
 
                     try:
                         certificates = analysis_temp.get_certificates()
-                        if certificates != None:
+                        if certificates is not None:
                             len_certs = len(certificates)
 
                             logging.debug("static analysis returned "+str(len_certs)+" certificate(s) ")
@@ -361,13 +365,13 @@ if len(search_cb_json) == 1 and search_cb_json != None:
                     try:
                         analysis_temp.print_embedded_trackers()
                     except Exception as e:
-                        logging.error("printing of 'embedded_trackers' to console failed! -> error: "+str(e))                    
+                        logging.error(f"printing of 'embedded_trackers' to console failed! -> error: {e} ")
                     
                     result_markdown += "\n## Trackers \n"
 
                     try:
                         embeddedTrackers = analysis_temp.detect_trackers()
-                        if embeddedTrackers != None:
+                        if embeddedTrackers is not None:
                             lenEmbeddedTrackers = len(embeddedTrackers)
 
                             logging.debug("static analysis returned "+str(lenEmbeddedTrackers)+" tracker(s): "+str(embeddedTrackers))
@@ -402,7 +406,7 @@ if len(search_cb_json) == 1 and search_cb_json != None:
 
                     try:
                         embeddedClasses = analysis_temp.get_embedded_classes()
-                        if embeddedClasses != None:
+                        if embeddedClasses is not None:
                             lenEmbeddedClasses = len(embeddedClasses)
 
                             logging.debug("static analysis returned "+str(lenEmbeddedClasses)+" class(es): "+str(embeddedClasses))
@@ -410,8 +414,8 @@ if len(search_cb_json) == 1 and search_cb_json != None:
                             # based on: https://gist.github.com/hrldcpr/2012250
                             def tree(): return defaultdict(tree)
 
-                            def addLeafs(t, List):
-                                for node in List:
+                            def add_leafs(t, node_list):
+                                for node in node_list:
                                     t = t[node]
 
                             classesTree = tree()
@@ -420,17 +424,17 @@ if len(search_cb_json) == 1 and search_cb_json != None:
                             for class_temp in embeddedClasses:
                                 try:
                                     class_parts = list(class_temp.split("/"))
-                                    addLeafs(classesTree, class_parts)
+                                    add_leafs(classesTree, class_parts)
                                     classes_dict[class_parts[-1]] = class_temp.replace(class_parts[-1],'').strip('/')
                                 except Exception as e:
                                     logging.error(f"failed to parse class -> error: {e}")
 
                             printClassesResult = f"<details><summary>{len(list(class_temp))} class(es) detected</summary>\n"
 
-                            def printClassesTree(tree, result, level):
+                            def print_classes_tree(tree, result, level):
                                 for leaf in list(tree):
                                     lvl_indent = ""
-                                    for levelIndex in range (0, level):
+                                    for level_index in range (0, level):
                                         lvl_indent += "-"
                                     
                                     sub_classes_count = len(list(dict(tree[leaf])))
@@ -453,13 +457,13 @@ if len(search_cb_json) == 1 and search_cb_json != None:
                                         result += '\t<span class="classes-tree-child subclass-child" id="classes-tree-child-'+str(level+1)+'-'+str(sub_classes_count)+'" data-path="'+str(class_path)+str(leaf_name)+'.java" title="subclass '+str(leaf_name)+'">|'+str(lvl_indent)+'> '+str(leaf_name)+str(source_a)+str(docs_a)+'</span>\n'
                                     
                                     if sub_classes_count > 0:
-                                        result = printClassesTree(tree[leaf], result, level+1)
+                                        result = print_classes_tree(tree[leaf], result, level+1)
                                     
                                     if sub_classes_count > 0:
                                         result += "</details>"
                                 return result
 
-                            printClassesResult = str(printClassesTree(dict(classesTree), printClassesResult, 1))
+                            printClassesResult = str(print_classes_tree(dict(classesTree), printClassesResult, 1))
                             printClassesResult += "</details>\n"
 
                             #printClassesResult = str(BeautifulSoup(printClassesResult, features="html.parser").prettify())
@@ -641,7 +645,7 @@ if len(search_cb_json) == 1 and search_cb_json != None:
                                                 css_add = regex.sub(r'(?im)[\r\t\n]+','',css_add)
                                                 css_add = regex.sub(r'(?im)( )*(  ){2}',' ',css_add)
                                                 css_txt += css_add
-                                                logging.debug(f"insert additional css")
+                                                logging.debug("insert additional css")
                                         except Exception as e:
                                             logging.error(f"failed to insert additional css -> error: {e}")
 
@@ -745,7 +749,8 @@ if len(search_cb_json) == 1 and search_cb_json != None:
                         report_html_file = str(Path(working_dir / "index.html").absolute())
                         try:
                             with open(report_html_file, "w+", encoding="utf-8") as fh:
-                                fh.write(htmlmin.minify(report_file_html, remove_empty_space=True))
+                                fh.write(htmlmin.minify(report_file_html,
+                                                        remove_empty_space=True))
                         except Exception as e:
                             logging.error(f"minification of '{report_html_file}' failed -> error: {e}")
                             with open(report_html_file, "w+", encoding="utf-8") as fh:
