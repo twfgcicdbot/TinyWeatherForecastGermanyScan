@@ -31,8 +31,8 @@ jobs:
       - name: update packages
         run: timeout 120s sudo apt update || true
       
-      - name: upgrade packages
-        run: timeout 120s sudo apt upgrade -y || true
+      # - name: upgrade packages
+      #   run: timeout 120s sudo apt upgrade -y || true
       
       - name: Setup Python 3.x
         uses: actions/setup-python@v4.5.0
