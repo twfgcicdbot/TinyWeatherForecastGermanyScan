@@ -8,7 +8,7 @@ on:
   push:
     branches: [ main ]
   pull_request:
-    branches: [ ]
+    branches-ignore: [ main ]
   schedule:
     - cron: "5 7 * * */2" # every two days at 7:05am UTC
 
@@ -31,11 +31,11 @@ jobs:
       - name: update packages
         run: timeout 120s sudo apt update || true
       
-      # - name: upgrade packages
-      #   run: timeout 120s sudo apt upgrade -y || true
+      - name: upgrade packages
+        run: timeout 120s sudo apt upgrade -y || true
       
       - name: Setup Python 3.x
-        uses: actions/setup-python@v4.5.0
+        uses: actions/setup-python@v4
         with:
           python-version: 3.10.10
       
@@ -43,16 +43,16 @@ jobs:
         run: python -m pip install --upgrade pip
       
       - name: install dexdump
-        run: sudo apt-get install -y dexdump
+        run: sudo apt install -y dexdump
       
       - name: install ripgrep
-        run: sudo apt-get install -y ripgrep
+        run: sudo apt install -y ripgrep
       
       - name: install apktool
-        run: sudo apt-get install -y apktool
+        run: sudo apt install -y apktool
 
       #- name: install brotli
-      #  run: apt-get install brotli || true
+      #  run: sudo apt install -y brotli || true
 
       - name: install virtualenv
         run: pip install virtualenv
@@ -72,8 +72,8 @@ jobs:
       - name: install python requirements
         run: pip install -r TinyWeatherForecastGermanyScan/requirements.txt
       
-      - name: run main.py
-        run: python TinyWeatherForecastGermanyScan/main.py
+      - name: run __init__.py
+        run: python TinyWeatherForecastGermanyScan/__init__.py
 
       - name: run rg-pattern-search.py
         run: python TinyWeatherForecastGermanyScan/rg-pattern-search.py || true
@@ -91,7 +91,7 @@ jobs:
         run: du -sh
 
       - name: Archive analysis report and tracker signatures
-        uses: actions/upload-artifact@v3.1.2
+        uses: actions/upload-artifact@v3
         with:
           name: reports-and-tracker-signatures
           path: |
@@ -100,7 +100,7 @@ jobs:
             */*.html
 
       - name: Archive analysed apk
-        uses: actions/upload-artifact@v3.1.2
+        uses: actions/upload-artifact@v3
         with:
           name: analysed-apk
           path: |
