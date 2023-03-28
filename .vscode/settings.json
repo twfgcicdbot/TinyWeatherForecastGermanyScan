@@ -1,0 +1,5 @@
+{
+    "sonarlint.disableTelemetry": true,
+    "gitlens.telemetry.enabled": false,
+    "redhat.telemetry.enabled": false
+}
