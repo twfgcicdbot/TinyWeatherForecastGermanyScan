@@ -23,61 +23,70 @@ import logging
 from pathlib import Path
 import sys
 
-from bs4 import BeautifulSoup # for html parsing
-import htmlmin # html minifier
-import regex # extends feature set of 're' -> regular expressions
+from bs4 import BeautifulSoup  # for html parsing
+import htmlmin  # html minifier
+import regex  # extends feature set of 're' -> regular expressions
 
-from pygments import highlight # python code syntax hightlighter
+from pygments import highlight  # python code syntax hightlighter
 from pygments.lexers import get_lexer_by_name
 from pygments.formatters import HtmlFormatter
 
-workingDir = Path("TinyWeatherForecastGermanyScan")
+working_dir = Path("TinyWeatherForecastGermanyScan")
+# create directory if not exists
+working_dir.mkdir(parents=True, exist_ok=True)
 
-workingDir.mkdir(parents=True, exist_ok=True) # create directory if not exists
-
+log_p2 = working_dir / "debug2.log"
 try:
-    logging.basicConfig(format=u'%(asctime)-s %(levelname)s [%(name)s]: %(message)s',
-        level=logging.DEBUG,
-        handlers=[
-            logging.FileHandler(str(Path(workingDir / "debug2.log").absolute()), encoding="utf-8"),
-            logging.StreamHandler()
-    ])
+    logging.basicConfig(format='%(asctime)-s %(levelname)s [%(name)s]: %(message)s',
+                        level=logging.DEBUG,
+                        handlers=[
+                            logging.FileHandler(str(log_p2), encoding="utf-8"),
+                            logging.StreamHandler()
+                        ])
 except Exception as e:
-    logging.error("while logger init! -> error: "+str(e))
+    logging.error(f"while logger init! -> error: {e} ")
 
+log_p1 = working_dir / "debug.log"
 try:
-    with open(str(Path(workingDir / "debug.log").absolute()), "r", encoding="utf-8") as fh:
+    with open(str(log_p1), "r", encoding="utf-8") as fh:
         code = str(fh.read())
 except Exception as e:
-    logging.error("failed to open 'debug.log' -> error: "+str(e))
+    logging.error(f"failed to open '{log_p1.absolute()}' -> error: {e} ")
     sys.exit("FATAL ERROR script execution aborted!")
 
 codeLines = str(code).split("\n")
 hlLinesIndices = []
 
 for lineIndex in range(len(codeLines)):
-    #print(codeLines[lineIndex])
-    lineTemp = str(codeLines[lineIndex]).lower()
+    # print(codeLines[lineIndex])
+    line_tmp = str(codeLines[lineIndex]).lower()
 
-    if "error:" in lineTemp or "warning:" in lineTemp:
+    if "error:" in line_tmp or "warning:" in line_tmp:
         hlLinesIndices.append(lineIndex+1)
-        logging.debug("identified 'error:' match in line #"+str(lineIndex+1)+" ")
+        logging.debug(f"identified 'error:' match in line #{lineIndex+1} ")
 
-lexer = get_lexer_by_name("logtalk", stripall=True) # using 'logtalk' as there's no dedicated python log lexer
+# using 'logtalk' as no dedicated python log lexer exists
+lexer = get_lexer_by_name("logtalk", stripall=True)
 logging.debug("lexer init completed")
 
-formatter = HtmlFormatter(linenos=True, cssclass="sourcecode", full=True, style="perldoc", title="debug.log | Tiny Weather Forecast Germany", lineanchors="debuglog", lineseparator="<br>", hl_lines=hlLinesIndices, wrapcode=True)
+formatter = HtmlFormatter(linenos=True, cssclass="sourcecode", full=True,
+                          style="perldoc", title="debug.log | Tiny Weather Forecast Germany",
+                          lineanchors="debuglog", lineseparator="<br>",
+                          hl_lines=hlLinesIndices, wrapcode=True)
 logging.debug("HtmlFormatter init completed")
 
 result = highlight(code, lexer, formatter)
 logging.debug("highlight finished")
 
-debugFileSoup = BeautifulSoup(str(result), features='html.parser') # parse html to modify elements
+# parse html to modify elements
+debug_file_soup = BeautifulSoup(str(result), features='html.parser')
 
-for metaTemp in debugFileSoup.select('head > meta'):
+for metaTemp in debug_file_soup.select('head > meta'):
     metaTemp.decompose()
 
-headHtml = '\n\n<meta http-equiv="content-type" content="text/html; charset=UTF-8" />\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1.0">\n<meta name="robots" content="noindex, nofollow">'
+headHtml = ('\n\n<meta http-equiv="content-type" content="text/html; charset=UTF-8" />\n'
+            '<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1.0">\n'
+            '<meta name="robots" content="noindex, nofollow">')
 
 headHtml += """\n
 <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png">
@@ -96,15 +105,18 @@ headHtml += """\n
 <meta name="thumbnail" content="images/icon.png">
 """
 
-debugFileSoup.title.insert_after(BeautifulSoup(headHtml, features='html.parser')) # parse html to modify elements
+debug_file_soup.title.insert_after(BeautifulSoup(
+    headHtml, features='html.parser'))  # parse html to modify elements
 
 logging.debug("added additional 'meta' tags ")
 
-first_css = debugFileSoup.select("head style")[0]
-css_txt = str(first_css.text)
-first_css.decompose()
+first_css_el = debug_file_soup.select("head style")
+if len(first_css_el) > 0:
+    first_css = first_css_el[0]
+    css_txt = str(first_css.text)
+    first_css.decompose()
 
-cssStr = """
+css_str = """
 /*
     dark mode -> added by @eugenoptic44
 */
@@ -130,23 +142,26 @@ cssStr = """
 }
 """
 
-css_txt += cssStr
+css_txt += css_str
 css_txt = regex.sub(r'(?im)[\r\t\n]+', '', css_txt)
 css_txt = regex.sub(r'(?im)( )*(  ){2}', ' ', css_txt)
 css_txt = regex.sub(r'(?m)\/\*([^\*]+)\*\/', '', css_txt)
 
-debugFileSoup.head.append(BeautifulSoup('<style type="text/css">'+css_txt+'</style>', features='html.parser')) # parse html to modify elements
+# parse html to modify elements
+debug_file_soup.head.append(BeautifulSoup(f'<style type=\"text/css\">{css_txt}</style>',
+                                          features='html.parser'))
 
 logging.debug("added additional 'css' tag ")
 
-debugHtmlFile = str(Path(workingDir / "debug.html").absolute())
+debug_html_file = str(Path(working_dir / "debug.html").absolute())
 try:
-    with open(debugHtmlFile, "w+", encoding="utf-8") as fh:
-        fh.write(htmlmin.minify(str(debugFileSoup), remove_empty_space=True, remove_comments=True))
+    with open(debug_html_file, "w+", encoding="utf-8") as fh:
+        fh.write(htmlmin.minify(str(debug_file_soup),
+                 remove_empty_space=True, remove_comments=True))
 except Exception as e:
-    logging.error("minification of '"+debugHtmlFile+"' failed -> error: "+str(e))
-    with open(debugHtmlFile, "w+", encoding="utf-8") as fh:
-        fh.write(str(debugFileSoup))
+    logging.error(f"minification of '{debug_html_file}' failed -> error: {e} ")
+    with open(debug_html_file, "w+", encoding="utf-8") as fh:
+        fh.write(str(debug_file_soup))
 
 print("done")
 logging.info("finished execution of logtohtml.py")
