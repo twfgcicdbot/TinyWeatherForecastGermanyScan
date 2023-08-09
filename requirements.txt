@@ -3,5 +3,5 @@ beautifulsoup4==4.12.2
 exodus-core==1.3.8
 htmlmin==0.1.12
 Markdown==3.4.4
-regex==2023.6.3
+regex==2023.8.8
 ripgrepy==2.0.0
