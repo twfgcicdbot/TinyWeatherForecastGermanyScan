@@ -56,8 +56,8 @@ try:
                                                 encoding="utf-8"),
                             logging.StreamHandler()
                         ])
-except Exception as e:
-    logging.error(f"while logger init! -> error: {e}")
+except Exception as error_msg:
+    logging.error(f"while logger init! -> error: {error_msg}")
 
 # sources of user agent data -> License: MIT
 #  -> https://github.com/tamimibrahim17/List-of-user-agents/blob/master/Chrome.txt
@@ -85,8 +85,8 @@ try:
     search_cb_json = search_cb_req.json()
     # pprint(searchResultCodebergJson)
     logging.debug("fetched Codeberg data")
-except Exception as e:
-    logging.error(f"codeberg api request failed! -> error: {e} ")
+except Exception as error_msg:
+    logging.error(f"codeberg api request failed! -> error: {error_msg} ")
 
 if len(search_cb_json) == 1 and search_cb_json is not None:
     twfg_json = search_cb_json[0]
@@ -100,9 +100,9 @@ if len(search_cb_json) == 1 and search_cb_json is not None:
         try:
             pprint(str(search_cb_req.headers))
             pprint(str(search_cb_req.text))
-        except Exception as e:
+        except Exception as error_msg:
             logging.error(
-                f"failed to print request raw data to console! -> error: {e}")
+                f"failed to print request raw data to console! -> error: {error_msg}")
 
         sys.exit(1)
 
@@ -123,8 +123,8 @@ if len(search_cb_json) == 1 and search_cb_json is not None:
         logging.info(f"skipped download of '{apk_name}' file"
                      f" '{apk_path}' already exists ")
 
-    logging.debug("file name: " + apk_name)
-    logging.debug("file path: " + str(apk_path.absolute()))
+    logging.debug(f"file name: {apk_name}")
+    logging.debug(f"file path: {apk_path.absolute()}")
 
     try:
         apk_files = list(working_dir.glob('*.apk'))
@@ -145,9 +145,9 @@ if len(search_cb_json) == 1 and search_cb_json is not None:
 
                     try:
                         analysis_temp.print_apk_infos()
-                    except Exception as e:
+                    except Exception as error_msg:
                         logging.error(f"printing of 'apk_infos' to console failed!"
-                                      f" -> error: {e}")
+                                      f" -> error: {error_msg}")
 
                     # --- start of apk_infos ---
 
@@ -162,9 +162,9 @@ if len(search_cb_json) == 1 and search_cb_json is not None:
                             result_markdown += "# apk name missing \n\n"
                             logging.error(
                                 f"parsing of 'get_app_name()' for apk '{apk_file_temp}' failed! -> error: result is 'None'!")
-                    except Exception as e:
+                    except Exception as error_msg:
                         logging.error(
-                            f"parsing of 'get_app_name()' for apk '{apk_file_temp}' failed! -> error: {e}")
+                            f"parsing of 'get_app_name()' for apk '{apk_file_temp}' failed! -> error: {error_msg}")
                         result_markdown += "# apk name missing \n\n"
 
                     result_markdown += "\n\n[TOC]\n\n"
@@ -183,9 +183,9 @@ if len(search_cb_json) == 1 and search_cb_json is not None:
                             result_markdown += "* **package**: *unknown* \n"
                             logging.error(
                                 f"parsing of 'get_package()' for apk '{apk_file_temp}' failed! -> error: result is 'None'!")
-                    except Exception as e:
+                    except Exception as error_msg:
                         logging.error(
-                            f"parsing of 'get_package()' for apk '{apk_file_temp}' failed! -> error: {e}")
+                            f"parsing of 'get_package()' for apk '{apk_file_temp}' failed! -> error: {error_msg}")
                         result_markdown += "* **package**: *unknown* \n"
 
                     try:
@@ -201,16 +201,16 @@ if len(search_cb_json) == 1 and search_cb_json is not None:
                                 sha_path = Path(working_dir / "sha256.html")
                                 with open(str(sha_path.absolute()), "w+", encoding="utf-8") as fh:
                                     fh.write(str(apk_sum))
-                            except Exception as e:
+                            except Exception as error_msg:
                                 logging.error(
-                                    f"failed to write sha256 hash to '{sha_path}' -> error: {e}")
+                                    f"failed to write sha256 hash to '{sha_path}' -> error: {error_msg}")
                         else:
                             result_markdown += "* **sha256 hash**: *unknown* \n"
                             logging.error(
                                 f"parsing of 'get_sha256()' for apk '{apk_file_temp}' failed! -> error: result is 'None'!")
-                    except Exception as e:
+                    except Exception as error_msg:
                         logging.error(
-                            f"parsing of 'get_sha256()' for apk '{apk_file_temp}' failed! -> error: {e}")
+                            f"parsing of 'get_sha256()' for apk '{apk_file_temp}' failed! -> error: {error_msg}")
                         result_markdown += "* **sha256 hash**: *unknown* \n"
 
                     try:
@@ -224,9 +224,9 @@ if len(search_cb_json) == 1 and search_cb_json is not None:
                             result_markdown += "* **version**: *unknown* \n"
                             logging.error(
                                 f"parsing of 'get_version()' for apk '{apk_file_temp}' failed! -> error: result is 'None'!")
-                    except Exception as e:
+                    except Exception as error_msg:
                         logging.error(
-                            f"parsing of 'get_version()' for apk '{apk_file_temp}' failed! -> error: {e}")
+                            f"parsing of 'get_version()' for apk '{apk_file_temp}' failed! -> error: {error_msg}")
                         result_markdown += "* **version**: *unknown* \n"
 
                     try:
@@ -240,9 +240,9 @@ if len(search_cb_json) == 1 and search_cb_json is not None:
                             result_markdown += "* **version code**: *unknown* \n"
                             logging.error(
                                 f"parsing of 'get_version_code()' for apk '{apk_file_temp}' failed! -> error: result is None!")
-                    except Exception as e:
+                    except Exception as error_msg:
                         logging.error(
-                            f"parsing of 'get_version_code()' for apk '{apk_file_temp}' failed! -> error: {e}")
+                            f"parsing of 'get_version_code()' for apk '{apk_file_temp}' failed! -> error: {error_msg}")
                         result_markdown += "* **version code**: *unknown* \n"
 
                     try:
@@ -257,9 +257,9 @@ if len(search_cb_json) == 1 and search_cb_json is not None:
                             result_markdown += "* [**app UID**](https://stackoverflow.com/a/5709279){ title='android app UID explanation on StackOverflow' }: *unknown* \n"
                             logging.error(
                                 f"parsing of 'get_application_universal_id()' (UID) for apk '{apk_file_temp}' failed! -> error: result is None!")
-                    except Exception as e:
+                    except Exception as error_msg:
                         logging.error(
-                            f"parsing of 'get_application_universal_id()' (UID) for apk '{apk_file_temp}' failed! -> error: {e}")
+                            f"parsing of 'get_application_universal_id()' (UID) for apk '{apk_file_temp}' failed! -> error: {error_msg}")
                         result_markdown += "* **app UID**: *unknown* \n"
 
                     logging.debug("working on permissions ... ")
@@ -269,14 +269,14 @@ if len(search_cb_json) == 1 and search_cb_json is not None:
                     try:
                         permissions = analysis_temp.get_permissions()
                         if permissions is not None:
-                            lenPermissions = len(permissions)
+                            len_perms = len(permissions)
 
                             logging.debug(
-                                f"static analysis returned {lenPermissions} permission(s) ")
-                            result_markdown += f"\n {lenPermissions} permissions detected \n\n"
+                                f"static analysis returned {len_perms} permission(s) ")
+                            result_markdown += f"\n {len_perms} permissions detected \n\n"
 
                             result_dict["permissions"] = []
-                            if lenPermissions > 0:
+                            if len_perms > 0:
                                 # pprint(permissions)
                                 result_markdown += '<ul id="permissions-list">'
 
@@ -295,12 +295,12 @@ if len(search_cb_json) == 1 and search_cb_json is not None:
                                         permissionDictTemp["description"] = permissionDesc
 
                                         pprint(permissionDictTemp)
-                                    except Exception as e:
+                                    except Exception as error_msg:
                                         permissionDictTemp = {
                                             "name": str(permissionTemp)}
                                         permissionDesc = ""
                                         logging.error("parsing of exodus knowledge data for permission '"+str(
-                                            permissionTemp)+"' of '"+str(apk_file_temp)+"' failed! -> error: "+str(e))
+                                            permissionTemp)+"' of '"+str(apk_file_temp)+"' failed! -> error: "+str(error_msg))
 
                                     perm_icon = ''
                                     if 'icon' in permissionDictTemp:
@@ -322,22 +322,22 @@ if len(search_cb_json) == 1 and search_cb_json is not None:
                                                 permissionTemp))+'" class="permission-description">'+permissionDesc+"</p>"
 
                                         result_markdown += "</li>\n"
-                                    except Exception as e:
+                                    except Exception as error_msg:
                                         logging.error("saving of permission '"+str(permissionTemp)+"' of '"+str(
-                                            apk_file_temp)+"' failed! -> error: "+str(e))
+                                            apk_file_temp)+"' failed! -> error: "+str(error_msg))
 
                                 result_markdown += '</ul>'
                             else:
                                 logging.debug(
-                                    "skipping iteration of permissions as 'lenPermissions' is "+str(lenPermissions))
+                                    "skipping iteration of permissions as 'lenPermissions' is "+str(len_perms))
                         else:
                             result_markdown += "\n **failed** to detect permissions! \n\n"
                             logging.error("parsing of 'permissions' for apk '" +
                                           str(apk_file_temp)+"' failed! -> error: result is None!")
-                    except Exception as e:
+                    except Exception as error_msg:
                         result_markdown += "\n **failed** to detect permissions! \n\n"
                         logging.error("parsing of 'permissions' for apk '" +
-                                      str(apk_file_temp)+"' failed! -> error: "+str(e))
+                                      str(apk_file_temp)+"' failed! -> error: "+str(error_msg))
 
                     logging.debug("working on libraries ... ")
 
@@ -359,9 +359,8 @@ if len(search_cb_json) == 1 and search_cb_json is not None:
                                             str(libraryTemp))
                                         result_markdown += "* " + \
                                             str(libraryTemp)+" \n"
-                                    except Exception as e:
-                                        logging.error("saving of library '"+str(libraryTemp)+"' of '"+str(
-                                            apk_file_temp)+"' failed! -> error: "+str(e))
+                                    except Exception as error_msg:
+                                        logging.error(f"saving of library '{libraryTemp}' of '{apk_file_temp}' failed! -> error: {error_msg}")
                             else:
                                 logging.debug(
                                     "skipping iteration of libraries as 'lenLibraries' is "+str(len_libraries))
@@ -369,10 +368,10 @@ if len(search_cb_json) == 1 and search_cb_json is not None:
                             result_markdown += "\n **failed** to detect libraries! \n\n"
                             logging.error("parsing of 'libraries' for apk '" +
                                           str(apk_file_temp)+"' failed! -> error: result is None!")
-                    except Exception as e:
+                    except Exception as error_msg:
                         result_markdown += "\n **failed** to detect libraries! \n\n"
                         logging.error("parsing of 'libraries' for apk '" +
-                                      str(apk_file_temp)+"' failed! -> error: "+str(e))
+                                      str(apk_file_temp)+"' failed! -> error: "+str(error_msg))
 
                     result_markdown += "\n## Certificates\n"
 
@@ -382,9 +381,8 @@ if len(search_cb_json) == 1 and search_cb_json is not None:
                             len_certs = len(certificates)
 
                             logging.debug(
-                                "static analysis returned "+str(len_certs)+" certificate(s) ")
-                            result_markdown += "\n " + \
-                                str(len_certs)+" certificate(s) detected \n\n"
+                                f"static analysis returned {len_certs} certificate(s)")
+                            result_markdown += f"\n {len_certs} certificate(s) detected \n\n"
 
                             result_dict["certificates"] = []
 
@@ -402,9 +400,9 @@ if len(search_cb_json) == 1 and search_cb_json is not None:
                                         else:
                                             cert_temp_md = '\n<details class="cert-details">\n<summary>click to expand</summary>\n\n<b>Issuer</b>: {} <br><b>Subject</b>: {} <br><b>Fingerprint</b>: <span>{}</span> <br><b>Serial</b>: {}<br></details>\n'.format(
                                                 certificateTemp.issuer, certificateTemp.subject, certificateTemp.fingerprint, certificateTemp.serial)
-                                    except Exception as e:
+                                    except Exception as error_msg:
                                         logging.warning("serializing of certificate '"+str(
-                                            certificateTemp)+"' of '"+str(apk_file_temp)+"' failed! -> error: "+str(e))
+                                            certificateTemp)+"' of '"+str(apk_file_temp)+"' failed! -> error: "+str(error_msg))
                                         logging.warning(
                                             " using fallback solution ")
                                     try:
@@ -412,9 +410,9 @@ if len(search_cb_json) == 1 and search_cb_json is not None:
                                             str(certificateTempStr))
                                         result_markdown += str(
                                             cert_temp_md)+" \n\n"
-                                    except Exception as e:
+                                    except Exception as error_msg:
                                         logging.error("saving of certificate '"+str(certificateTemp)+"' of '"+str(
-                                            apk_file_temp)+"' failed! -> error: "+str(e))
+                                            apk_file_temp)+"' failed! -> error: "+str(error_msg))
                             else:
                                 logging.debug(
                                     "skipping iteration of certificates as 'lenCertificates' is "+str(len_certs))
@@ -422,10 +420,10 @@ if len(search_cb_json) == 1 and search_cb_json is not None:
                             result_markdown += "\n **failed** to detect certificates! \n\n"
                             logging.error("parsing of 'certificates' for apk '" +
                                           str(apk_file_temp)+"' failed! -> error: result is None!")
-                    except Exception as e:
+                    except Exception as error_msg:
                         result_markdown += "\n **failed** to detect certificates! \n\n"
                         logging.error("parsing of 'certificates' for apk '" +
-                                      str(apk_file_temp)+"' failed! -> error: "+str(e))
+                                      str(apk_file_temp)+"' failed! -> error: "+str(error_msg))
 
                     # --- end of apk_infos ---
 
@@ -435,9 +433,9 @@ if len(search_cb_json) == 1 and search_cb_json is not None:
 
                     try:
                         analysis_temp.print_embedded_trackers()
-                    except Exception as e:
+                    except Exception as error_msg:
                         logging.error(
-                            f"printing of 'embedded_trackers' to console failed! -> error: {e} ")
+                            f"printing of 'embedded_trackers' to console failed! -> error: {error_msg} ")
 
                     result_markdown += "\n## Trackers\n"
 
@@ -460,9 +458,9 @@ if len(search_cb_json) == 1 and search_cb_json is not None:
                                             str(embeddedTrackerTemp))
                                         result_markdown += "<li>" + \
                                             str(embeddedTrackerTemp)+"</li> \n"
-                                    except Exception as e:
+                                    except Exception as error_msg:
                                         logging.error("saving of tracker '"+str(embeddedTrackerTemp)+"' from '"+str(
-                                            apk_file_temp)+"' failed! -> error: "+str(e))
+                                            apk_file_temp)+"' failed! -> error: "+str(error_msg))
                             else:
                                 logging.debug(
                                     "skipping iteration of trackers as 'lenEmbeddedTrackers' is "+str(lenEmbeddedTrackers))
@@ -472,10 +470,10 @@ if len(search_cb_json) == 1 and search_cb_json is not None:
                             result_markdown += "\n **failed** to detect trackers! \n\n"
                             logging.error("parsing of 'detect_trackers()' for apk '" +
                                           str(apk_file_temp)+"' failed! -> error: result is None!")
-                    except Exception as e:
+                    except Exception as error_msg:
                         result_markdown += "\n **failed** to detect trackers! \n\n"
                         logging.error("parsing of 'detect_trackers()' for apk '" +
-                                      str(apk_file_temp)+"' failed! -> error: "+str(e))
+                                      str(apk_file_temp)+"' failed! -> error: "+str(error_msg))
 
                     # --- end of embedded_trackers ---
 
@@ -486,12 +484,12 @@ if len(search_cb_json) == 1 and search_cb_json is not None:
                     result_markdown += "\n## Classes\n"
 
                     try:
-                        embeddedClasses = analysis_temp.get_embedded_classes()
-                        if embeddedClasses is not None:
-                            lenEmbeddedClasses = len(embeddedClasses)
+                        embbed_classes = analysis_temp.get_embedded_classes()
+                        if embbed_classes is not None:
+                            len_embbed_cls = len(embbed_classes)
 
                             logging.debug(
-                                "static analysis returned "+str(lenEmbeddedClasses)+" class(es): "+str(embeddedClasses))
+                                f"static analysis returned {len_embbed_cls} class(es): {embbed_classes}")
 
                             # based on: https://gist.github.com/hrldcpr/2012250
                             def tree(): return defaultdict(tree)
@@ -503,15 +501,15 @@ if len(search_cb_json) == 1 and search_cb_json is not None:
                             classesTree = tree()
                             classes_dict = {}
 
-                            for class_temp in embeddedClasses:
+                            for class_temp in embbed_classes:
                                 try:
                                     class_parts = list(class_temp.split("/"))
                                     add_leafs(classesTree, class_parts)
                                     classes_dict[class_parts[-1]] = class_temp.replace(
                                         class_parts[-1], '').strip('/')
-                                except Exception as e:
+                                except Exception as error_msg:
                                     logging.error(
-                                        f"failed to parse class -> error: {e}")
+                                        f"failed to parse class -> error: {error_msg}")
 
                             printClassesResult = f"<details><summary>{len(list(class_temp))} class(es) detected</summary>\n"
 
@@ -568,10 +566,10 @@ if len(search_cb_json) == 1 and search_cb_json is not None:
                             result_markdown += "\n **failed** to detect classes! \n\n"
                             logging.error("parsing of 'get_embedded_classes()' for apk '"+str(
                                 apk_file_temp)+"' failed! -> error: result is None!")
-                    except Exception as e:
+                    except Exception as error_msg:
                         result_markdown += "\n **failed** to detect classes! \n\n"
                         logging.error("parsing of 'get_embedded_classes()' for apk '" +
-                                      str(apk_file_temp)+"' failed! -> error: "+str(e))
+                                      str(apk_file_temp)+"' failed! -> error: "+str(error_msg))
 
                     # --- end of embedded_classes ---
 
@@ -583,39 +581,41 @@ if len(search_cb_json) == 1 and search_cb_json is not None:
 
                         try:
                             # list of named tuples -> also see: https://stackoverflow.com/questions/26180528/convert-a-namedtuple-into-a-dictionary
-                            trackerSignatures = list(analysis_temp.signatures)
-                        except Exception as e:
-                            trackerSignatures = []
+                            tracker_sigs = list(analysis_temp.signatures)
+                        except Exception as error_msg:
+                            tracker_sigs = []
                             logging.error(
-                                "while trying to save tracker signatures -> error: "+str(e))
+                                "while trying to save tracker signatures -> error: "+str(error_msg))
 
-                        if len(trackerSignatures) > 0:
-                            trackerSignaturesRaw = trackerSignatures
-                            trackerSignatures = []
-                            for trackerSignatureTemp in trackerSignaturesRaw:
+                        if len(tracker_sigs) > 0:
+                            tracker_sigs_raw = tracker_sigs
+                            tracker_sigs = []
+                            for tracker_sig in tracker_sigs_raw:
                                 try:
-                                    trackerSignatures.append(
-                                        trackerSignatureTemp._asdict())
-                                except Exception as e:
+                                    tracker_sigs.append(
+                                        tracker_sig._asdict())
+                                except Exception as error_msg:
                                     logging.error(
-                                        "while trying to parse tracker signature '"+str(trackerSignatureTemp)+"' -> error: "+str(e))
+                                        f"while trying to parse tracker signature '{tracker_sig}'"
+                                        f" -> error: {error_msg}")
                         else:
                             logging.error(
                                 "while trying to parse tracker signatures -> error: data length is invalid!")
 
-                        with open(str(Path(working_dir / "tracker-signatures.json").absolute()), "w+", encoding="utf-8") as fh:
-                            fh.write(
-                                str(json.dumps(trackerSignatures, indent=4)))
+                        tracker_sigs_file = working_dir / "tracker-signatures.json"
 
-                        logging.debug("created tracker signature dump '"+str(Path(working_dir / "tracker-signatures.json").absolute(
-                        ))+"' ("+str(Path(working_dir / "tracker-signatures.json").stat().st_size)+") ")
+                        with open(tracker_sigs_file, "w+", encoding="utf-8") as fh:
+                            fh.write(
+                                str(json.dumps(tracker_sigs, indent=4)))
+
+                        logging.debug(f"created tracker signature dump '{tracker_sigs_file}' ({tracker_sigs_file.stat().st_size}) ")
 
                         result_markdown += "\nThe analysis has been conducted using " + \
                             str(len(analysis_temp.signatures)) + \
                             " tracker signatures by [ExodusPrivacy](https://exodus-privacy.eu.org/)."
-                    except Exception as e:
+                    except Exception as error_msg:
                         logging.error(
-                            "while trying to save tracker signatures -> error: "+str(e))
+                            f"while trying to save tracker signatures -> error: {error_msg}")
 
                     try:
                         # pprint(resultDict)
@@ -624,9 +624,9 @@ if len(search_cb_json) == 1 and search_cb_json is not None:
 
                         logging.debug("created report '"+str(Path(working_dir / "analysis-result.json").absolute(
                         ))+"' ("+str(Path(working_dir / "analysis-result.json").stat().st_size)+") ")
-                    except Exception as e:
+                    except Exception as error_msg:
                         logging.error("while trying to save analysis result as json file '"+str(
-                            Path(working_dir / "analysis-result.json").absolute())+"' -> error: "+str(e))
+                            Path(working_dir / "analysis-result.json").absolute())+"' -> error: "+str(error_msg))
 
                     try:
                         # pprint(resultMarkdown)
@@ -635,9 +635,9 @@ if len(search_cb_json) == 1 and search_cb_json is not None:
 
                         logging.debug("created report '"+str(Path(working_dir / "analysis-result.md").absolute(
                         ))+"' ("+str(Path(working_dir / "analysis-result.md").stat().st_size)+") ")
-                    except Exception as e:
+                    except Exception as error_msg:
                         logging.error("while trying to save analysis result as markdown file '"+str(
-                            Path(working_dir / "analysis-result.md").absolute())+"' -> error: "+str(e))
+                            Path(working_dir / "analysis-result.md").absolute())+"' -> error: "+str(error_msg))
 
                     try:
                         indexHtmlReq = requests.get(
@@ -683,9 +683,9 @@ if len(search_cb_json) == 1 and search_cb_json is not None:
                             else:
                                 logging.error(
                                     f"failed to change contents of '#page-timestamp-last-update' in index.html -> error: selector did not match!")
-                        except Exception as e:
+                        except Exception as error_msg:
                             logging.error(
-                                f"failed to change contents of '#page-timestamp-last-update' in index.html -> error: {e}")
+                                f"failed to change contents of '#page-timestamp-last-update' in index.html -> error: {error_msg}")
 
                         schema_org_meta = ",".join(list(index_html_soup.select(
                             'script[type="application/ld+json"]')[0].contents)).strip()
@@ -727,9 +727,9 @@ if len(search_cb_json) == 1 and search_cb_json is not None:
                             if len(list(index_html_soup.select('body script[src*="gitlab"]'))) > 0:
                                 for script_tag in index_html_soup.select('body script[src*="gitlab"]'):
                                     script_tag.decompose()
-                        except Exception as e:
+                        except Exception as error_msg:
                             logging.error(
-                                f"failed to remove 'script' tags from 'body' -> error: {e}")
+                                f"failed to remove 'script' tags from 'body' -> error: {error_msg}")
 
                         try:
                             css_links = list(index_html_soup.select(
@@ -783,9 +783,9 @@ if len(search_cb_json) == 1 and search_cb_json is not None:
                                                 css_txt += css_add
                                                 logging.debug(
                                                     "insert additional css")
-                                        except Exception as e:
+                                        except Exception as error_msg:
                                             logging.error(
-                                                f"failed to insert additional css -> error: {e}")
+                                                f"failed to insert additional css -> error: {error_msg}")
 
                                         with open(str(dl_path.absolute()), 'w+') as fh:
                                             fh.write(css_txt)
@@ -796,12 +796,12 @@ if len(search_cb_json) == 1 and search_cb_json is not None:
                                     else:
                                         logging.error(
                                             f"failed to download stylesheet '{css_link}' -> error: value of 'href' -> '{css_href}' is invalid!")
-                                except Exception as e:
+                                except Exception as error_msg:
                                     logging.error(
-                                        f"failed to download stylesheet '{css_link}' -> error: {e}")
-                        except Exception as e:
+                                        f"failed to download stylesheet '{css_link}' -> error: {error_msg}")
+                        except Exception as error_msg:
                             logging.error(
-                                f"failed to remove stylesheet 'link' tags from 'head' -> error: {e}")
+                                f"failed to remove stylesheet 'link' tags from 'head' -> error: {error_msg}")
 
                         try:
                             toc_js_str = """
@@ -843,9 +843,9 @@ if len(search_cb_json) == 1 and search_cb_json is not None:
                                 toc_js_str, features='html.parser')
                             index_html_soup.select(
                                 "#page-footer-text")[0].insert_after(toc_js_soup)
-                        except Exception as e:
+                        except Exception as error_msg:
                             logging.error(
-                                "failed to add ToC JavaScript code -> error: "+str(e))
+                                "failed to add ToC JavaScript code -> error: "+str(error_msg))
 
                         try:
                             if len(index_html_soup.select("#page-footer-hosting-name")) > 0:
@@ -854,9 +854,9 @@ if len(search_cb_json) == 1 and search_cb_json is not None:
                             else:
                                 logging.warning(
                                     "failed to find '#page-footer-hosting-name' in index.html ")
-                        except Exception as e:
+                        except Exception as error_msg:
                             logging.error(
-                                f"failed to change contents of '#page-footer-hosting-name' in index.html -> error: {e}")
+                                f"failed to change contents of '#page-footer-hosting-name' in index.html -> error: {error_msg}")
 
                         try:
                             if len(index_html_soup.select("#page-footer-source-code-link")) > 0:
@@ -865,9 +865,9 @@ if len(search_cb_json) == 1 and search_cb_json is not None:
                             else:
                                 logging.warning(
                                     "failed to find '#page-footer-source-code-link' in index.html ")
-                        except Exception as e:
+                        except Exception as error_msg:
                             logging.error(
-                                f"failed to change contents of '#page-footer-source-code-link' in index.html -> error: {e}")
+                                f"failed to change contents of '#page-footer-source-code-link' in index.html -> error: {error_msg}")
 
                         try:
                             if len(index_html_soup.select("#page-footer-repo-license-link")) > 0:
@@ -876,9 +876,9 @@ if len(search_cb_json) == 1 and search_cb_json is not None:
                             else:
                                 logging.warning(
                                     "failed to find '#page-footer-repo-license-link' in index.html")
-                        except Exception as e:
+                        except Exception as error_msg:
                             logging.error(
-                                f"failed to change contents of '#page-footer-repo-license-link' in index.html -> error: {e}")
+                                f"failed to change contents of '#page-footer-repo-license-link' in index.html -> error: {error_msg}")
 
                         try:
                             stars_count = index_html_soup.select(
@@ -889,9 +889,9 @@ if len(search_cb_json) == 1 and search_cb_json is not None:
                             else:
                                 logging.warning(
                                     "failed to find '#repo-stars-count' in index.html")
-                        except Exception as e:
+                        except Exception as error_msg:
                             logging.error(
-                                f"failed to change contents of '#repo-stars-count' in index.html -> error: {e}")
+                                f"failed to change contents of '#repo-stars-count' in index.html -> error: {error_msg}")
 
                         try:
                             watchers_count = index_html_soup.select(
@@ -902,9 +902,9 @@ if len(search_cb_json) == 1 and search_cb_json is not None:
                             else:
                                 logging.warning(
                                     "failed to find '#repo-watchers-count' in index.html")
-                        except Exception as e:
+                        except Exception as error_msg:
                             logging.error(
-                                f"failed to change contents of '#repo-watchers-count' in index.html -> error: {e}")
+                                f"failed to change contents of '#repo-watchers-count' in index.html -> error: {error_msg}")
 
                         report_file_html = str(index_html_soup).strip()
 
@@ -914,14 +914,14 @@ if len(search_cb_json) == 1 and search_cb_json is not None:
                             with open(report_html_file, "w+", encoding="utf-8") as fh:
                                 fh.write(htmlmin.minify(report_file_html,
                                                         remove_empty_space=True))
-                        except Exception as e:
+                        except Exception as error_msg:
                             logging.error(
-                                f"minification of '{report_html_file}' failed -> error: {e}")
+                                f"minification of '{report_html_file}' failed -> error: {error_msg}")
                             with open(report_html_file, "w+", encoding="utf-8") as fh:
                                 fh.write(report_file_html)
-                    except Exception as e:
+                    except Exception as error_msg:
                         logging.error(
-                            f"while trying to save analysis result as html file -> error: {e}")
+                            f"while trying to save analysis result as html file -> error: {error_msg}")
 
                     try:
                         robots_txt = """
@@ -933,18 +933,18 @@ Sitemap: https://twfgcicdbot.github.io/TinyWeatherForecastGermanyScan/sitemap.xm
 
                         with open(str(Path(working_dir / "robots.txt").absolute()), "w+", encoding="utf-8") as fh:
                             fh.write(str(robots_txt).strip())
-                    except Exception as e:
+                    except Exception as error_msg:
                         logging.error(
-                            f"failed to generate robots.txt -> error: {e}")
+                            f"failed to generate robots.txt -> error: {error_msg}")
 
                     lastModPageStrSiteMap = ""
                     try:
                         lastModPageStrSiteMap = '<lastmod>' + \
                             str(datetime.now(tzutc()).strftime(
                                 "%Y-%m-%dT%H:%M+00:00"))+'</lastmod>'
-                    except Exception as e:
+                    except Exception as error_msg:
                         logging.error(
-                            f"failed to generate meta tag 'pubdate' -> error: {e}")
+                            f"failed to generate meta tag 'pubdate' -> error: {error_msg}")
 
                     try:
                         sitemapXML = """
@@ -961,15 +961,15 @@ Sitemap: https://twfgcicdbot.github.io/TinyWeatherForecastGermanyScan/sitemap.xm
                         with open(str(Path(working_dir / "sitemap.xml").absolute()), "w+", encoding="utf-8") as fh:
                             fh.write(str(sitemapXML).strip())
 
-                    except Exception as e:
+                    except Exception as error_msg:
                         logging.error(
-                            f"while generarting sitemap.xml -> error: {e}")
+                            f"while generarting sitemap.xml -> error: {error_msg}")
 
-                except Exception as e:
+                except Exception as error_msg:
                     logging.error(
-                        f"while processing '{apk_file_temp}' -> error: {e}")
-    except Exception as e:
-        logging.error(""+str(e))
+                        f"while processing '{apk_file_temp}' -> error: {error_msg}")
+    except Exception as error_msg:
+        logging.error(""+str(error_msg))
 
 else:
     logging.error("content of codeberg json response is invalid!")
@@ -977,9 +977,9 @@ else:
     try:
         pprint(str(search_cb_req.headers))
         pprint(str(search_cb_req.text))
-    except Exception as e:
+    except Exception as error_msg:
         logging.error(
-            f"failed to print request raw data to console! -> error: {e}")
+            f"failed to print request raw data to console! -> error: {error_msg}")
 
     sys.exit(1)
 

@@ -3,17 +3,15 @@ WIP: androguard additional information about apk
 
 """
 
+import json
 from collections import defaultdict
 from pathlib import Path
 from pprint import pprint
-import json
 
 from androguard.misc import AnalyzeAPK
-
-from exodus_core.analysis.static_analysis import StaticAnalysis
-from exodus_core.analysis.apk_signature import ApkSignature
-
 from bs4 import BeautifulSoup
+from exodus_core.analysis.apk_signature import ApkSignature
+from exodus_core.analysis.static_analysis import StaticAnalysis
 
 apkFileTemp = Path("TinyWeatherForecastGermanyScan/TinyWeatherForecastGermany-build031-version_0.57.3_20211028.apk")
 
