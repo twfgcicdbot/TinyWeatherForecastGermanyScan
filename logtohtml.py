@@ -43,15 +43,15 @@ try:
                             logging.FileHandler(str(log_p2), encoding="utf-8"),
                             logging.StreamHandler()
                         ])
-except Exception as e:
-    logging.error(f"while logger init! -> error: {e} ")
+except Exception as error_msg:
+    logging.error(f"while logger init! -> error: {error_msg} ")
 
 log_p1 = working_dir / "debug.log"
 try:
-    with open(str(log_p1), "r", encoding="utf-8") as fh:
-        code = str(fh.read())
-except Exception as e:
-    logging.error(f"failed to open '{log_p1.absolute()}' -> error: {e} ")
+    with open(str(log_p1), "r", encoding="utf-8") as file_handle:
+        code = str(file_handle.read())
+except Exception as error_msg:
+    logging.error(f"failed to open '{log_p1.absolute()}' -> error: {error_msg} ")
     sys.exit("FATAL ERROR script execution aborted!")
 
 codeLines = str(code).split("\n")
@@ -84,11 +84,11 @@ debug_file_soup = BeautifulSoup(str(result), features='html.parser')
 for metaTemp in debug_file_soup.select('head > meta'):
     metaTemp.decompose()
 
-headHtml = ('\n\n<meta http-equiv="content-type" content="text/html; charset=UTF-8" />\n'
+head_html = ('\n\n<meta http-equiv="content-type" content="text/html; charset=UTF-8" />\n'
             '<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1.0">\n'
             '<meta name="robots" content="noindex, nofollow">')
 
-headHtml += """\n
+head_html += """\n
 <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="images/favicon-16x16.png">
@@ -106,7 +106,7 @@ headHtml += """\n
 """
 
 debug_file_soup.title.insert_after(BeautifulSoup(
-    headHtml, features='html.parser'))  # parse html to modify elements
+    head_html, features='html.parser'))  # parse html to modify elements
 
 logging.debug("added additional 'meta' tags ")
 
@@ -155,13 +155,13 @@ logging.debug("added additional 'css' tag ")
 
 debug_html_file = str(Path(working_dir / "debug.html").absolute())
 try:
-    with open(debug_html_file, "w+", encoding="utf-8") as fh:
-        fh.write(htmlmin.minify(str(debug_file_soup),
+    with open(debug_html_file, "w+", encoding="utf-8") as file_handle:
+        file_handle.write(htmlmin.minify(str(debug_file_soup),
                  remove_empty_space=True, remove_comments=True))
-except Exception as e:
-    logging.error(f"minification of '{debug_html_file}' failed -> error: {e} ")
-    with open(debug_html_file, "w+", encoding="utf-8") as fh:
-        fh.write(str(debug_file_soup))
+except Exception as error_msg:
+    logging.error(f"minification of '{debug_html_file}' failed -> error: {error_msg} ")
+    with open(debug_html_file, "w+", encoding="utf-8") as file_handle:
+        file_handle.write(str(debug_file_soup))
 
 print("done")
 logging.info("finished execution of logtohtml.py")
