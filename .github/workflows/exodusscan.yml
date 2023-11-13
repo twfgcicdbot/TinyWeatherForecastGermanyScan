@@ -26,7 +26,11 @@ jobs:
         run: git clone https://github.com/$GITHUB_REPOSITORY TinyWeatherForecastGermanyScan
 
       - name: clone remote repo
-        run: cd TinyWeatherForecastGermanyScan && git clone https://github.com/twfgcicdbot/TinyWeatherForecastGermanyMirror TinyWeatherForecastGermanyMirror || true
+        run: |
+          cd TinyWeatherForecastGermanyScan
+          git clone https://github.com/twfgcicdbot/TinyWeatherForecastGermanyMirror TinyWeatherForecastGermanyMirror || true
+          pwd
+          ls -lisha
       
       - name: update packages
         run: timeout 120s sudo apt update || true
@@ -42,17 +46,8 @@ jobs:
       - name: upgrade pip
         run: python -m pip install --upgrade pip
       
-      - name: install dexdump
-        run: sudo apt install -y dexdump
-      
-      - name: install ripgrep
-        run: sudo apt install -y ripgrep
-      
-      - name: install apktool
-        run: sudo apt install -y apktool
-
-      #- name: install brotli
-      #  run: sudo apt install -y brotli || true
+      - name: install dexdump, ripgrep and apktool
+        run: sudo apt install -y dexdump ripgrep apktool brotli
 
       - name: install virtualenv
         run: pip install virtualenv
