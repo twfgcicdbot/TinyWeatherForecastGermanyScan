@@ -6,15 +6,15 @@ name: exodus-privacy scan
 on:
   # Triggers the workflow on push or pull request events but only for the main branch
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches-ignore: [ main ]
+    branches-ignore: [main]
   schedule:
-    - cron: "5 7 * * */2" # every two days at 7:05am UTC
+    - cron: "5 7 * * */3" # at 07:05AM (UTC) on every 3rd day-of-week 
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
-  
+
   repository_dispatch: # run workflow on api request
 
 jobs:
@@ -27,61 +27,58 @@ jobs:
 
       - name: clone remote repo
         run: |
-          cd TinyWeatherForecastGermanyScan
           git clone https://github.com/twfgcicdbot/TinyWeatherForecastGermanyMirror TinyWeatherForecastGermanyMirror || true
-          pwd
-          ls -lisha
-      
+
       - name: update packages
         run: timeout 120s sudo apt update || true
-      
+
       - name: upgrade packages
         run: timeout 120s sudo apt upgrade -y || true
-      
-      - name: Setup Python 3.x
+
+      - name: Setup Python 3.10.x
         uses: actions/setup-python@v4
         with:
           python-version: 3.10.10
-      
+
       - name: upgrade pip
-        run: python -m pip install --upgrade pip
-      
+        run: python -m pip install --upgrade pip wheel
+
       - name: install dexdump, ripgrep and apktool
         run: sudo apt install -y dexdump ripgrep apktool brotli
 
       - name: install virtualenv
         run: pip install virtualenv
-      
+
       - name: list directory contents
         run: ls -lisha
-      
+
       - name: init virtualenv
         run: virtualenv venv
-      
+
       - name: activate virtualenv
         run: source venv/bin/activate
-      
+
       - name: list directory contents
         run: ls -lisha
 
       - name: install python requirements
         run: pip install -r TinyWeatherForecastGermanyScan/requirements.txt
-      
+
       - name: run __init__.py
         run: python TinyWeatherForecastGermanyScan/__init__.py
 
       - name: run rg-pattern-search.py
         run: python TinyWeatherForecastGermanyScan/rg-pattern-search.py || true
-      
+
       - name: run logtohtml.py
         run: python TinyWeatherForecastGermanyScan/logtohtml.py || true
 
       - name: list directory contents
         run: ls -lisha
-      
+
       - name: list directory contents of TinyWeatherForecastGermanyScan
         run: cd TinyWeatherForecastGermanyScan && ls -lisha
-      
+
       - name: return directory size
         run: du -sh
 
@@ -100,19 +97,19 @@ jobs:
           name: analysed-apk
           path: |
             */*.apk
-      
+
       - name: list directory contents of TinyWeatherForecastGermanyScan
         run: cd TinyWeatherForecastGermanyScan && ls -lisha
-      
-      # also see here: https://github.community/t/support-for-pre-compressed-assets-and-brotli-compression/10605 
+
+      # also see here: https://github.community/t/support-for-pre-compressed-assets-and-brotli-compression/10605
       #- name: compress assets using gzip and brotli
       #  run: |
       #    gzip -k -6 $(find TinyWeatherForecastGermanyScan -type f -regex '.*\.\(htm\|html\|txt\|text\|js\|css\)$') || true
       #    find TinyWeatherForecastGermanyScan -type f -regex '.*\.\(htm\|html\|txt\|text\|js\|css\)$' -exec brotli -f -k {} \; || true
 
-      #- name: list directory contents of TinyWeatherForecastGermanyScan
-      #  run: cd TinyWeatherForecastGermanyScan && ls -lisha
-      
+      # - name: list directory contents of TinyWeatherForecastGermanyScan
+      #   run: cd TinyWeatherForecastGermanyScan && ls -lisha
+
       - name: git push to origin
         run: |
           cd TinyWeatherForecastGermanyScan
