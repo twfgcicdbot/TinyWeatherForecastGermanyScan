@@ -1,8 +1,11 @@
 tasks:
-- init: sudo apt update -y && sudo apt upgrade -y && sudo apt install -y apktool && sudo apt install -y dexdump && sudo apt install -y ripgrep && virtualenv venv && source venv/bin/activate && python -m pip install --upgrade pip && pip install -r requirements.txt && python __init__.py
+- init: sudo apt update && sudo apt upgrade -y && sudo apt install -y apktool dexdump ripgrep && virtualenv venv && source venv/bin/activate && python -m pip install --upgrade pip wheel setuptools && pip install -r requirements.txt && python __init__.py
 vscode:
   extensions:
     - ms-python.python
+    - ms-python.vscode-pylance
+    - ms-python.black-formatter
     - eamodio.gitlens
     - charliermarsh.ruff
     - SonarSource.sonarlint-vscode
+    - redhat.vscode-yaml
