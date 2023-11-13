@@ -534,10 +534,26 @@ if len(search_cb_json) == 1 and search_cb_json is not None:
                                         if leaf_name in classes_dict:
                                             class_path = classes_dict[leaf_name]
                                             if class_path[0:3] == 'de/' or 'nodomain/freeyourgadget' in class_path or 'org/astronomie' in class_path:
-                                                source_a = ' -> <a class="subclass-source" title="open source at codeberg.org" target="_blank" href="https://codeberg.org/Starfish/TinyWeatherForecastGermany/src/branch/master/app/src/main/java/' + \
-                                                    str(class_path)+'/' + \
-                                                    str(leaf_name) + \
-                                                    '.java">source</a>'
+                                                c_java_p = Path(f"app/src/main/java/{class_path}/{leaf_name}.java")
+                                                c_java_p_local = "TinyWeatherForecastGermanyMirror" /  c_java_p
+
+                                                # parsing files to get line numbers
+                                                if c_java_p_local.exists():
+                                                    try:
+                                                        java_lines = []
+                                                        with open(c_java_p_local, "r", encoding="utf-8") as file_handle:
+                                                            java_lines = file_handle.read().split("\n")
+                                                        for jl_index, java_line in enumerate(java_lines):
+                                                            if f"class {c_java_p_local.stem}" in java_line:
+                                                                logging.debug(f"found class in line #{jl_index+1} -> '{java_line}'")
+                                                                c_java_p = f"{c_java_p}#L{jl_index+1}"
+                                                                break
+                                                    except Exception as error_msg:
+                                                        logging.error(f"while searching line number of class '{c_java_p_local.stem}' in {c_java_p_local} -> error: {error_msg}")
+
+                                                source_a = ' -> <a class="subclass-source" title="open source at codeberg.org" target="_blank" href="https://codeberg.org/Starfish/TinyWeatherForecastGermany/src/branch/master/' + \
+                                                    str(c_java_p) + \
+                                                    '">source</a>'
                                                 docs_a = ' -> <a class="subclass-docs" title="open javadocs" target="_blank" href="https://tinyweatherforecastgermanygroup.gitlab.io/twfg-javadoc/' + \
                                                     str(class_path)+'/' + \
                                                     str(leaf_name) + \
