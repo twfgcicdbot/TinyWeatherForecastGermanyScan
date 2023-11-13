@@ -12,7 +12,7 @@
 
 ## Disclaimer
 
-No warranty or guarantee of any kind provided. Use at your own risk only.
+No warranty of any kind provided. Use at your own risk only.
 Not meant to be used in commercial or in general critical/productive environments at all.
 
 """
@@ -69,7 +69,7 @@ cryptogen.shuffle(user_agents)
 
 user_agent = str(cryptogen.choice(user_agents))
 
-logging.debug(f"querying data as '{user_agent}' ")
+logging.debug(f"querying data as '{user_agent}'")
 
 headers = {
     "User-Agent": user_agent,
@@ -86,7 +86,7 @@ try:
     # pprint(searchResultCodebergJson)
     logging.debug("fetched Codeberg data")
 except Exception as error_msg:
-    logging.error(f"codeberg api request failed! -> error: {error_msg} ")
+    logging.error(f"codeberg api request failed! -> error: {error_msg}")
 
 if len(search_cb_json) == 1 and search_cb_json is not None:
     twfg_json = search_cb_json[0]
@@ -95,8 +95,7 @@ if len(search_cb_json) == 1 and search_cb_json is not None:
 
     if twfg_json is None:
         logging.error(
-            "content of key 'results' in codeberg json response is 'None' ")
-
+            "content of key 'results' in codeberg json response is 'None'")
         try:
             pprint(str(search_cb_req.headers))
             pprint(str(search_cb_req.text))

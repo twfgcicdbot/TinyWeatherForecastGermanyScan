@@ -7,20 +7,19 @@ author: Jean-Luc Tibaux
 
 DISCLAIMER:
 use only at your own risk. your mileage might vary.
-no warranty or guarantee of any kind provided.
-
-
+no warranty of any kind provided.
 """
 
-from pathlib import Path
-from pprint import pprint
 import json
-import regex
 import logging
 import subprocess
 import sys
+from pathlib import Path
+from pprint import pprint
 
+import regex
 from ripgrepy import Ripgrepy
+
 # The Ripgrepy class takes two arguments. The regex to search for and the folder path to search in
 # docs: https://ripgrepy.readthedocs.io/en/latest/
 
@@ -35,8 +34,8 @@ try:
                             logging.FileHandler(log_p, encoding="utf-8"),
                             logging.StreamHandler()
                         ])
-except Exception as e:
-    logging.error(f"while logger init! -> error: {e} ")
+except Exception as error_msg:
+    logging.error(f"while logger init! -> error: {error_msg}")
 
 apk_files = list(working_dir.glob('*.apk'))
 pprint(apk_files)
@@ -62,7 +61,7 @@ rg = Ripgrepy(rg_pattern, f'{twfg_apk_dir}/smali')
 http_matches_list = rg.H().n().json().run().as_dict
 
 logging.debug(f"found {len(http_matches_list)} matches"
-              f" for '{rg_pattern}' in smali code ")
+              f" for '{rg_pattern}' in smali code")
 
 # with open("temp.json","w+",encoding="utf-8") as fh:
 #    fh.write(str(json.dumps(http_matches_list, indent=4)))
@@ -85,8 +84,8 @@ for http_match_dict in http_matches_list:
             http_cleaned_matches[url_temp] = 1
         else:
             http_cleaned_matches[url_temp] += 1
-    except Exception as e:
-        logging.error(f"failed to parse http url match dict -> error: {e} ")
+    except Exception as error_msg:
+        logging.error(f"failed to parse http url match dict -> error: {error_msg}")
 
 pprint(http_cleaned_matches)
 
@@ -100,8 +99,7 @@ rg = Ripgrepy(
     f'{twfg_apk_dir}/smali')
 email_matches_list = rg.H().n().json().run().as_dict
 
-logging.debug("found "+str(len(email_matches_list)) +
-              " matches for email pattern in smali code ")
+logging.debug(f"found {len(email_matches_list)} matches for email pattern in smali code")
 
 # with open("temp.json","w+",encoding="utf-8") as fh:
 #    fh.write(str(json.dumps(email_matches_list, indent=4)))
@@ -115,8 +113,8 @@ for email_match_dict in email_matches_list:
             email_cleaned_matches[email_temp] = 1
         else:
             email_cleaned_matches[email_temp] += 1
-    except Exception as e:
-        logging.error("failed to parse email match dict -> error: "+str(e))
+    except Exception as error_msg:
+        logging.error(f"failed to parse email match dict -> error: {error_msg}")
 
 pprint(email_cleaned_matches)
 
@@ -158,8 +156,8 @@ pprint(ipaddress_cleaned_matches)
 #    fh.write(str(json.dumps(ipaddress_cleaned_matches, indent=4)))
 """
 
-with open("TinyWeatherForecastGermanyScan/rg-pattern-matches.json", "w+", encoding="utf-8") as fh:
-    fh.write(str(json.dumps({
+with open("TinyWeatherForecastGermanyScan/rg-pattern-matches.json", "w+", encoding="utf-8") as file_handle:
+    file_handle.write(str(json.dumps({
              "http": http_cleaned_matches,
              "emails": email_cleaned_matches,
              "ipaddress": ipaddress_cleaned_matches}, indent=4)))
