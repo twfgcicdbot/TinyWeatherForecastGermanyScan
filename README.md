@@ -1,6 +1,6 @@
 # TinyWeatherForecastGermanyScan
 
-[![exodus-privacy scan](https://img.shields.io/github/workflow/status/twfgcicdbot/TinyWeatherForecastGermanyScan/exodus-privacy%20scan?label=exodus-privacy%20scan&logo=github&style=for-the-badge)](https://github.com/twfgcicdbot/TinyWeatherForecastGermanyScan/actions/workflows/exodusscan.yml) [![github pages page](https://img.shields.io/badge/-github%20pages-green?style=for-the-badge&logo=github)](https://twfgcicdbot.github.io/TinyWeatherForecastGermanyScan/index.html) [![F-Droid Store release version](https://img.shields.io/f-droid/v/de.kaffeemitkoffein.tinyweatherforecastgermany?color=%23efbb24&logo=fdroid&style=for-the-badge)](https://f-droid.org/packages/de.kaffeemitkoffein.tinyweatherforecastgermany) [![code license](https://img.shields.io/github/license/twfgcicdbot/TinyWeatherForecastGermanyMirror?style=for-the-badge&logo=github)](https://github.com/twfgcicdbot/TinyWeatherForecastGermanyMirror/blob/master/COPYING) 
+[![exodus-privacy scan](https://img.shields.io/github/workflow/status/twfgcicdbot/TinyWeatherForecastGermanyScan/exodus-privacy%20scan?label=exodus-privacy%20scan&logo=github&style=for-the-badge)](https://github.com/twfgcicdbot/TinyWeatherForecastGermanyScan/actions/workflows/exodusscan.yml) [![github pages page](https://img.shields.io/badge/-github%20pages-green?style=for-the-badge&logo=github)](https://twfgcicdbot.github.io/TinyWeatherForecastGermanyScan/index.html) [![F-Droid Store release version](https://img.shields.io/f-droid/v/de.kaffeemitkoffein.tinyweatherforecastgermany?color=%23efbb24&logo=fdroid&style=for-the-badge)](https://f-droid.org/packages/de.kaffeemitkoffein.tinyweatherforecastgermany) [![code license](https://img.shields.io/github/license/twfgcicdbot/TinyWeatherForecastGermanyMirror?style=for-the-badge&logo=github)](https://github.com/twfgcicdbot/TinyWeatherForecastGermanyMirror/blob/master/COPYING)
 
 tl;dr -> scan code of [**TinyWeatherForecastGermany**](https://codeberg.org/Starfish/TinyWeatherForecastGermany) (TWFG) for tracker signatures provided by [**ExodusPrivacy**](https://exodus-privacy.eu.org/en/) using the python module [exodus-core](https://github.com/Exodus-Privacy/exodus-core/)
 
@@ -9,6 +9,7 @@ tl;dr -> scan code of [**TinyWeatherForecastGermany**](https://codeberg.org/Star
 The DWD is Germany's **national weather agency** (similiar to **N**ational **O**ceanic **a**nd **A**tmospheric **A**dministration ([NOAA](https://www.noaa.gov/about-our-agency)) in the US).
 
 **Note**:
+
 * *'TWFG'* is an inofficial abbreviation for ***T**iny **W**eather **F**orecast **G**ermany.*
 * *[ExodusPrivacy](https://github.com/Exodus-Privacy)* also partially uses the alternative spelling *'εxodus'*. To maintain readability the author sticks to the first version without the leading greek character.
 
@@ -66,7 +67,7 @@ This project is **not affialited** with any of the following organizations: Clas
 ## Contributing
 
 * All contributions to **Tiny Weather Forecast Germany** are managed at the ['main'](https://codeberg.org/Starfish/TinyWeatherForecastGermany) code repository at [codeberg.org](https://codeberg.org/Starfish/TinyWeatherForecastGermany)
-* [**Translations**](https://translate.codeberg.org/engage/tiny-weather-forecast-germany/) are managed at the [**weblate** instance](https://translate.codeberg.org/projects/tiny-weather-forecast-germany/) provided by Codeberg e.V. 
+* [**Translations**](https://translate.codeberg.org/engage/tiny-weather-forecast-germany/) are managed at the [**weblate** instance](https://translate.codeberg.org/projects/tiny-weather-forecast-germany/) provided by Codeberg e.V.
 * Feel free to contribute to this script by opening issues and/or merge requests.
 * Please also see the automatically generated *javadoc* **code documentation** of Tiny Weather Forecast Germany [at GitLab](https://gitlab.com/tinyweatherforecastgermanygroup/twfg-javadoc).
 * For cybersec, privacy and/or copyright related issues regarding this repository please directly contact the maintainer [**Jean-Luc Tibaux** (@eUgEntOptIc44)](https://codeberg.org/eUgEntOptIc44) or our [CI/CD bot](https://github.com/twfgcicdbot).

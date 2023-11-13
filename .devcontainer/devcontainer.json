@@ -1,0 +1,24 @@
+{
+    "image": "mcr.microsoft.com/devcontainers/universal:2",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "tamasfe.even-better-toml",
+                "eamodio.gitlens",
+                "DavidAnson.vscode-markdownlint",
+                "ms-python.python",
+                "ms-python.vscode-pylance",
+                "ms-python.black-formatter",
+                "charliermarsh.ruff",
+                "timonwong.shellcheck",
+                "SonarSource.sonarlint-vscode"
+            ],
+            "settings": {
+                "sonarlint.disableTelemetry": true,
+                "gitlens.telemetry.enabled": false,
+                "redhat.telemetry.enabled": false
+            }
+        }
+    },
+    "postCreateCommand": "sudo apt update && sudo apt upgrade -y && sudo apt install -y apktool dexdump ripgrep && virtualenv venv && source venv/bin/activate && python -m pip install --upgrade pip && pip install -r requirements.txt && python __init__.py"
+}

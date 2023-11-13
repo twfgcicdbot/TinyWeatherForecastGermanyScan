@@ -41,8 +41,8 @@ for embeddedClassTemp in embeddedClasses:
     try:
         classPartsTemp = list(embeddedClassTemp.split("/"))
         addLeafs(classesTree, classPartsTemp)
-    except Exception as e:
-        print("ERROR:" + str(e))
+    except Exception as error_msg:
+        print(f"ERROR: {error_msg}")
 
 #pprint(classesTree)
 
@@ -72,5 +72,5 @@ printClassesResult += "</details>\n"
 
 printClassesResult = str(BeautifulSoup(printClassesResult, features="html.parser").prettify())
 
-with open(str(Path("index.html").absolute()), "w+", encoding="utf-8") as fh:
-    fh.write(printClassesResult)
+with open(str(Path("index.html").absolute()), "w+", encoding="utf-8") as file_handle:
+    file_handle.write(printClassesResult)

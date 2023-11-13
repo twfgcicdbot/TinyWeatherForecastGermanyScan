@@ -22,11 +22,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: clone remote repo
-        run: git clone https://github.com/twfgcicdbot/TinyWeatherForecastGermanyMirror TinyWeatherForecastGermanyMirror
-          
       - name: clone this repo
         run: git clone https://github.com/$GITHUB_REPOSITORY TinyWeatherForecastGermanyScan
+
+      - name: clone remote repo
+        run: cd TinyWeatherForecastGermanyScan && git clone https://github.com/twfgcicdbot/TinyWeatherForecastGermanyMirror TinyWeatherForecastGermanyMirror || true
       
       - name: update packages
         run: timeout 120s sudo apt update || true
@@ -68,7 +68,7 @@ jobs:
       
       - name: list directory contents
         run: ls -lisha
-      
+
       - name: install python requirements
         run: pip install -r TinyWeatherForecastGermanyScan/requirements.txt
       
