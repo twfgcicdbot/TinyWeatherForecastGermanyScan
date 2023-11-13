@@ -59,6 +59,10 @@ try:
 except Exception as error_msg:
     logging.error(f"while logger init! -> error: {error_msg}")
 
+java_dir = Path("TinyWeatherForecastGermanyMirror")
+if not java_dir.exists():
+    logging.error(f"failed to locate '{java_dir.absolute()}' -> permissions missing or the directory does not exists!")
+
 # sources of user agent data -> License: MIT
 #  -> https://github.com/tamimibrahim17/List-of-user-agents/blob/master/Chrome.txt
 #  -> https://github.com/tamimibrahim17/List-of-user-agents/blob/master/Firefox.txt
@@ -154,7 +158,7 @@ if len(search_cb_json) == 1 and search_cb_json is not None:
                         apk_name = str(analysis_temp.get_app_name())
                         if apk_name != "None":
                             logging.debug(f"static analysis returned app name:"
-                                          f" {apk_name} ")
+                                          f" {apk_name}")
                             result_dict["name"] = apk_name
                             result_markdown += "# " + apk_name + "\n\n"
                         else:
@@ -279,50 +283,40 @@ if len(search_cb_json) == 1 and search_cb_json is not None:
                                 # pprint(permissions)
                                 result_markdown += '<ul id="permissions-list">'
 
-                                for permissionTemp in permissions:
+                                for permission_tmp in permissions:
                                     try:
                                         permissionDictTemp = AOSP_PERMISSIONS_EN["permissions"][str(
-                                            permissionTemp).strip()]
+                                            permission_tmp).strip()]
 
-                                        permissionDesc = str(
+                                        permission_desc = str(
                                             permissionDictTemp["description"]).replace("\n", "").strip()
-                                        permissionDesc = regex.sub(
-                                            r"(?im)\n", "", permissionDesc)
-                                        while "  " in permissionDesc:
-                                            permissionDesc = regex.sub(
-                                                r"(?im)(  )+", " ", permissionDesc)
-                                        permissionDictTemp["description"] = permissionDesc
+                                        permission_desc = regex.sub(
+                                            r"(?im)\n", "", permission_desc)
+                                        while "  " in permission_desc:
+                                            permission_desc = regex.sub(
+                                                r"(?im)(  )+", " ", permission_desc)
+                                        permissionDictTemp["description"] = permission_desc
 
                                         pprint(permissionDictTemp)
                                     except Exception as error_msg:
                                         permissionDictTemp = {
-                                            "name": str(permissionTemp)}
-                                        permissionDesc = ""
-                                        logging.error("parsing of exodus knowledge data for permission '"+str(
-                                            permissionTemp)+"' of '"+str(apk_file_temp)+"' failed! -> error: "+str(error_msg))
-
-                                    perm_icon = ''
-                                    if 'icon' in permissionDictTemp:
-                                        perm_icon = str(permissionDictTemp["icon"]).replace(
-                                            "\n", "").strip()
-                                    else:
-                                        logging.debug(
-                                            f" failed to find icon for permission '{permissionTemp}' -> dict keys: {list(permissionDictTemp.keys())} ")
+                                            "name": str(permission_tmp)}
+                                        permission_desc = ""
+                                        logging.error(f"parsing of exodus knowledge data for permission '{permission_tmp}'"
+                                                      f" of '{apk_file_temp}' failed! -> error: {error_msg}")
 
                                     try:
                                         result_dict["permissions"].append(
                                             permissionDictTemp)
-                                        result_markdown += '<li>' + \
-                                            str(perm_icon)+' <b class="permission-title">' + \
-                                            str(permissionTemp)+'</b> '
+                                        result_markdown += f"<li><b class=\"permission-title\">{permission_tmp}</b> "
 
-                                        if len(str(permissionDesc).lower().replace("none", "")) > 5:
-                                            result_markdown += '<p id="permission-desc-'+regex.sub(r"(?im)[^A-z0-9]+", "", str(
-                                                permissionTemp))+'" class="permission-description">'+permissionDesc+"</p>"
+                                        if len(str(permission_desc).lower().replace("none", "")) > 5:
+                                            p_desc_slug = regex.sub(r"(?im)[^A-z\d]+", "", str(permission_tmp))
+                                            result_markdown += f'<p id="permission-desc-{p_desc_slug} class="permission-description">{permission_desc}</p>'
 
                                         result_markdown += "</li>\n"
                                     except Exception as error_msg:
-                                        logging.error("saving of permission '"+str(permissionTemp)+"' of '"+str(
+                                        logging.error("saving of permission '"+str(permission_tmp)+"' of '"+str(
                                             apk_file_temp)+"' failed! -> error: "+str(error_msg))
 
                                 result_markdown += '</ul>'
@@ -369,8 +363,7 @@ if len(search_cb_json) == 1 and search_cb_json is not None:
                                           str(apk_file_temp)+"' failed! -> error: result is None!")
                     except Exception as error_msg:
                         result_markdown += "\n **failed** to detect libraries! \n\n"
-                        logging.error("parsing of 'libraries' for apk '" +
-                                      str(apk_file_temp)+"' failed! -> error: "+str(error_msg))
+                        logging.error(f"parsing of 'libraries' for apk '{apk_file_temp}' failed! -> error: {error_msg}")
 
                     result_markdown += "\n## Certificates\n"
 
@@ -434,45 +427,39 @@ if len(search_cb_json) == 1 and search_cb_json is not None:
                         analysis_temp.print_embedded_trackers()
                     except Exception as error_msg:
                         logging.error(
-                            f"printing of 'embedded_trackers' to console failed! -> error: {error_msg} ")
+                            f"printing of 'embedded_trackers' to console failed! -> error: {error_msg}")
 
                     result_markdown += "\n## Trackers\n"
 
                     try:
-                        embeddedTrackers = analysis_temp.detect_trackers()
-                        if embeddedTrackers is not None:
-                            lenEmbeddedTrackers = len(embeddedTrackers)
+                        embed_trackers = analysis_temp.detect_trackers()
+                        if embed_trackers is not None:
+                            len_embed_trackers = len(embed_trackers)
 
                             logging.debug(
-                                "static analysis returned "+str(lenEmbeddedTrackers)+" tracker(s): "+str(embeddedTrackers))
-                            result_markdown += "\n<details>\n<summary>" + \
-                                str(lenEmbeddedTrackers) + \
-                                " tracker(s) detected</summary>\n\n<ul>"
+                                f"static analysis returned {len_embed_trackers} tracker(s): {embed_trackers}")
+                            result_markdown += f"\n<details>\n<summary>{len_embed_trackers} tracker(s) detected</summary>\n\n<ul>"
                             result_dict["trackers"] = []
 
-                            if lenEmbeddedTrackers > 0:
-                                for embeddedTrackerTemp in embeddedTrackers:
+                            if len_embed_trackers > 0:
+                                for embed_tracker_tmp in embed_trackers:
                                     try:
                                         result_dict["trackers"].append(
-                                            str(embeddedTrackerTemp))
-                                        result_markdown += "<li>" + \
-                                            str(embeddedTrackerTemp)+"</li> \n"
+                                            str(embed_tracker_tmp))
+                                        result_markdown += f"<li>{embed_tracker_tmp}</li> \n"
                                     except Exception as error_msg:
-                                        logging.error("saving of tracker '"+str(embeddedTrackerTemp)+"' from '"+str(
-                                            apk_file_temp)+"' failed! -> error: "+str(error_msg))
+                                        logging.error(f"saving of tracker '{embed_tracker_tmp}' from '{apk_file_temp}' failed! -> error: {error_msg}")
                             else:
                                 logging.debug(
-                                    "skipping iteration of trackers as 'lenEmbeddedTrackers' is "+str(lenEmbeddedTrackers))
+                                    f"skipping iteration of trackers as 'len_embed_trackers' is {len_embed_trackers}")
 
                             result_markdown += "\n</ul>\n</details>\n\n"
                         else:
                             result_markdown += "\n **failed** to detect trackers! \n\n"
-                            logging.error("parsing of 'detect_trackers()' for apk '" +
-                                          str(apk_file_temp)+"' failed! -> error: result is None!")
+                            logging.error(f"parsing of 'detect_trackers()' for apk '{apk_file_temp}' failed! -> error: result is 'None'!")
                     except Exception as error_msg:
                         result_markdown += "\n **failed** to detect trackers! \n\n"
-                        logging.error("parsing of 'detect_trackers()' for apk '" +
-                                      str(apk_file_temp)+"' failed! -> error: "+str(error_msg))
+                        logging.error(f"parsing of 'detect_trackers()' for apk '{apk_file_temp}' failed! -> error: {error_msg}")
 
                     # --- end of embedded_trackers ---
 
@@ -497,20 +484,21 @@ if len(search_cb_json) == 1 and search_cb_json is not None:
                                 for node in node_list:
                                     t = t[node]
 
-                            classesTree = tree()
-                            classes_dict = {}
+                            # classes tree
+                            cls_tree = tree()
+                            cls_dict = {}
 
-                            for class_temp in embbed_classes:
+                            for class_tmp in embbed_classes:
                                 try:
-                                    class_parts = list(class_temp.split("/"))
-                                    add_leafs(classesTree, class_parts)
-                                    classes_dict[class_parts[-1]] = class_temp.replace(
+                                    class_parts = list(class_tmp.split("/"))
+                                    add_leafs(cls_tree, class_parts)
+                                    cls_dict[class_parts[-1]] = class_tmp.replace(
                                         class_parts[-1], '').strip('/')
                                 except Exception as error_msg:
                                     logging.error(
                                         f"failed to parse class -> error: {error_msg}")
 
-                            printClassesResult = f"<details><summary>{len(list(class_temp))} class(es) detected</summary>\n"
+                            print_cls_result = f"<details><summary>{len(list(class_tmp))} class(es) detected</summary>\n"
 
                             def print_classes_tree(tree, result, level):
                                 for leaf in list(tree):
@@ -531,11 +519,11 @@ if len(search_cb_json) == 1 and search_cb_json is not None:
                                     else:
                                         docs_a = ''
                                         source_a = ''
-                                        if leaf_name in classes_dict:
-                                            class_path = classes_dict[leaf_name]
+                                        if leaf_name in cls_dict:
+                                            class_path = cls_dict[leaf_name]
                                             if class_path[0:3] == 'de/' or 'nodomain/freeyourgadget' in class_path or 'org/astronomie' in class_path:
                                                 c_java_p = Path(f"app/src/main/java/{class_path}/{leaf_name}.java")
-                                                c_java_p_local = "TinyWeatherForecastGermanyMirror" /  c_java_p
+                                                c_java_p_local = java_dir /  c_java_p
 
                                                 # parsing files to get line numbers
                                                 if c_java_p_local.exists():
@@ -545,11 +533,14 @@ if len(search_cb_json) == 1 and search_cb_json is not None:
                                                             java_lines = file_handle.read().split("\n")
                                                         for jl_index, java_line in enumerate(java_lines):
                                                             if f"class {c_java_p_local.stem}" in java_line:
-                                                                logging.debug(f"found class in line #{jl_index+1} -> '{java_line}'")
+                                                                logging.debug(f"found class in line #{jl_index+1} -> '{java_line.strip()}'")
                                                                 c_java_p = f"{c_java_p}#L{jl_index+1}"
                                                                 break
                                                     except Exception as error_msg:
                                                         logging.error(f"while searching line number of class '{c_java_p_local.stem}' in {c_java_p_local} -> error: {error_msg}")
+                                                else:
+                                                    logging.error(f"failed to search line number of class '{c_java_p_local.stem}' in {c_java_p_local.absolute()}"
+                                                                  f" -> error: failed to find java file.")
 
                                                 source_a = ' -> <a class="subclass-source" title="open source at codeberg.org" target="_blank" href="https://codeberg.org/Starfish/TinyWeatherForecastGermany/src/branch/master/' + \
                                                     str(c_java_p) + \
@@ -570,37 +561,33 @@ if len(search_cb_json) == 1 and search_cb_json is not None:
                                         result += "</details>"
                                 return result
 
-                            printClassesResult = str(print_classes_tree(
-                                dict(classesTree), printClassesResult, 1))
-                            printClassesResult += "</details>\n"
+                            print_cls_result = str(print_classes_tree(
+                                dict(cls_tree), print_cls_result, 1))
+                            print_cls_result += "</details>\n"
 
                             # printClassesResult = str(BeautifulSoup(printClassesResult, features="html.parser").prettify())
 
-                            result_markdown += "\n" + printClassesResult + "\n"
+                            result_markdown += "\n" + print_cls_result + "\n"
                         else:
                             result_markdown += "\n **failed** to detect classes! \n\n"
-                            logging.error("parsing of 'get_embedded_classes()' for apk '"+str(
-                                apk_file_temp)+"' failed! -> error: result is None!")
+                            logging.error(f"parsing of 'get_embedded_classes()' for apk '{apk_file_temp}' failed! -> error: result is 'None'!")
                     except Exception as error_msg:
                         result_markdown += "\n **failed** to detect classes! \n\n"
-                        logging.error("parsing of 'get_embedded_classes()' for apk '" +
-                                      str(apk_file_temp)+"' failed! -> error: "+str(error_msg))
+                        logging.error(f"parsing of 'get_embedded_classes()' for apk '{apk_file_temp}' failed! -> error: {error_msg}")
 
                     # --- end of embedded_classes ---
 
-                    result_markdown += "\n\nThis report was generated on " + str(datetime.now(tzutc()).strftime(
-                        "%Y-%m-%d at %H:%M (%Z)")) + " using [`exodus-core`](https://github.com/Exodus-Privacy/exodus-core/).\n"
+                    utc_timestamp = str(datetime.now(tzutc()).strftime("%Y-%m-%d at %H:%M (%Z)"))
+                    result_markdown += f"\n\nThis report was generated on {utc_timestamp} using [`exodus-core`](https://github.com/Exodus-Privacy/exodus-core/).\n"
 
                     try:
-                        # pprint(analysisTemp.signatures[0])
-
                         try:
                             # list of named tuples -> also see: https://stackoverflow.com/questions/26180528/convert-a-namedtuple-into-a-dictionary
                             tracker_sigs = list(analysis_temp.signatures)
                         except Exception as error_msg:
                             tracker_sigs = []
                             logging.error(
-                                "while trying to save tracker signatures -> error: "+str(error_msg))
+                                f"while trying to save tracker signatures -> error: {error_msg}")
 
                         if len(tracker_sigs) > 0:
                             tracker_sigs_raw = tracker_sigs
@@ -697,7 +684,7 @@ if len(search_cb_json) == 1 and search_cb_json is not None:
                                     datetime.now(tzutc()).strftime("%Y-%m-%dT%H:%M:000"))
                             else:
                                 logging.error(
-                                    f"failed to change contents of '#page-timestamp-last-update' in index.html -> error: selector did not match!")
+                                    "failed to change contents of '#page-timestamp-last-update' in index.html -> error: selector did not match!")
                         except Exception as error_msg:
                             logging.error(
                                 f"failed to change contents of '#page-timestamp-last-update' in index.html -> error: {error_msg}")
@@ -751,7 +738,7 @@ if len(search_cb_json) == 1 and search_cb_json is not None:
                                 'head link[rel="stylesheet"]'))
                             len_css = len(css_links)
                             logging.debug(
-                                f"found {len_css} referenced stylesheets in 'head' -> {css_links} ")
+                                f"found {len_css} referenced stylesheets in 'head' -> {css_links}")
 
                             for css_index in range(len_css):
                                 css_link = css_links[css_index]
