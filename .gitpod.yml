@@ -1,5 +1,5 @@
 tasks:
-- init: sudo apt update && sudo apt upgrade -y && sudo apt install -y apktool dexdump ripgrep && virtualenv venv && source venv/bin/activate && python -m pip install --upgrade pip wheel setuptools && pip install -r requirements.txt && python __init__.py
+- init: sudo apt update && sudo apt upgrade -y && sudo apt install -y apktool dexdump ripgrep && git clone https://github.com/twfgcicdbot/TinyWeatherForecastGermanyMirror TinyWeatherForecastGermanyMirror && virtualenv venv && source venv/bin/activate && python -m pip install --upgrade pip wheel setuptools && pip install -r requirements.txt && python __init__.py
 vscode:
   extensions:
     - ms-python.python
