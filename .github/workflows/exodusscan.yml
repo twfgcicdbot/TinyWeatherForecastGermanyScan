@@ -35,13 +35,13 @@ jobs:
       - name: upgrade packages
         run: timeout 120s sudo apt upgrade -y || true
 
-      - name: Setup Python 3.10.x
+      - name: Setup Python 3.11.x
         uses: actions/setup-python@v5
         with:
-          python-version: 3.10.10
+          python-version: 3.11.8
 
       - name: upgrade pip
-        run: python -m pip install --upgrade pip wheel
+        run: python -m pip install --upgrade pip wheel setuptools
 
       - name: install dexdump, ripgrep and apktool
         run: sudo apt install -y dexdump ripgrep apktool brotli
@@ -90,6 +90,7 @@ jobs:
             */*.json
             */*.md
             */*.html
+          retention-days: 5
 
       - name: Archive analysed apk
         uses: actions/upload-artifact@v4
@@ -97,6 +98,7 @@ jobs:
           name: analysed-apk
           path: |
             */*.apk
+          retention-days: 5
 
       - name: list directory contents of TinyWeatherForecastGermanyScan
         run: cd TinyWeatherForecastGermanyScan && ls -lisha
