@@ -1,5 +1,6 @@
 {
     "sonarlint.disableTelemetry": true,
     "gitlens.telemetry.enabled": false,
-    "redhat.telemetry.enabled": false
+    "redhat.telemetry.enabled": false,
+    "flake8.args": ["--max-line-length=120"]
 }
