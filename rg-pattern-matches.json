@@ -1,0 +1,27 @@
+{
+    "http": {
+        "https://opendata.dwd.de/climate_environment/health/alerts/s31fg.json": 1,
+        "http://opendata.dwd.de/climate_environment/health/alerts/s31fg.json": 1,
+        "https://maps.dwd.de/geoserver/dwd/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=dwd%3APollenfluggebiete&outputFormat=application%2Fjson": 1,
+        "http://maps.dwd.de/geoserver/dwd/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=dwd%3APollenfluggebiete&outputFormat=application%2Fjson": 1,
+        "https://opendata.dwd.de/weather/local_forecasts/mos/MOSMIX_L/single_stations/": 1,
+        "http://opendata.dwd.de/weather/local_forecasts/mos/MOSMIX_L/single_stations/": 1,
+        "https://opendata.dwd.de/weather/local_forecasts/dmo/icon-eu/single_stations/": 1,
+        "http://opendata.dwd.de/weather/local_forecasts/dmo/icon-eu/single_stations/": 1,
+        "http://opendata.dwd.de/weather/alerts/cap/COMMUNEUNION_DWD_STAT/Z_CAP_C_EDZW_LATEST_PVW_STATUS_PREMIUMDWD_COMMUNEUNION_EN.zip": 1,
+        "http://opendata.dwd.de/weather/alerts/cap/COMMUNEUNION_DWD_STAT/Z_CAP_C_EDZW_LATEST_PVW_STATUS_PREMIUMDWD_COMMUNEUNION_FR.zip": 1,
+        "http://opendata.dwd.de/weather/alerts/cap/COMMUNEUNION_DWD_STAT/Z_CAP_C_EDZW_LATEST_PVW_STATUS_PREMIUMDWD_COMMUNEUNION_ES.zip": 1,
+        "http://opendata.dwd.de/weather/alerts/cap/COMMUNEUNION_DWD_STAT/Z_CAP_C_EDZW_LATEST_PVW_STATUS_PREMIUMDWD_COMMUNEUNION_DE.zip": 1,
+        "https://opendata.dwd.de/weather/alerts/cap/COMMUNEUNION_DWD_STAT/Z_CAP_C_EDZW_LATEST_PVW_STATUS_PREMIUMDWD_COMMUNEUNION_EN.zip": 1,
+        "https://opendata.dwd.de/weather/alerts/cap/COMMUNEUNION_DWD_STAT/Z_CAP_C_EDZW_LATEST_PVW_STATUS_PREMIUMDWD_COMMUNEUNION_FR.zip": 1,
+        "https://opendata.dwd.de/weather/alerts/cap/COMMUNEUNION_DWD_STAT/Z_CAP_C_EDZW_LATEST_PVW_STATUS_PREMIUMDWD_COMMUNEUNION_ES.zip": 1,
+        "https://opendata.dwd.de/weather/alerts/cap/COMMUNEUNION_DWD_STAT/Z_CAP_C_EDZW_LATEST_PVW_STATUS_PREMIUMDWD_COMMUNEUNION_DE.zip": 1,
+        "https://openstreetmap.org/copyright": 1,
+        "https://opendata.dwd.de/weather/text_forecasts/txt/": 1,
+        "http://opendata.dwd.de/weather/text_forecasts/txt/": 1,
+        "https://opendata.dwd.de/weather/maritime/forecast/german/": 1,
+        "https://opendata.dwd.de/weather/maritime/forecast/english/": 1
+    },
+    "emails": {},
+    "ipaddress": {}
+}
