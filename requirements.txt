@@ -1,6 +1,6 @@
 androguard==4.1.1
 beautifulsoup4==4.12.3
-exodus-core==1.3.12
+exodus-core==1.3.13
 htmlmin==0.1.12
 Markdown==3.7
 regex==2024.9.11
