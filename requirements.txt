@@ -4,4 +4,4 @@ exodus-core==1.3.13
 htmlmin==0.1.12
 Markdown==3.7
 regex==2024.11.6
-ripgrepy==2.0.0
+ripgrepy==2.0.1
