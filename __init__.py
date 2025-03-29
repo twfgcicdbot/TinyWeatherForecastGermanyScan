@@ -129,7 +129,7 @@ headers = {"User-Agent": user_agent, "DNT": "1"}
 search_cb_req = requests.get(
     "https://codeberg.org/api/v1/repos/Starfish/TinyWeatherForecastGermany/releases?limit=1",
     headers=headers,
-    timeout=50,
+    timeout=120,
 )
 
 try:
@@ -304,7 +304,9 @@ if len(search_cb_json) == 1 and search_cb_json is not None:
                         result_markdown += "* **version**: *unknown* \n"
 
                     try:
-                        apk_v_code = str(analysis_temp.get_version_code()).replace("None", "")
+                        apk_v_code = str(analysis_temp.get_version_code()).replace(
+                            "None", ""
+                        )
                         if len(apk_v_code) > 1:
                             logging.debug(
                                 f"static analysis returned apk version code: {apk_v_code}"
@@ -387,9 +389,9 @@ if len(search_cb_json) == 1 and search_cb_json is not None:
                                             permission_desc = regex.sub(
                                                 r"(?im)(  )+", " ", permission_desc
                                             )
-                                        permissionDictTemp[
-                                            "description"
-                                        ] = permission_desc
+                                        permissionDictTemp["description"] = (
+                                            permission_desc
+                                        )
 
                                         pprint(permissionDictTemp)
                                     except Exception as error_msg:
@@ -524,9 +526,7 @@ if len(search_cb_json) == 1 and search_cb_json is not None:
 
                                         if (
                                             str(cert_tmp.issuer).strip().lower()
-                                            == str(cert_tmp.subject)
-                                            .strip()
-                                            .lower()
+                                            == str(cert_tmp.subject).strip().lower()
                                         ):
                                             cert_temp_md = '\n<details class="cert-details">\n<summary>click to expand</summary>\n\n<b>Issuer</b>: {} <br><b>Fingerprint</b>: <span>{}</span> <br><b>Serial</b>: {}<br></details>\n'.format(
                                                 cert_tmp.issuer,
@@ -1330,9 +1330,7 @@ Sitemap: https://twfgcicdbot.github.io/TinyWeatherForecastGermanyScan/sitemap.xm
 
                     last_mod_sitemap = ""
                     try:
-                        last_mod_sitemap = (
-                            f"<lastmod>{datetime.now(tzutc()).strftime('%Y-%m-%dT%H:%M+00:00')}</lastmod>"
-                        )
+                        last_mod_sitemap = f"<lastmod>{datetime.now(tzutc()).strftime('%Y-%m-%dT%H:%M+00:00')}</lastmod>"
                     except Exception as error_msg:
                         logging.error(
                             f"failed to generate meta tag 'pubdate' -> error: {error_msg}"

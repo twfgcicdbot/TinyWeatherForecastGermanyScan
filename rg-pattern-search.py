@@ -28,16 +28,18 @@ working_dir.mkdir(parents=True, exist_ok=True)  # create directory if not exists
 
 log_p = working_dir / "debug.log"
 try:
-    logging.basicConfig(format='%(asctime)-s %(levelname)s [%(name)s]: %(message)s',
-                        level=logging.DEBUG,
-                        handlers=[
-                            logging.FileHandler(log_p, encoding="utf-8"),
-                            logging.StreamHandler()
-                        ])
+    logging.basicConfig(
+        format="%(asctime)-s %(levelname)s [%(name)s]: %(message)s",
+        level=logging.DEBUG,
+        handlers=[
+            logging.FileHandler(log_p, encoding="utf-8"),
+            logging.StreamHandler(),
+        ],
+    )
 except Exception as error_msg:
     logging.error(f"while logger init! -> error: {error_msg}")
 
-apk_files = list(working_dir.glob('*.apk'))
+apk_files = list(working_dir.glob("*.apk"))
 pprint(apk_files)
 
 if len(apk_files) == 0:
@@ -50,23 +52,24 @@ apk_file_p = apk_files[0]
 logging.debug(f"reverse engineering '{apk_file_p}' using apktool ... ")
 # reverse engineering apk -> output: smali code
 twfg_apk_dir = "TinyWeatherForecastGermanyApk"
-subprocess.run(["apktool", "d", str(apk_file_p), "-o",
-               twfg_apk_dir, "-f"])
+subprocess.run(["apktool", "d", str(apk_file_p), "-o", twfg_apk_dir, "-f"])
 
-logging.debug(f"saved extracted contents of '{apk_file_p}'"
-              f" to '{twfg_apk_dir}/' ")
+logging.debug(f"saved extracted contents of '{apk_file_p}'" f" to '{twfg_apk_dir}/' ")
 
-rg_pattern = '(?im)http(s)*://'
-rg = Ripgrepy(rg_pattern, f'{twfg_apk_dir}/smali')
+rg_pattern = "(?im)http(s)*://"
+rg = Ripgrepy(rg_pattern, f"{twfg_apk_dir}/smali")
 http_matches_list = rg.H().n().json().run().as_dict
 
-logging.debug(f"found {len(http_matches_list)} matches"
-              f" for '{rg_pattern}' in smali code")
+logging.debug(
+    f"found {len(http_matches_list)} matches" f" for '{rg_pattern}' in smali code"
+)
 
 # with open("temp.json","w+",encoding="utf-8") as fh:
 #    fh.write(str(json.dumps(http_matches_list, indent=4)))
 
-url_re_pattern = regex.compile(r'(?im)\b((?:[a-z][\w-]+:(?:\/{1,3}|[a-z0-9%])|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}\/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:\'".,<>?«»“”‘’]))')
+url_re_pattern = regex.compile(
+    r'(?im)\b((?:[a-z][\w-]+:(?:\/{1,3}|[a-z0-9%])|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}\/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:\'".,<>?«»“”‘’]))'
+)
 http_cleaned_matches = {}
 
 for http_match_dict in http_matches_list:
@@ -95,11 +98,13 @@ pprint(http_cleaned_matches)
 # --------------- email ----------------------
 
 rg = Ripgrepy(
-    '(?im)^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$',
-    f'{twfg_apk_dir}/smali')
+    "(?im)^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$", f"{twfg_apk_dir}/smali"
+)
 email_matches_list = rg.H().n().json().run().as_dict
 
-logging.debug(f"found {len(email_matches_list)} matches for email pattern in smali code")
+logging.debug(
+    f"found {len(email_matches_list)} matches for email pattern in smali code"
+)
 
 # with open("temp.json","w+",encoding="utf-8") as fh:
 #    fh.write(str(json.dumps(email_matches_list, indent=4)))
@@ -156,10 +161,20 @@ pprint(ipaddress_cleaned_matches)
 #    fh.write(str(json.dumps(ipaddress_cleaned_matches, indent=4)))
 """
 
-with open("TinyWeatherForecastGermanyScan/rg-pattern-matches.json", "w+", encoding="utf-8") as file_handle:
-    file_handle.write(str(json.dumps({
-             "http": http_cleaned_matches,
-             "emails": email_cleaned_matches,
-             "ipaddress": ipaddress_cleaned_matches}, indent=4)))
+with open(
+    "TinyWeatherForecastGermanyScan/rg-pattern-matches.json", "w+", encoding="utf-8"
+) as file_handle:
+    file_handle.write(
+        str(
+            json.dumps(
+                {
+                    "http": http_cleaned_matches,
+                    "emails": email_cleaned_matches,
+                    "ipaddress": ipaddress_cleaned_matches,
+                },
+                indent=4,
+            )
+        )
+    )
 
 print("done")

@@ -41,13 +41,10 @@ jobs:
           python-version: 3.11.8
 
       - name: upgrade pip
-        run: python -m pip install --upgrade pip wheel setuptools
+        run: python -m pip install --upgrade pip wheel setuptools virtualenv
 
       - name: install dexdump, ripgrep and apktool
         run: sudo apt install -y dexdump ripgrep apktool brotli
-
-      - name: install virtualenv
-        run: pip install virtualenv
 
       - name: list directory contents
         run: ls -lisha
@@ -92,10 +89,10 @@ jobs:
             */*.html
           retention-days: 5
 
-      - name: Archive analysed apk
+      - name: Archive analyzed apk
         uses: actions/upload-artifact@v4
         with:
-          name: analysed-apk
+          name: analyzed-apk
           path: |
             */*.apk
           retention-days: 5
