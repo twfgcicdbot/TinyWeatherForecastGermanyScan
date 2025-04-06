@@ -32,8 +32,9 @@ jobs:
       - name: update packages
         run: timeout 120s sudo apt update || true
 
-      - name: upgrade packages
-        run: timeout 120s sudo apt upgrade -y || true
+      # temp deactivated due to dpkg issues
+      # - name: upgrade packages
+      #   run: timeout 120s sudo apt upgrade -y || true
 
       - name: Setup Python 3.11.x
         uses: actions/setup-python@v5
