@@ -81,7 +81,7 @@ jobs:
         run: du -sh
 
       - name: Archive analysis report and tracker signatures
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: reports-and-tracker-signatures
           path: |
@@ -91,7 +91,7 @@ jobs:
           retention-days: 5
 
       - name: Archive analyzed apk
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: analyzed-apk
           path: |
