@@ -1,0 +1,10 @@
+{
+    "http": {
+        "https://openstreetmap.org/copyright": 1,
+        "http://schemas.android.com/apk/res-auto": 1,
+        "https://maps.dwd.de/geoserver/dwd/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=dwd%3APollenfluggebiete&outputFormat=application%2Fjson": 1,
+        "http://maps.dwd.de/geoserver/dwd/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=dwd%3APollenfluggebiete&outputFormat=application%2Fjson": 1
+    },
+    "emails": {},
+    "ipaddress": {}
+}

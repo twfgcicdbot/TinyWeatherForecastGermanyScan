@@ -1,0 +1,108 @@
+{
+    "name": "Tiny Weather Forecast Germany",
+    "package": "de.kaffeemitkoffein.tinyweatherforecastgermany",
+    "hash_sha256": "2dac232f3a0e8029f9c06a869ab5cd6cf9ceab25cf2a88d7d553ae50c0578d2c",
+    "version": "0.63.2",
+    "version_code": "61",
+    "UID": "9516B3B40C249FEC74C079FEC8ED9036E97A7830",
+    "permissions": [
+        {
+            "description": "Allows the app to create network sockets and use custom network protocols. The browser and other applications provide means to send data to the internet, so this permission is not required to send data to the internet.",
+            "description_ptr": "permdesc_createNetworkSockets",
+            "label": "have full network access",
+            "label_ptr": "permlab_createNetworkSockets",
+            "name": "android.permission.INTERNET",
+            "permission_group": "",
+            "protection_level": "normal|instant"
+        },
+        {
+            "name": "android.permission.POST_NOTIFICATIONS"
+        },
+        {
+            "description": "Allows the app to view information about network connections such as which networks exist and are connected.",
+            "description_ptr": "permdesc_accessNetworkState",
+            "label": "view network connections",
+            "label_ptr": "permlab_accessNetworkState",
+            "name": "android.permission.ACCESS_NETWORK_STATE",
+            "permission_group": "",
+            "protection_level": "normal|instant"
+        },
+        {
+            "description": "Allows the app to read the sync settings for an account. For example, this can determine whether the People app is synced with an account.",
+            "description_ptr": "permdesc_readSyncSettings",
+            "label": "read sync settings",
+            "label_ptr": "permlab_readSyncSettings",
+            "name": "android.permission.READ_SYNC_SETTINGS",
+            "permission_group": "",
+            "protection_level": "normal"
+        },
+        {
+            "description": "This app can get your precise location from location services while the app is in use. Location services for your device must be turned on for the app to get location. This may increase battery usage.",
+            "description_ptr": "permdesc_accessFineLocation",
+            "label": "access precise location only in the foreground",
+            "label_ptr": "permlab_accessFineLocation",
+            "name": "android.permission.ACCESS_FINE_LOCATION",
+            "permission_group": "android.permission-group.LOCATION",
+            "protection_level": "dangerous|instant"
+        },
+        {
+            "description": "This app can access location at any time, even while the app is not in use.",
+            "description_ptr": "permdesc_accessBackgroundLocation",
+            "label": "access location in the background",
+            "label_ptr": "permlab_accessBackgroundLocation",
+            "name": "android.permission.ACCESS_BACKGROUND_LOCATION",
+            "permission_group": "android.permission-group.LOCATION",
+            "protection_level": "dangerous|instant"
+        },
+        {
+            "description": "Allows an app to modify the sync settings for an account. For example, this can be used to enable sync of the People app with an account.",
+            "description_ptr": "permdesc_writeSyncSettings",
+            "label": "toggle sync on and off",
+            "label_ptr": "permlab_writeSyncSettings",
+            "name": "android.permission.WRITE_SYNC_SETTINGS",
+            "permission_group": "",
+            "protection_level": "normal"
+        },
+        {
+            "description": "Allows the app to have itself started as soon as the system has finished booting. This can make it take longer to start the phone and allow the app to slow down the overall phone by always running.",
+            "description_ptr": "permdesc_receiveBootCompleted",
+            "label": "run at startup",
+            "label_ptr": "permlab_receiveBootCompleted",
+            "name": "android.permission.RECEIVE_BOOT_COMPLETED",
+            "permission_group": "",
+            "protection_level": "normal"
+        },
+        {
+            "description": "",
+            "description_ptr": "",
+            "label": "",
+            "label_ptr": "",
+            "name": "android.permission.AUTHENTICATE_ACCOUNTS",
+            "permission_group": "",
+            "protection_level": "normal"
+        },
+        {
+            "description": "This app can get your approximate location from location services while the app is in use. Location services for your device must be turned on for the app to get location.",
+            "description_ptr": "permdesc_accessCoarseLocation",
+            "label": "access approximate location only in the foreground",
+            "label_ptr": "permlab_accessCoarseLocation",
+            "name": "android.permission.ACCESS_COARSE_LOCATION",
+            "permission_group": "android.permission-group.LOCATION",
+            "protection_level": "dangerous|instant"
+        },
+        {
+            "description": "Allows an app to ask for permission to ignore battery optimizations for that app.",
+            "description_ptr": "permdesc_requestIgnoreBatteryOptimizations",
+            "label": "ask to ignore battery optimizations",
+            "label_ptr": "permlab_requestIgnoreBatteryOptimizations",
+            "name": "android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS",
+            "permission_group": "",
+            "protection_level": "normal"
+        }
+    ],
+    "libraries": [],
+    "certificates": [
+        "Issuer: Common Name: Pawel Dube, Organizational Unit: Unknown, Organization: Unknown, Locality: Hamburg, State/Province: Hamburg, Country: DE \n Subject: Common Name: Pawel Dube, Organizational Unit: Unknown, Organization: Unknown, Locality: Hamburg, State/Province: Hamburg, Country: DE \n Fingerprint: f7a5b59b8fbd6a6d287916881f2a5ab9343c5323 \n Serial: 263314478"
+    ],
+    "trackers": []
+}
